@@ -1,0 +1,217 @@
+<?php
+
+namespace App\Controller\Admin;
+
+use App\Entity\User;
+use App\Controller\DatatablesController;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+
+#[Route('/admin/users')]
+class UsersController extends AbstractController
+{
+    private $passwordEncoder, $em;
+
+    public function __construct(UserPasswordHasherInterface $passwordEncoder, ManagerRegistry $doctrine)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+        $this->em = $doctrine->getManager();
+    }
+    
+    #[Route('/', name: 'app_admin_users')]
+    public function index(): Response
+    {
+        return $this->render('admin/users/index.html.twig');
+    }
+
+    #[Route('/list', name: 'app_admin_users_list')]
+    public function list(Request $request): Response
+    {
+        
+        $params = $request->query;
+        // dd($params);
+        $where = $totalRows = $sqlRequest = "";
+        $filtre = "where active = 1";   
+        // dd($params->all('columns')[0]);
+            
+        $columns = array(
+            array( 'db' => 'u.id','dt' => 0),
+            array( 'db' => 'u.username','dt' => 1),
+            array( 'db' => 'u.roles','dt' => 2),
+            array( 'db' => 'u.valide','dt' => 3),
+
+        );
+        $sql = "SELECT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
+        
+        FROM user u 
+        
+        $filtre "
+        ;
+        // dd($sql);
+        $totalRows .= $sql;
+        $sqlRequest .= $sql;
+        $stmt = $this->em->getConnection()->prepare($sql);
+        $newstmt = $stmt->executeQuery();
+        $totalRecords = count($newstmt->fetchAll());
+        // dd($sql);
+            
+        // search 
+        $where = DatatablesController::Search($request, $columns);
+        if (isset($where) && $where != '') {
+            $sqlRequest .= $where;
+        }
+        $sqlRequest .= DatatablesController::Order($request, $columns);
+        // dd($sqlRequest);
+        $stmt = $this->em->getConnection()->prepare($sqlRequest);
+        $resultSet = $stmt->executeQuery();
+        $result = $resultSet->fetchAll();
+        
+        
+        $data = array();
+        // dd($result);
+        $i = 1;
+        foreach ($result as $key => $row) {
+            $nestedData = array();
+            $cd = $row['id'];
+            // dd($row);
+            
+            foreach (array_values($row) as $key => $value) {
+                if($key == 3) {
+                    $nestedData[] = $value == 2 ?  "<i class='fa fa-check-square text-success' id='$cd'></i>" : "<i class='fa fa-times-circle text-danger' id='$cd'></i>";
+                    $nestedData[] = "<button class='btn_reinitialiser btn btn-secondary' id='$cd'><i class='fas fa-sync'></i></button>";
+                }
+                if($key == 4) {
+                    
+                    $nestedData[] = implode(",", $this->em->getRepository(User::class)->find($cd)->getRoles());
+                } else {
+                    $nestedData[] = $value;
+                }
+            }
+            $nestedData[4] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-left" style="left: inherit; right: 0px;"><a href="#" id="btnDevalider" class="dropdown-item"><i class="fas fa-times-circle mr-2"></i> Dévalider/Valider</a><a href="#" class="dropdown-item" id="btnReinitialiser"><i class="fas fa-sync mr-2"></i> Reinitialiser</a><div class="dropdown-divider"></div><a id="btnSupprimer" href="#" class="dropdown-item"><i class="fas fa-trash mr-2"></i> Supprimer</a>';
+            $nestedData["DT_RowId"] = $cd;
+            $nestedData["DT_RowClass"] = "";
+            $data[] = $nestedData;
+            $i++;
+        }
+        // dd($data);
+        $json_data = array(
+            "draw" => intval($params->get('draw')),
+            "recordsTotal" => intval($totalRecords),
+            "recordsFiltered" => intval($totalRecords),
+            "data" => $data   
+        );
+        // die;
+        return new Response(json_encode($json_data));
+    }
+
+    #[Route('/fournisseurs', name: 'app_admin_users_fournisseurs')]
+    public function fournisseurs(ManagerRegistry $doctrine): Response
+    {
+        $entityManager = $doctrine->getManager('ugouv')->getConnection();
+        $query = "SELECT  code , nom, prenom from u_p_partenaire ";
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $fournisseurs = $result->fetchAll();
+
+        foreach ($fournisseurs as $key => $frs) {
+            $usernameExists = $this->em->createQueryBuilder()
+                ->select('u.id')
+                ->from(User::class, 'u')
+                ->where('u.username = :username')
+                ->setParameter('username', $frs['code'])
+                ->getQuery()
+                ->getOneOrNullResult();
+        
+            if ($usernameExists) {
+                $fournisseurs[$key]['existsInUserTable'] = true;
+            } else {
+                $fournisseurs[$key]['existsInUserTable'] = false;
+            }
+        }
+    // dd($fournisseurs);
+       return new JsonResponse([
+           'fournisseurs' => $fournisseurs
+       ]);
+    }
+
+    #[Route('/ajouter', name: 'app_admin_users_ajouter')]
+    public function ajouter(Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $selectedValues = $request->get('codes');
+        // dd($request->get('codes'));
+        $codes = explode(',', $selectedValues);
+
+        $defaultPassword = '0123456789';
+        
+
+
+        foreach ($codes as $code) {
+            $user = new User();
+            $user->setUsername($code);
+            $user->setPassword($passwordHasher->hashPassword(
+                $user,
+                $defaultPassword
+            ));
+            $user->setRoles(["ROLE_FRS"]);
+
+            $this->em->persist($user);
+        }
+    
+        $this->em->flush();
+
+        return $this->json([
+            'message' => 'Les utilisateurs son bien ajoutés!',
+        ]);
+    }
+
+    #[Route('/devalider/{id}', name: 'app_admin_users_devalider')]
+    public function devalider(Request $request, $id): Response
+    {
+        // dd($id);
+        $user = $this->em->getRepository(User::class)->find($id);
+        if ($user) {
+            $currentValiderValue = $user->getValide();
+            $newValiderValue = ($currentValiderValue == 1) ? 2 : 1;
+            $message = ($currentValiderValue == 1) ? "L'utilisateurs est bien validé!" : "L'utilisateurs est bien devalidé!";
+            $user->setValide($newValiderValue);
+            
+            $this->em->flush();
+            
+        }
+    
+        $this->em->flush();
+
+        return $this->json([
+            'message' => $message,
+        ]);
+    }
+
+    #[Route('/delete/{user}', name: 'app_admin_users_delete')]
+    public function delete(Request $request, User $user): Response
+    {
+        $user->setActive(0);
+        $this->em->flush();
+        
+        return new JsonResponse('Utilisateur bien supprimer!',200);
+    }
+
+    #[Route('/reset/{user}', name: 'app_admin_users_reset')]
+    public function reset(Request $request, User $user, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $defaultPassword = '0123456789';
+
+        $user->setPassword($passwordHasher->hashPassword(
+            $user,
+            $defaultPassword
+        ));
+        $this->em->flush();
+        
+        return new JsonResponse('Le mot de pass a bien réinitialiser!',200);
+    }
+}
