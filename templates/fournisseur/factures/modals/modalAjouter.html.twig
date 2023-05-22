@@ -1,0 +1,72 @@
+
+
+<div class="modal fade" id="ajouter_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h6 class="modal-title">Ajouter factures</h6>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+                    <div class="modal-body">
+                        <label>Reclamation:</label>
+                        <form id="formAjouter">
+                    
+                            <div class="row">
+                                
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="observation">Objet</label>
+                                        <textarea type="text" class="form-control" placeholder="Objet" name="objet"></textarea>
+                                    </div>
+                                </div>   
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <label for="observation">Observation</label>
+                                        <textarea type="text" class="form-control" placeholder="Observation" name="observation"></textarea>
+                                    </div>
+                                </div>   
+
+                            </div>
+                        
+                        </form>
+                    
+                    
+                        <hr>
+
+                        <h6>Liste des Factures:</h6>
+
+                        <table id="datatables_facture_ajoute" style="width: 100% !important"  class="table table-condensed table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="">N° Facture</th>
+                                            <th width="10%">Date</th>
+                                            <th width="10%">Montant</th>
+                                            <th width="">Observation</th>
+                                            <th width="5%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input class="form-control" id="numFacture"  placeholder="N° Facture"></td>
+                                            <td width="15%" ><input class="form-control" type="date" id="date"  placeholder="Date"></td>
+                                            <td><input class="form-control" type="number" step="0.01" id="montant"  placeholder="Montant"></td>
+                                            <td><input class="form-control" id="observation"  placeholder="Observation"></td>
+                                            <td style="width:4% !important"><a id="btnAjouterFacture"class="btn btn-secondary btn-xs pull-right" style="width: 20px;"><i class="fas fa-plus"></i></a></td>
+                                        </tr>
+                                    </tbody>
+                        </table>
+                
+                        
+                    
+                    </div>
+                        
+                    <div class="modal-footer" style="float: right;">
+                        <button type="submit" form="formAjouter" class="btn btn-danger btn-xs pull-right" style="width: 100px;">Reclamer</button>  
+                    </div>
+            </div>
+        <!-- /.modal-dialog -->
+        </div>
+    </div>
+</div>

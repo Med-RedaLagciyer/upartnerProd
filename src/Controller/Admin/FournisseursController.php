@@ -40,6 +40,13 @@ class FournisseursController extends AbstractController
             array( 'db' => 'p.code','dt' => 1),
             array( 'db' => 'p.nom','dt' => 2),
             array( 'db' => 'p.prenom','dt' => 3),
+            array( 'db' => 'p.mail1','dt' => 4),
+            array( 'db' => 'p.tel1','dt' => 5),
+            array( 'db' => 'p.adresse','dt' => 6),
+            array( 'db' => 'p.pays','dt' => 7),
+            array( 'db' => 'p.ville','dt' => 8),
+            array( 'db' => 'p.societe','dt' => 9),
+            array( 'db' => 'p.ICE','dt' => 10),
 
         );
         $sql = "SELECT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -77,16 +84,8 @@ class FournisseursController extends AbstractController
             // dd($row);
             
             foreach (array_values($row) as $key => $value) {
-                if($key == 5) {
-                    $nestedData[] = $value == 2 ?  "<i class='fas fa-lock-open disable text-success' id='$cd'></i>" : "<i class='enable fas fa-lock text-danger' id='$cd'></i>";
-                    $nestedData[] = "<button class='btn_reinitialiser btn btn-secondary' id='$cd'><i class='fas fa-sync'></i></button>";
-                }
-                if($key == 4) {
-                    
-                    $nestedData[] = implode(",", $this->em->getRepository(User::class)->find($cd)->getRoles());
-                } else {
+                
                     $nestedData[] = $value;
-                }
             }
             $nestedData["DT_RowId"] = $cd;
             $nestedData["DT_RowClass"] = "";

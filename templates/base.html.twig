@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gestion Reclamation | {% block title %}{% endblock %}</title>
+  <title>Espace Fournisseur | {% block title %}{% endblock %}</title>
 
 {% block styles %}
   <!-- Google Font: Source Sans Pro -->
@@ -33,17 +33,21 @@
   <!-- Main Sidebar Container -->
   {% include 'inc/sidebar.html.twig' %}
 
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>{% block pagetitle %}
-				
-			{% endblock %}</h1>
-          </div>
+        <div class="row mb-2"style="
+    height: 39px;
+    margin-bottom: 0px !important; justify-content: space-between;
+    ">
+          <ul id="breadcrumb">
+              <li><a ><i class="fas fa-home"></i></a></li>
+              <li><a ><span class="icon icon-beaker"> </span> {% block pagetitle %}{% endblock %}</a></li>
+          </ul>
+          {% block buttons %}{% endblock %}
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -51,31 +55,24 @@
     <!-- Main content -->
     <section class="content">
 
+      {% block body %}
+  
+      {% endblock %}
       <!-- Default box -->
-      <div class="card">
-        <div class="card-body">
-          {% block body %}
-			
-		  {% endblock %}
-        </div>
-        <!-- /.card-body -->
-        {# <div class="card-footer">
-          Footer
-        </div> #}
-        <!-- /.card-footer-->
-      </div>
+      
       <!-- /.card -->
+  {% include 'inc/modals/password.html.twig' %}
 
     </section>
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
 
-  <footer class="main-footer">
+  {# <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
     </div>
     <strong>Copyright &copy; 2023- <a href="#">FCZ</a> MTSI</strong> All rights reserved.
-  </footer>
+  </footer> #}
 
 </div>
 <!-- ./wrapper -->
@@ -87,6 +84,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
   <!-- Bootstrap 4 -->
   <script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+   <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- AdminLTE App -->
   <script src="{{asset('dist/js/adminlte.min.js')}}"></script>
   <!-- AdminLTE for demo purposes -->
@@ -102,6 +101,42 @@
 <script src="{{asset('plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js')}}"></script>
 
 <script>
+  $(document).ready(function(){
+    var Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+      $(".password_change").on("click", function(){
+          $("#password_modal").modal("show")
+      })
+      $("#password_modal #save_password_change").on("submit", async function(e) {
+          e.preventDefault();
+          var formData = new FormData($(this)[0])
+
+          try {
+            
+              const request = await axios.post('/passwordchange', formData);
+              const response = request.data;
+
+              // icon.addClass('fa-check-circle').removeClass("fa-spinner fa-spin ");
+              // $('#password_modal #save')[0].reset();
+              // $("#password_modal").modal("hide")
+              window.location.href="/logout";
+          } catch (error) {
+              console.log(error, error.response);
+              const message = error.response.data;
+              Toast.fire({
+                  icon: 'error',
+                  title: message,
+                })
+              icon.addClass('fa-check-circle').removeClass("fa-spinner fa-spin ");
+              
+          }
+      })
+  })
   $(function () {
       //Initialize Select2 Elements
       $('.select2').select2()

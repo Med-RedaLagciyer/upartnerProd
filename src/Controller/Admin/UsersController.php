@@ -43,8 +43,10 @@ class UsersController extends AbstractController
         $columns = array(
             array( 'db' => 'u.id','dt' => 0),
             array( 'db' => 'u.username','dt' => 1),
-            array( 'db' => 'u.roles','dt' => 2),
-            array( 'db' => 'u.valide','dt' => 3),
+            array( 'db' => 'u.nom','dt' => 2),
+            array( 'db' => 'u.prenom','dt' => 3),
+            array( 'db' => 'u.roles','dt' => 4),
+            array( 'db' => 'u.valide','dt' => 5),
 
         );
         $sql = "SELECT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -82,18 +84,21 @@ class UsersController extends AbstractController
             // dd($row);
             
             foreach (array_values($row) as $key => $value) {
-                if($key == 3) {
+                
+                // dd($fournisseur);
+
+
+
+                if($key == 5) {
                     $nestedData[] = $value == 2 ?  "<i class='fa fa-check-square text-success' id='$cd'></i>" : "<i class='fa fa-times-circle text-danger' id='$cd'></i>";
                     $nestedData[] = "<button class='btn_reinitialiser btn btn-secondary' id='$cd'><i class='fas fa-sync'></i></button>";
-                }
-                if($key == 4) {
-                    
-                    $nestedData[] = implode(",", $this->em->getRepository(User::class)->find($cd)->getRoles());
                 } else {
                     $nestedData[] = $value;
                 }
+
+                
             }
-            $nestedData[4] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-left" style="left: inherit; right: 0px;"><a href="#" id="btnDevalider" class="dropdown-item"><i class="fas fa-times-circle mr-2"></i> Dévalider/Valider</a><a href="#" class="dropdown-item" id="btnReinitialiser"><i class="fas fa-sync mr-2"></i> Reinitialiser</a><div class="dropdown-divider"></div><a id="btnSupprimer" href="#" class="dropdown-item"><i class="fas fa-trash mr-2"></i> Supprimer</a>';
+            $nestedData[6] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-left"><a href="#" id="btnDevalider" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Dévalider/Valider</a><a href="#" class="dropdown-item btn-xs" id="btnReinitialiser"><i class="fas fa-sync mr-2"></i> Reinitialiser</a><div class="dropdown-divider"></div><a id="btnSupprimer" href="#" class="dropdown-item btn-xs"><i class="fas fa-trash mr-2"></i> Supprimer</a>';
             $nestedData["DT_RowId"] = $cd;
             $nestedData["DT_RowClass"] = "";
             $data[] = $nestedData;
@@ -114,7 +119,7 @@ class UsersController extends AbstractController
     public function fournisseurs(ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager('ugouv')->getConnection();
-        $query = "SELECT  code , nom, prenom from u_p_partenaire ";
+        $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $fournisseurs = $result->fetchAll();
@@ -141,19 +146,34 @@ class UsersController extends AbstractController
     }
 
     #[Route('/ajouter', name: 'app_admin_users_ajouter')]
-    public function ajouter(Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function ajouter(Request $request, UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine): Response
     {
         $selectedValues = $request->get('codes');
+
+        if(!$selectedValues){
+            return new JsonResponse('Vous devez selectionner un ou plusieurs fournisseurs!',500);
+        }
         // dd($request->get('codes'));
         $codes = explode(',', $selectedValues);
 
         $defaultPassword = '0123456789';
+
+        
+        
         
 
 
         foreach ($codes as $code) {
+            $entityManager = $doctrine->getManager('ugouv')->getConnection();
+
+        $query = "SELECT nom, prenom FROM `u_p_partenaire` where code ='" . $code ."';";
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $fournisseur = $result->fetchAll();
             $user = new User();
             $user->setUsername($code);
+            $user->setNom($fournisseur[0]['nom']);
+            $user->setPrenom($fournisseur[0]['prenom']);
             $user->setPassword($passwordHasher->hashPassword(
                 $user,
                 $defaultPassword

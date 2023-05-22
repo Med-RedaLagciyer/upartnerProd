@@ -1,31 +1,10 @@
-{# <div class="modal fade" id="modalAjouter">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-				<h4 class="modal-title">Ajouter un compte fournisseur</h4>
-			</div>
-			<div class="modal-body">
-				<form id="save">
 
-                    <label for="categorie">Fournisseurs:</label>
-                    <select class="form-control" name="categorie" id="fournisseurs">
-                        <option value="">Choix fournisseurs </option>
-                            <option value=""></option>
-                    </select>
-                    <br>
-                    <button type="submit" class="btn btn-success mt-4"><i class="fa fa-check"></i> Créer Compte</button>
-                </form>
-			</div>
-		</div>
-	</div>
-</div> #}
 
 <div class="modal fade" id="modalAjouter">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h4 class="modal-title">Ajouter un compte fournisseur</h4>
+              <h6 class="modal-title">Ajouter un compte fournisseur</h6>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -41,9 +20,9 @@
                     {# <button type="submit" class="btn btn-success mt-4"><i class="fa fa-check"></i> Créer Compte</button> #}
                 
 				</div>
-				<div class="modal-footer justify-content-between">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="submit" id="btnCreeCompte" class="btn btn-success mt-4"><i class="fa fa-check"></i> Créer Compte</button>
+				<div class="modal-footer justify-content-between" style="float: right !important">
+					{# <button type="button" class="btn btn-default mt-4" data-dismiss="modal">Exit</button> #}
+					<button type="submit" id="btnCreeCompte" class="btn btn-success btn-xs"><i class="fa fa-check"></i> Créer Compte</button>
 				</div>
 			</form>
           </div>

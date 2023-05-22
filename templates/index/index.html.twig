@@ -1,25 +1,61 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello IndexController!{% endblock %}
-
-
-{% block pagetitle %}
-    Index
-{% endblock %}
-
-{% block body %}
+{% extends 'base.html.twig' %} {% block title %}{% endblock %} {% block
+pagetitle %} Index {% endblock %} {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .small-box{
+        font-size: 100% !important;
+    }
 </style>
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+              <div class="inner">
+                <h3>{{donnee.userCount}}</h3>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+                <p>Utilisateurs</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-users" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+              <div class="inner">
+                <h3>{{donnee.factureCount}}</h3>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/xampp/htdocs/gest_rec_frs/src/Controller/IndexController.php'|file_link(0) }}">src/Controller/IndexController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/xampp/htdocs/gest_rec_frs/templates/index/index.html.twig'|file_link(0) }}">templates/index/index.html.twig</a></code></li>
-    </ul>
-</div>
+                <p>Factures</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+              <div class="inner">
+                <h3>{{donnee.fournisseurCount}}</h3>
+
+                <p>Fournisseurs</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-user" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+              <div class="inner">
+                <h3>{{donnee.reclamationCount}}</h3>
+
+                <p>Reclamations</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-exclamation-triangle" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+
+    
+  </div>
+
 {% endblock %}

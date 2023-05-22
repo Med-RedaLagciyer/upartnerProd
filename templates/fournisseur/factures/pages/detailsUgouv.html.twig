@@ -1,0 +1,46 @@
+
+
+<label>Reclamation:</label>
+<div class="row">
+          <div class="col-3">
+            <div class="form-group">
+              <label>Objet:</label>
+              <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea>
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="form-group">
+              <label>Observation: </label>
+              <textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+            </div>
+          </div>
+</div>
+<hr>
+
+<div class="row">
+          <div class="col-12">
+            <label>Liste des articles:</label>
+
+            <table id="datatables_detail_facture" style="width: 100% !important"  class="table table-condensed table-bordered">
+                <thead>
+                    <tr>
+                        <th width="">Article</th>
+                        <th width="10%">Unite</th>
+                        <th width="10%">Quantite</th>
+                        <th width="10%">Prix Unt</th>
+                        <th width="10%">Tva</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                        <td id="article">{{dets.article}}</td>
+                        <td id="unite">{{dets.unite}}</td>
+                        <td id="quantite">{{dets.quantite}}</td>
+                        <td id="prixunitaire">{{dets.prixunitaire}}</td>
+                        <td id="tva">{{dets.tva}}</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+          
+</div>
