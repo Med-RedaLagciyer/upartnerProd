@@ -187,6 +187,10 @@ body {
     overflow: visible;
 } */
 
+#btnAjouter:hover{
+    text-decoration: underline;
+}
+
 table.dataTable{
     font-size: 12px !important;
     border-collapse: collapse !important;

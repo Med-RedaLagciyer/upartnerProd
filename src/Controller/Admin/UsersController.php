@@ -98,7 +98,7 @@ class UsersController extends AbstractController
 
                 
             }
-            $nestedData[6] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-left"><a href="#" id="btnDevalider" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Dévalider/Valider</a><a href="#" class="dropdown-item btn-xs" id="btnReinitialiser"><i class="fas fa-sync mr-2"></i> Reinitialiser</a><div class="dropdown-divider"></div><a id="btnSupprimer" href="#" class="dropdown-item btn-xs"><i class="fas fa-trash mr-2"></i> Supprimer</a>';
+            $nestedData[6] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"><a href="#" id="btnDevalider" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Dévalider/Valider</a><a href="#" class="dropdown-item btn-xs" id="btnReinitialiser"><i class="fas fa-sync mr-2"></i> Reinitialiser</a><div class="dropdown-divider"></div><a id="btnSupprimer" href="#" class="dropdown-item btn-xs"><i class="fas fa-trash mr-2"></i> Supprimer</a>';
             $nestedData["DT_RowId"] = $cd;
             $nestedData["DT_RowClass"] = "";
             $data[] = $nestedData;
