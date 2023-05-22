@@ -1,0 +1,121 @@
+<aside class="main-sidebar sidebar-dark-primary elevation-4 text-sm">
+    <!-- Brand Logo -->
+    <a href="{{path('app_index')}}" class="brand-link">
+      <img src="{{asset('dist/img/fcz.png')}}" alt="Fcz" class="brand-image " style="margin-left: 0;opacity: .8">
+      <span class="brand-text font-weight-light">Espace Fournisseur</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column nav-flat nav-compact" data-widget="treeview" role="menu" data-accordion="false">
+          
+          {# for administration #}
+        {% if is_granted('ROLE_ADMIN') %}
+          <li class="nav-item menu-is-opening menu-open">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users-cog"></i>
+              <p>
+                Administration
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{path('app_admin_users')}}" class="nav-link {% if 'app_admin_users' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>Utilisateurs</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{path('app_admin_fournisseurs')}}" class="nav-link {% if 'app_admin_fournisseurs' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>Fournisseurs</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{path('app_admin_reclamations')}}" class="nav-link {% if 'app_admin_reclamations' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>Reclamations</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+        {% elseif  app.user.valide == 2 %}
+          {# for fournisseurs #}
+          <li class="nav-item menu-is-opening menu-open">
+            <a href="#" class="nav-link">
+              <i class="nav-icon far fa-envelope"></i>
+              <p>
+                 Reclamations
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{path('app_fournisseur_factures')}}" class="nav-link {% if 'app_fournisseur_factures' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>List des factures</p>
+                </a>
+              </li>
+              {# <li class="nav-item">
+                <a href="{{path('app_fournisseur_reclamations')}}" class="nav-link {% if 'app_fournisseur_reclamations' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>Reclamations</p>
+                </a>
+              </li> #}
+            </ul>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a href="{{path('app_fournisseur_validation')}}" class="nav-link {% if 'app_fournisseur_validation' in app.request.get('_route') %}active{% endif %}">
+              <i class="nav-icon fas fa-wrench"></i>
+              <p>
+                Validation
+              </p>
+            </a>
+          </li> 
+        {% endif %}
+          {# <li class="nav-item {% if 'app_fournisseurs' in app.request.get('_route') %}menu-is-opening menu-open{% endif %}">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users-cog"></i>
+              <p>
+                Administration
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{path('app_admin_users')}}" class="nav-link {% if 'app_admin_users' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>Utilisateurs</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{path('app_admin_fournisseurs')}}" class="nav-link {% if 'app_admin_fournisseurs' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>Fournisseurs</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="../widgets.html" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Widgets
+                <span class="right badge badge-danger">New</span>
+              </p>
+            </a>
+          </li> #}
+          
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>

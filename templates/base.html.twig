@@ -1,19 +1,156 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Espace Fournisseur | {% block title %}{% endblock %}</title>
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+{% block styles %}
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{asset('dist/css/adminlte.min.css')}}">
+    <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="{{asset('plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css')}}">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="{{asset('plugins/toastr/toastr.min.css')}}">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{{asset('plugins/select2/css/select2.min.css')}}">
+  <link rel="stylesheet" href="{{asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="{{asset('plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css')}}">
+{% endblock %}
+</head>
+<body class="sidebar-mini control-sidebar-slide-open layout-fixed text-sm">
+<!-- Site wrapper -->
+<div class="wrapper">
+  <!-- Navbar -->
+  {% include 'inc/navbar.html.twig' %}
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+  {% include 'inc/sidebar.html.twig' %}
+
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2"style="
+    height: 39px;
+    margin-bottom: 0px !important; justify-content: space-between;
+    ">
+          <ul id="breadcrumb">
+              <li><a ><i class="fas fa-home"></i></a></li>
+              <li><a ><span class="icon icon-beaker"> </span> {% block pagetitle %}{% endblock %}</a></li>
+          </ul>
+          {% block buttons %}{% endblock %}
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      {% block body %}
+  
+      {% endblock %}
+      <!-- Default box -->
+      
+      <!-- /.card -->
+  {% include 'inc/modals/password.html.twig' %}
+
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  {# <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+    </div>
+    <strong>Copyright &copy; 2023- <a href="#">FCZ</a> MTSI</strong> All rights reserved.
+  </footer> #}
+
+</div>
+<!-- ./wrapper -->
+
+{% block javascripts %}
+  <!-- jQuery -->
+  <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
+  <!-- axios -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+   <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- AdminLTE App -->
+  <script src="{{asset('dist/js/adminlte.min.js')}}"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="{{asset('dist/js/demo.js')}}"></script>
+  <!-- SweetAlert2 -->
+<script src="{{asset('plugins/sweetalert2/sweetalert2.min.js')}}"></script>
+<!-- Toastr -->
+<script src="{{asset('plugins/toastr/toastr.min.js')}}"></script>
+
+<!-- Select2 -->
+<script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
+<!-- Bootstrap4 Duallistbox -->
+<script src="{{asset('plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js')}}"></script>
+
+<script>
+  $(document).ready(function(){
+    var Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+      $(".password_change").on("click", function(){
+          $("#password_modal").modal("show")
+      })
+      $("#password_modal #save_password_change").on("submit", async function(e) {
+          e.preventDefault();
+          var formData = new FormData($(this)[0])
+
+          try {
+            
+              const request = await axios.post('/passwordchange', formData);
+              const response = request.data;
+
+              // icon.addClass('fa-check-circle').removeClass("fa-spinner fa-spin ");
+              // $('#password_modal #save')[0].reset();
+              // $("#password_modal").modal("hide")
+              window.location.href="/logout";
+          } catch (error) {
+              console.log(error, error.response);
+              const message = error.response.data;
+              Toast.fire({
+                  icon: 'error',
+                  title: message,
+                })
+              icon.addClass('fa-check-circle').removeClass("fa-spinner fa-spin ");
+              
+          }
+      })
+  })
+  $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  });
+</script>
+
+
+
+{% endblock %}
+</body>
+
 </html>

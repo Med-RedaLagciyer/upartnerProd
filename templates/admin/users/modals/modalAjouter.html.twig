@@ -1,0 +1,32 @@
+
+
+<div class="modal fade" id="modalAjouter">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h6 class="modal-title">Ajouter un compte fournisseur</h6>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+			<form id="save">
+            	<div class="modal-body">
+              
+                    <label for="categorie">Fournisseurs:</label>
+                    <select class="select2 form-control" multiple name="categorie" id="fournisseurs">
+                        <option value="" disabled>Choix fournisseurs </option>
+                    </select>
+                    <br>
+                    {# <button type="submit" class="btn btn-success mt-4"><i class="fa fa-check"></i> Créer Compte</button> #}
+                
+				</div>
+				<div class="modal-footer justify-content-between" style="float: right !important">
+					{# <button type="button" class="btn btn-default mt-4" data-dismiss="modal">Exit</button> #}
+					<button type="submit" id="btnCreeCompte" class="btn btn-success btn-xs"><i class="fa fa-check"></i> Créer Compte</button>
+				</div>
+			</form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+</div>

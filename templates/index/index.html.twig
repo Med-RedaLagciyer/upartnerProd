@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %} {% block title %}{% endblock %} {% block
+pagetitle %} Index {% endblock %} {% block body %}
+<style>
+    .small-box{
+        font-size: 100% !important;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+              <div class="inner">
+                <h3>{{donnee.userCount}}</h3>
+
+                <p>Utilisateurs</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-users" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+              <div class="inner">
+                <h3>{{donnee.factureCount}}</h3>
+
+                <p>Factures</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+              <div class="inner">
+                <h3>{{donnee.fournisseurCount}}</h3>
+
+                <p>Fournisseurs</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-user" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+              <div class="inner">
+                <h3>{{donnee.reclamationCount}}</h3>
+
+                <p>Reclamations</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-exclamation-triangle" style="font-size: 50px !important;"></i>
+              </div>
+        </div>
+    </div>
+
+    
+  </div>
+
+{% endblock %}

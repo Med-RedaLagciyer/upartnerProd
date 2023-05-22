@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Factures{% endblock %}
+
+{% block pagetitle %}Liste des factures{% endblock %}
+{% block buttons %}
+            <ul id="">
+              <a type="button" id="btnAjouter" class="btn btn-success mt-1" style ="font-size: 12px !important; padding:7px !important"><i class="fa fa-plus"></i> Autre Factures</a>
+            </ul>
+{% endblock %}
+{% block stylesheets %} 
+    {{parent()}}
+{% endblock %}
+{% block body %}
+	{# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" /> #}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" />
+
+<div class="card card-tabs">
+        <div class="card-header p-0 pt-1">
+            <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true" style="color: #6f6f6f;">Factures comptabilisé</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false" style="color: #6f6f6f;">Factures non comptabilisé</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="custom-tabs-one-tabContent">
+                <div class="tab-pane fade active show" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
+                    <div class="card-header" style="padding: 10px 0 !important;border:none !important">
+                        <h3 class="card-title">
+                        </h3>
+                        <div class="card-tools" style="margin: 0;">
+                            <ul class="nav nav-pills ml-auto">
+                                <li class="nav-item" style=" float: right !important;">
+                                    <a id="btnReclamer" class="btn btn-danger btn-xs buttons-html5 btn-sm" style=" float: right !important;font-size : 12px !important;"><i class="fas fa-exclamation-triangle"></i>  <span>Reclamer</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <table id="datatables_gestion_factures" class="table table-condensed table-bordered">
+                            <thead>
+                                <tr>
+                                    <th><input type ="checkbox" class="check_all_factures"></th>
+                                    <th>N° facture</th>
+                                    <th>N° facture FRS</th>
+                                    <th>Montant</th>
+                                    <th>Date facture</th>
+                                    <th>Date document FRS</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
+                    <div>
+                        <table id="datatables_gestion_factures_2" class="table table-condensed table-bordered">
+                            <thead>
+                                <tr>
+                                    <th><input type ="checkbox" class="check_all_factures"></th>
+                                    <th>N° facture</th>
+                                    <th>Montant</th>
+                                    <th>Observation</th>
+                                    <th>Date facture</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# <div class="card-header">
+                <h3 class="card-title">
+                </h3>
+                
+            </div>
+            <br> #}
+            {# <div class="" >
+                    <div class="dt-buttons btn-group pull-right">
+                        <a id="btnReclamer" class="btn btn-danger btn-xs buttons-html5 btn-sm" style=" float: right !important;"<i class="fas fa-exclamation-triangle"></i>  <span>Reclamer</span></a>
+                    </div>
+            </div> #}
+            {# <div class="panel panel-inverse" >
+                <div class="panel-body">
+                             
+                </div>
+            </div> #}
+            
+        </div>
+</div>
+
+<!-- #modal-dialog -->
+{% include 'fournisseur/factures/modals/modalDetails.html.twig' %}
+{% include 'fournisseur/factures/modals/modalReclamer.html.twig' %}
+{% include 'fournisseur/factures/modals/modalAjouter.html.twig' %}
+
+
+    
+    {# {# <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script> #}
+
+    
+
+{% endblock %}
+
+{% block javascripts %}
+    {{parent()}}
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="{{asset('dist/js/components/fournisseur/factures.js')}}"></>
+<script>
+    
+</script>
+
+{% endblock %}
