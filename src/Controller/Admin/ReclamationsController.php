@@ -2,9 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Statut;
+use App\Entity\Reponse;
 use App\Entity\Reclamation;
 use App\Controller\DatatablesController;
-use App\Entity\Reponse;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -137,39 +138,73 @@ class ReclamationsController extends AbstractController
 
         $entityManager = $doctrine->getManager('ugouv')->getConnection();
 
-        $query = "SELECT cab.* FROM `ua_t_facturefrscab` cab where id_reclamation =" . $reclamation->getId();
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $factures = $result->fetchAll();
-        // dd($factures);
+        if($reclamation->getFactures()){
+            $factures = $reclamation->getFactures();
+            // dd($factures);
+            $reclamation_infos = $this->render("admin/reclamations/pages/infos_reclamation.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local'=>true
+            ])->getContent();
+            
+            $reclamation_repondre = $this->render("admin/reclamations/pages/repondre_reclamation.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local'=>true
+            ])->getContent();
+            // dd($reclamation);
+            return new JsonResponse([
+                'infos' => $reclamation_infos,
+                'repondre' => $reclamation_repondre,
+                'local'=>true
+            ]);
+        }else{
+            $query = "SELECT cab.* FROM `ua_t_facturefrscab` cab where id_reclamation =" . $reclamation->getId();
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $factures = $result->fetchAll();
+            // dd($factures);
+            $reclamation_infos = $this->render("admin/reclamations/pages/infos_reclamation.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local'=>false
+            ])->getContent();
+            
+            $reclamation_repondre = $this->render("admin/reclamations/pages/repondre_reclamation.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local'=>false
+                
+            ])->getContent();
+            // dd($reclamation);
+            return new JsonResponse([
+                'infos' => $reclamation_infos,
+                'repondre' => $reclamation_repondre,
+                'local'=>false
+            ]);
+        }
+
         
-        $reclamation_infos = $this->render("admin/reclamations/pages/infos_reclamation.html.twig", [
-            'factures' => $factures,
-            'reclamation' => $reclamation,
-        ])->getContent();
         
-        $reclamation_repondre = $this->render("admin/reclamations/pages/repondre_reclamation.html.twig", [
-            'factures' => $factures,
-            'reclamation' => $reclamation,
-        ])->getContent();
-        // dd($reclamation);
-        return new JsonResponse([
-            'infos' => $reclamation_infos,
-            'repondre' => $reclamation_repondre
-        ]);
+        
     }
 
 
     
 
     #[Route('/message', name: 'app_admin_reclamations_message')]
-    public function message(Request $request, ManagerRegistry $doctrine): Response
+    public function message(Request $request, ManagerRegistry $doctrine,): Response
     {
+        $entityManager = $doctrine->getManager('ugouv')->getConnection();
         // dd($request);
         if($request->get("message")){
             $reclamation = $this->em->getRepository(Reclamation::class)->find($request->get("reclamation"));
             // dd($reclamation);
-            // dd('hi');
+            
+            
+
+            
+           
             $reponse = new Reponse();
 
             $reponse->setMessage($request->get("message"));
@@ -183,6 +218,39 @@ class ReclamationsController extends AbstractController
             $this->em->persist($reponse);
 
             $this->em->flush();
+
+            $statut = $this->em->getRepository(Statut::class)->find(3);
+            
+            if($reclamation->getFactures()){
+                $factures = $reclamation->getFactures();
+                if($factures){
+                    foreach($factures as $facture){
+                        // dd($facture);
+                        $facture->setStatut($statut);
+
+                        $this->em->flush();
+                        // dd($facture);
+                        
+                        // dd('hi');
+                    }
+                }
+            }else{
+                $query = "SELECT * FROM `ua_t_facturefrscab` where id_reclamation =" . $reclamation->getId();
+                $statement = $entityManager->prepare($query);
+                $result = $statement->executeQuery();
+                $factures = $result->fetchAll();
+                if($factures){
+                    foreach($factures as $facture){
+                            $entityManager = $doctrine->getManager('ugouv')->getConnection();
+                            $query = "UPDATE ua_t_facturefrscab SET statut_reclamation_id = 3 where id = " .$facture['id'];
+                            $statement = $entityManager->prepare($query);
+                            $result = $statement->executeQuery();
+                        // dd($facture);
+                        
+                        // dd('hi');
+                    }
+                }
+            }
             
 
             return new JsonResponse([

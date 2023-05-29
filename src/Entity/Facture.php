@@ -44,6 +44,9 @@ class Facture
     #[ORM\Column(nullable: true)]
     private ?bool $active = true;
 
+    #[ORM\ManyToOne(inversedBy: 'factures')]
+    private ?Statut $statut = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -166,6 +169,18 @@ class Facture
     public function setActive(?bool $active): self
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getStatut(): ?Statut
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(?Statut $statut): self
+    {
+        $this->statut = $statut;
 
         return $this;
     }

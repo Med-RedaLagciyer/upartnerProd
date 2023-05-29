@@ -6,6 +6,7 @@ use App\Entity\Facture;
 use App\Entity\Reponse;
 use App\Entity\Reclamation;
 use App\Controller\DatatablesController;
+use App\Entity\Statut;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,12 +50,17 @@ class facturesController extends AbstractController
             array( 'db' => 'f.datefacture','dt' => 4),
             array( 'db' => 'f.dateDocAsso','dt' => 5),
             array( 'db' => 'f.id_reclamation','dt' => 6),
+            
+            array( 'db' => 'UPPER(o.id)','dt' =>7),
+            array( 'db' => 'o.executer','dt' => 8),
+            array( 'db' => 'f.statut_reclamation_id','dt' => 9),
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
         
         FROM ua_t_facturefrscab f 
         inner join u_p_partenaire p on p.id = f.partenaire_id
+        left join u_general_operation o on o.facture_fournisseur_id = f.id
         
         $filtre "
         ;
@@ -87,16 +93,20 @@ class facturesController extends AbstractController
             $cd = $row['id'];
             // dd($row);
             // $nestedData[] = "<input type ='checkbox' class='checkfacture' id ='$cd' value='$cd'>";
-            foreach (array_values($row) as $key => $value) {
-                if($key == 6){
-                    // $nestedData[] = $value == 1 ? 'oui' : 'non';
-                    $nestedData[0] = $value == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
-                    
-                    $nestedData[6] = $value == null ? '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="ugouv" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="ugouv" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' : '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"  style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="ugouv" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="ugouv" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>';
-                }
-                else{
-                    $nestedData[] = $value;
-                }
+            $nestedData[] = $row['id_reclamation'] == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
+            $nestedData[] = $row['code'];
+            $nestedData[] = $row['refDocAsso'];
+            $nestedData[] = $row['montant'];
+            $nestedData[] = $row['datefacture'];
+            $nestedData[] = $row['dateDocAsso'];
+
+            
+
+            $row['statut_reclamation_id'] != null ? $nestedData[] = $this->em->getRepository(Statut::class)->find($row['statut_reclamation_id'])->getDesignation() : $nestedData[] = "";
+            // dd('hi');
+
+
+            $nestedData[] = $row['id_reclamation'] == null ? '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="ugouv" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="ugouv" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' : '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"  style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="ugouv" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="ugouv" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>';            
 
                 $reclamation = null;
                 
@@ -112,8 +122,13 @@ class facturesController extends AbstractController
                 }else{
                     $etat_bg = "";
                 }
+
+                
+                if($row['id_reclamation'] == null && $row['UPPER(o.id)'] != null && $row['executer'] == 1){
+                    // dd('hi');
+                    $etat_bg ="etat_bg_vert";
+                }
                
-            }
             $nestedData["DT_RowId"] = $cd;
             $nestedData["DT_RowClass"] = $etat_bg;
             $data[] = $nestedData;
@@ -149,12 +164,14 @@ class facturesController extends AbstractController
             array( 'db' => 'f.montant','dt' => 2),
             array( 'db' => 'f.observation','dt' => 3),
             array( 'db' => 'f.datefacture','dt' => 4),
-            array( 'db' => 'f.reclamation_id','dt' => 5)
+            array( 'db' => 'f.reclamation_id','dt' => 5),
+            array( 'db' => 'st.designation','dt' => 6),
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
         
         FROM facture f
+        left join statut st on st.id = f.statut_id
         
         $filtre "
         ;
@@ -197,7 +214,10 @@ class facturesController extends AbstractController
             $nestedData[] = $row['montant'];
             $nestedData[] = $row['observation'];
             $nestedData[] = $row['datefacture'];
+            $nestedData[] = $row['designation']; //statut designation
             $nestedData[] = $row['reclamation_id'] == null ? '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="local" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="local" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' : '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"  style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="local" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="local" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>';
+            
+            
             if($row['reclamation_id'] != null && ($reclamation and count($reclamation->getReponses()) == 0)){
                 $etat_bg ="etat_bg_disable";
             }else if($row['reclamation_id'] != null && ($reclamation and $reclamation->getReponses())){
@@ -205,6 +225,8 @@ class facturesController extends AbstractController
             }else{
                 $etat_bg = "";
             }
+
+
             
             $nestedData["DT_RowId"] = $cd;
             $nestedData["DT_RowClass"] = $etat_bg;
@@ -347,7 +369,7 @@ class facturesController extends AbstractController
                 foreach($factures as $facture){
                     // dd($facture);
                     $entityManager = $doctrine->getManager('ugouv')->getConnection();
-                    $query = "UPDATE ua_t_facturefrscab SET id_reclamation = " . $reclamation->getId()." where id = " .$facture;
+                    $query = "UPDATE ua_t_facturefrscab SET id_reclamation = " . $reclamation->getId().", statut_reclamation_id = 2 where id = " .$facture;
                     $statement = $entityManager->prepare($query);
                     $result = $statement->executeQuery();
                     $fournisseurs = $result->fetchAll();
@@ -397,7 +419,7 @@ class facturesController extends AbstractController
     public function ajouterFactures(Request $request, ManagerRegistry $doctrine): Response
     {
         $factures = json_decode($request->get("factures"));
-        // dd($request);
+        // dd($factures);
         if($request->get("objet") && $request->get("observation")){
             
             
@@ -411,6 +433,8 @@ class facturesController extends AbstractController
             $reclamation->setCreated(new \DateTime());
 
             $this->em->persist($reclamation);
+            $statut = $this->em->getRepository(Statut::class)->find(2);
+            // dd($statut);
 
             foreach ($factures as $fac) {
                 $facture = new Facture();
@@ -421,6 +445,7 @@ class facturesController extends AbstractController
                 $facture->setCreated(new \DateTime());
                 $facture->setUserCreated($this->getUser());
                 $facture->setReclamation($reclamation);
+                $facture->setStatut($statut);
                 $this->em->persist($facture);
 
             }

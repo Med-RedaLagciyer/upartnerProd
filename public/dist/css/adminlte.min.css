@@ -187,7 +187,7 @@ body {
     overflow: visible;
 } */
 
-#btnAjouter:hover{
+.btnAjouter:hover{
     text-decoration: underline;
 }
 
@@ -282,6 +282,11 @@ hr {
 
 .etat_bg_blue{
     background-color : #c9e7ff !important;
+    color :#000 !important;    
+}
+
+.etat_bg_vert{
+    background-color : #78c994 !important;
     color :#000 !important;    
 }
 
