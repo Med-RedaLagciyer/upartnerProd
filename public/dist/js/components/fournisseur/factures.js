@@ -94,7 +94,7 @@ $(document).ready(function  () {
         deferRender: true,
         // orderable: false, targets: [0] ,
         columnDefs: [
-            { targets: [0], orderable: false } // First column (index 0) is not orderable
+            { orderable: false, targets: [0] } // First column (index 0) is not orderable
           ],
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
@@ -126,11 +126,15 @@ $(document).ready(function  () {
         // console.log(input.attr("data-id"))
         // input.prop("checked", true);
         if(input.is(":checked")){
+            
             factures.push(input.attr("data-id"));
         }else{
             const index = factures.indexOf(input.attr("data-id"));
             factures.splice(index,1);
         }
+
+        var anyChecked = $(".checkfacture:checked").length > 0;
+        $("#btnReclamer").prop("disabled", !anyChecked);
         
         console.log(factures);
     });
@@ -151,15 +155,9 @@ $(document).ready(function  () {
             }
         });
 
-        // if ($(".check_all_factures").prop("checked") == true) {
-        //     fac.prop("checked", true);
-        //     fac.map(function () {
-        //         factures.push(this.value);
-        //     });
-        //     // console.log(admissions);
-        // } else {
-        //     fac.prop("checked", false);
-        // }
+        var anyChecked = $(".checkfacture:checked").length > 0;
+        $("#btnReclamer").prop("disabled", !anyChecked);
+
         console.log(factures);
     });
 
