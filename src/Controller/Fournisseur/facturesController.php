@@ -331,7 +331,13 @@ class facturesController extends AbstractController
                     'infos' => $factures_infos
                 ]);
             }else{
-                return new JsonResponse('Y\'a aucune reclamation a cette facture!',500);
+                $factures_infos = $this->render("fournisseur/factures/pages/detailsUgouv.html.twig", [
+                    'dets' => $dets[0],
+                ])->getContent();
+                // dd($dets);
+                return new JsonResponse([
+                    'infos' => $factures_infos
+                ]);
             }
            
         }
