@@ -27,6 +27,15 @@
 
 }*/
 
+.login__error {
+    text-align: center;
+    margin: 0 0 10px;
+    background: rgba(189,61,61,1);
+    color: #fff;
+    font-weight: 400;
+    font-size: 14px;
+}
+
 .ua_success{
     display: none;
 }

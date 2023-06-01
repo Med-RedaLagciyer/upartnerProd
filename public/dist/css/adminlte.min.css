@@ -84,6 +84,7 @@ body {
 
 
 
+
 #breadcrumb {
     list-style: none;
     display: inline-block;
@@ -174,9 +175,21 @@ body {
     /* border-left-color: #4b6797; */
   }
 
+  #messages{
+        height: 200px; /* Set the desired height */
+        overflow-y: auto;
+        overflow-x: hidden;
+  }
+
 
 .text-truncate {
-    max-width: 200px; /* Adjust this value to fit your layout */
+    max-width: 120px; /* Adjust this value to fit your layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.text-truncate.objet {
+    max-width: 90px; /* Adjust this value to fit your layout */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

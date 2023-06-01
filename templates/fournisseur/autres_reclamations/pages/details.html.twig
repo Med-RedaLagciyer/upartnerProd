@@ -1,0 +1,48 @@
+
+
+<label>Reclamation:</label>
+<div class="row">
+          <div class="col-3">
+            <div class="form-group">
+              <label>Objet:</label>
+              <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea>
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="form-group">
+              <label>Observation: </label>
+              <textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+            </div>
+          </div>
+</div>
+
+<div class="row">
+          <div class="col-12">
+            <label>Liste des articles:</label>
+
+            <table id="datatables_gestion_autres" class="table table-condensed table-bordered">
+                <thead>
+                    <tr>
+                        <th>N° facture</th>
+                        <th>Montant</th>
+                        <th>Observation</th>
+                        <th>Date facture</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for fac in factures %}
+                    <tr>
+                        <th>{{fac.numFacture}}</th>
+                        <th width="25%">{{ fac.montant|number_format(2, '.', ' ') }}</th>
+                        <th class="text-truncate" title='{{fac.observation}}' width="25%">{{fac.observation}}</th>
+                        <th width="25%">{{fac.dateFacture | date('d-m-Y')}}</th>
+                        <th>{{fac.statut.designation}}</th>
+                    </tr>
+                {% endfor %}
+                    
+                </tbody>
+            </table>
+          </div>
+          
+</div>

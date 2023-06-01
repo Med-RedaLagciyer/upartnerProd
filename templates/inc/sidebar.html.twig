@@ -59,7 +59,13 @@
               <li class="nav-item">
                 <a href="{{path('app_fournisseur_factures')}}" class="nav-link {% if 'app_fournisseur_factures' in app.request.get('_route') %}active{% endif %}">
                   <i class="fas fa-chevron-right nav-icon"></i>
-                  <p>List des factures</p>
+                  <p>Reclamer une facture</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{path('app_fournisseur_autres')}}" class="nav-link {% if 'app_fournisseur_autres' in app.request.get('_route') %}active{% endif %}">
+                  <i class="fas fa-chevron-right nav-icon"></i>
+                  <p>Autres reclamations</p>
                 </a>
               </li>
               {# <li class="nav-item">

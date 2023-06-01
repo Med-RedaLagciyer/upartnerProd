@@ -94,7 +94,7 @@ $(document).ready(function  () {
         deferRender: true,
         // orderable: false, targets: [0] ,
         columnDefs: [
-            { orderable: false, targets: 0 } // First column (index 0) is not orderable
+            { targets: [0], orderable: false } // First column (index 0) is not orderable
           ],
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",

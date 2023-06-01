@@ -2,11 +2,11 @@
 
 namespace App\Controller\Fournisseur;
 
+use App\Entity\Statut;
 use App\Entity\Facture;
 use App\Entity\Reponse;
 use App\Entity\Reclamation;
 use App\Controller\DatatablesController;
-use App\Entity\Statut;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,9 +24,53 @@ class facturesController extends AbstractController
     }
 
     #[Route('/', name: 'app_fournisseur_factures')]
-    public function index(): Response
+    public function index(ManagerRegistry $doctrine): Response
     {
-        return $this->render('fournisseur/factures/index.html.twig');
+
+        $partenaire = [];
+
+            $reclamation = $this->em->getRepository(Reclamation::class);
+
+            $entityManager = $doctrine->getManager('ugouv')->getConnection();
+
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $facturesCount = $result->fetchAll();
+
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $facturesRegleCount = $result->fetchAll();
+
+            $query = "SELECT SUM(montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $montantTotal = $result->fetchAll();
+
+            $query = "SELECT SUM(cab.montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $montantTotalRegle = $result->fetchAll();
+
+            $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1 and code like '".$this->getUser()->getUsername()."'";
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $partenaire = $result->fetchAll();
+
+            // dd($facturesRegleCount);
+
+            $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
+            $donnee = [
+                'partenaire' => $partenaire[0],
+                'montantTotal' => $montantTotal[0]["total_sum"],
+                'montantTotalRegle' => $montantTotalRegle[0]["total_sum"],
+                'factureCount' => $facturesCount[0]['COUNT(*)'],
+                'facturesRegleCount' => $facturesRegleCount[0]['COUNT(*)'],
+            ];
+            return $this->render('fournisseur/factures/index.html.twig', [
+                'donnee' => $donnee,
+            ]);
     }
 
     #[Route('/list', name: 'app_fournisseur_factures_list')]
@@ -96,7 +140,7 @@ class facturesController extends AbstractController
             $nestedData[] = $row['id_reclamation'] == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
             $nestedData[] = $row['code'];
             $nestedData[] = $row['refDocAsso'];
-            $nestedData[] = $row['montant'];
+            $nestedData[] = "<div style='text-align:right !important; margin-right:5px !important'>".number_format($row['montant'], 2, ',', ' ')."</div>";
             $nestedData[] = $row['datefacture'];
             $nestedData[] = $row['dateDocAsso'];
 
