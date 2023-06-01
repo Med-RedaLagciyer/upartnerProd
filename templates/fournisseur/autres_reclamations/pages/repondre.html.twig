@@ -3,10 +3,16 @@
 <div id="messages">
 
 <div class="row">
-          <div class="col-6">
-            <div class="form-group">
+          <div class="col-1">
+            <div class="form-group" style="margin-bottom: 0;">
               <label>Objet:</label>
-              <textarea class="form-control" rows="2" disabled="">{{ reclamation.objet }}</textarea>
+              
+              {# <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea> #}
+            </div>
+          </div>
+          <div class="col-11" style="padding-left: 1 !important; margin-bottom: 0;">
+            <div class="form-group">
+              <p>{{ reclamation.objet }}</p>
             </div>
           </div>
 </div>
