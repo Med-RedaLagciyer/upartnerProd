@@ -182,7 +182,7 @@ class AutresReclamationsController extends AbstractController
         $code = $this->getUser()->getUsername();
         // dd($code);
 
-        $filtre = "where r.active = 1 and r.userCreated_id = ".$this->getUser()->getId();   
+        $filtre = "where r.active = 1 and r.userCreated_id = ".$this->getUser()->getId() ;   
         // dd($params->all('columns')[0]);
             
         $columns = array(
@@ -192,7 +192,7 @@ class AutresReclamationsController extends AbstractController
             array( 'db' => 'r.created','dt' => 3),
             array( 'db' => 'rep.message','dt' => 4),
             array( 'db' => 'UPPER(rep.created)','dt' => 5),
-            array( 'db' => 'rep.userSeen','dt' => 6)
+            array( 'db' => 'UPPER(rep.userCreated_id)','dt' => 6)
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -241,9 +241,9 @@ class AutresReclamationsController extends AbstractController
 
             $nestedData[] = "<div class='text-truncate objet' title='".$row['objet']."' style='text-align:left !important'>".$row['objet']."</div>";
             $nestedData[] = "<div class='text-truncate' title='".$row['observation']."' style='text-align:left !important'>".$row['observation']."</div>";
-            $nestedData[] = $row['created'];
-            $nestedData[] = $row['message'];
-            $nestedData[] = $row['UPPER(rep.created)'];
+            $nestedData[] = $row["UPPER(rep.userCreated_id)"] == $this->getUser()->getId() ? "" : "<div class='text-truncate' title='".$row['message']."' style='text-align:left !important'>".$row['message']."</div>" ;
+            // $nestedData[] = $row['created'];
+            // $nestedData[] = $row['UPPER(rep.created)'];
             $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="local" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="local" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' ;
 
             if($reponses && $reponses[0]->getUserCreated() != $this->getUser() ){

@@ -41,13 +41,40 @@ $(document).ready(function  () {
         deferRender: true,
         // orderable: false, targets: [0] ,
         columnDefs: [
-            { targets: [5], orderable: false } // First column (index 0) is not orderable
+            { targets: [3], orderable: false } // First column (index 0) is not orderable
           ],
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
         },
     });
-    
+
+    $("body").on("dblclick", "#datatables_gestion_reclamation tbody tr", async function (e) {
+        // alert('hi');
+        e.preventDefault();
+
+
+        id_reclamation = $(this).closest('tr').attr('id');
+        // console.log(type);
+
+        try {
+            const request = await axios.get('/fournisseur/autres/details/'+id_reclamation);
+            const response = request.data;
+            $('#repondre_modal #infos_factures').html(response.repondre);
+
+            
+
+            $("#repondre_modal").modal("show")
+            // $("#show_modal #designation").val(response.designation)
+        } catch (error) {
+            console.log(error, error.response);
+            const message = error.response.data;
+            Toast.fire({
+                icon: 'error',
+                title: message,
+              })
+        }
+        
+    });
 
     factures = [];
 

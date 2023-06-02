@@ -73,7 +73,9 @@
   <div class="col-md-6">
     <div class="card card-danger card-outline" style="height: 68vh !important; overflow: auto;">
       <div class="card-body">
-                        {# <label>Reclame:</label> #}
+                        <label style="font-weight:light !important;margin-bottom:15px !important; font-size:14px !important">
+                        Ajouter reclamation
+                        </label>
                         <form id="formAjouter">
                     
                             <div class="row">
@@ -111,7 +113,7 @@
                                         <tr>
                                             <th width="">N° Facture</th>
                                             <th width="10%">Date</th>
-                                            <th width="25%">Montant</th>
+                                            <th width="25   %">Montant</th>
                                             <th width="">Observation</th>
                                             <th width="5%"></th>
                                         </tr>
@@ -136,23 +138,18 @@
   <div class="col-md-6">
     <div class="card card-success card-outline" style="height: 68vh; !important overflow: auto;">
       <div class="card-body">
-      {# <label>Reclamations :</label> #}
+        <label style="font-weight:light !important;margin-bottom:15px !important; font-size:14px !important">
+        Reclamation
+        </label>
       <table
           id="datatables_gestion_reclamation"
           class="table table-condensed table-bordered"
         >
           <thead>
             <tr>
-              <th colspan="3">Reclamation</th>
-              <th colspan="2">reponse</th>
-              <th ></th>
-            </tr>
-            <tr>
-              <th width="">Objet</th>
-              <th width="25%">Observation</th>
-              <th width="25%">Date</th>
-              <th width="25%">Reponse</th>
-              <th width="25%">Date</th>
+              <th width="25%">Objet</th>
+              <th width="35%">Observation</th>
+              <th width="35%">Retoure fondation</th>
               <th></th>
             </tr>
           </thead>

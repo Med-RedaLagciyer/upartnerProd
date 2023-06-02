@@ -47,6 +47,20 @@ $(document).ready(function  () {
                 const request = await axios.get('/fournisseur/factures/details/'+id_facture_cab+'/'+type);
                 const response = request.data;
                 $('#show_modal #infos_factures').html(response.infos);
+                $("#datatables_detail_facture").DataTable({
+                    lengthMenu: [
+                        [10, 15, 25, 50, 100, 20000000000000],
+                        [10, 15, 25, 50, 100, "All"],
+                    ],
+                    order: [[0, "desc"]],
+                    // orderable: false, targets: [0] ,
+                    columnDefs: [
+                        { orderable: false, targets: 0 } // First column (index 0) is not orderable
+                      ],
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                    },
+                });
                 $("#show_modal").modal("show")
                 // $("#show_modal #designation").val(response.designation)
             } catch (error) {
