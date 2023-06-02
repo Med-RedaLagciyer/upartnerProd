@@ -241,17 +241,19 @@ class AutresReclamationsController extends AbstractController
 
             $nestedData[] = "<div class='text-truncate objet' title='".$row['objet']."' style='text-align:left !important'>".$row['objet']."</div>";
             $nestedData[] = "<div class='text-truncate' title='".$row['observation']."' style='text-align:left !important'>".$row['observation']."</div>";
-            $nestedData[] = $row["UPPER(rep.userCreated_id)"] == $this->getUser()->getId() ? "" : "<div class='text-truncate' title='".$row['message']."' style='text-align:left !important'>".$row['message']."</div>" ;
+            
             // $nestedData[] = $row['created'];
             // $nestedData[] = $row['UPPER(rep.created)'];
-            $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="local" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="local" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' ;
-
+            
             if($reponses && $reponses[0]->getUserCreated() != $this->getUser() ){
                 $etat_bg ="etat_bg_blue";
+                $nestedData[] = "<div class='text-truncate' title='".$reponses[0]->getMessage()."' style='text-align:left !important'>".$reponses[0]->getMessage()."</div>" ;
             }else{
                 $etat_bg ="etat_bg_disable";
+                $nestedData[] = "" ;
             }
-
+            
+            $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="local" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="local" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' ;
 
             
             $nestedData["DT_RowId"] = $cd;
