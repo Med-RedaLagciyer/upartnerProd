@@ -279,7 +279,7 @@ class ReclamationsController extends AbstractController
             
             return new JsonResponse('Reclamation a bien modifier!',200);
         }else{
-            return new JsonResponse('vous devez remplisser tous les champs!',500);
+            return new JsonResponse('vous devez remplir tous les champs!',500);
         }
         
     }
@@ -312,7 +312,7 @@ class ReclamationsController extends AbstractController
                 'date' => $reponse->getCreated()->format('d/m/Y'),
             ]);
         }else{
-            return new JsonResponse('vous devez remplisser tous les champs!',500);
+            return new JsonResponse('vous devez remplir tous les champs!',500);
         }
     }
 }

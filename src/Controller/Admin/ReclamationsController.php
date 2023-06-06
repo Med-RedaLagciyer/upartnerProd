@@ -258,7 +258,7 @@ class ReclamationsController extends AbstractController
                 'date' => $reponse->getCreated()->format('d/m/Y'),
             ]);
         }else{
-            return new JsonResponse('vous devez remplisser tous les champs!',500);
+            return new JsonResponse('vous devez remplir tous les champs!',500);
         }
     }
 
