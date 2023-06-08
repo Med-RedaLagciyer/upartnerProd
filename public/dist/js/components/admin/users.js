@@ -30,13 +30,15 @@ $(document).ready(function  () {
             const request = await axios.get('/admin/users/fournisseurs');
             const response = request.data;
             // console.log(response.fournisseurs)
-            
+            $("#modalAjouter #fournisseurs").empty();
             for (const fournisseur of response.fournisseurs) {
                 const nomComplet = fournisseur.nom + ' ' + fournisseur.prenom;
                 if(fournisseur.existsInUserTable == true){
-                    $("#modalAjouter #fournisseurs").append($('<option>').text(nomComplet).attr('value', fournisseur.code).attr("style", "width: 10px;").prop('disabled', true));
+                    $("#modalAjouter #fournisseurs").append($('<option>').text(nomComplet).attr('value', fournisseur.ice_o).attr("style", "width: 10px;").prop('disabled', true));
+                }else if (fournisseur.ice_o == null){
+                    $("#modalAjouter #fournisseurs").append($('<option>').text(nomComplet).attr('value', fournisseur.ice_o).attr("style", "width: 10px; background : red !important").prop('disabled', true));
                 }else{
-                    $("#modalAjouter #fournisseurs").append($('<option>').text(nomComplet).attr('value', fournisseur.code).attr("style", "width: 10px;"));
+                    $("#modalAjouter #fournisseurs").append($('<option>').text(nomComplet).attr('value', fournisseur.ice_o).attr("style", "width: 10px;"));
                 }
             }
             

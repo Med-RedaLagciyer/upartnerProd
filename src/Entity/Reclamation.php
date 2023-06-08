@@ -26,10 +26,10 @@ class Reclamation
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $objet = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $created = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updated = null;
 
     #[ORM\OneToMany(mappedBy: 'reclamation', targetEntity: Reponse::class)]

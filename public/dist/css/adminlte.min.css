@@ -68,6 +68,12 @@ section {
     display: block
 }
 
+#numberInput::-webkit-inner-spin-button,
+#numberInput::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
 body{
     margin: 0;
     font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";

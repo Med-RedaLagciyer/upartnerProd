@@ -21,16 +21,16 @@ class Facture
     #[ORM\Column(nullable: true)]
     private ?float $montant = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $dateFacture = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $created = null;
 
     #[ORM\ManyToOne(inversedBy: 'factures')]
     private ?User $userCreated = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updated = null;
 
     #[ORM\ManyToOne]

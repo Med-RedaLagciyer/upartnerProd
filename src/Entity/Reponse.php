@@ -24,10 +24,10 @@ class Reponse
     #[ORM\ManyToOne]
     private ?User $userUpdated = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $created = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updated = null;
 
     #[ORM\ManyToOne(inversedBy: 'reponses')]

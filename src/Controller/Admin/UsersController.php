@@ -98,7 +98,7 @@ class UsersController extends AbstractController
 
                 
             }
-            $nestedData[6] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"><a href="#" id="btnDevalider" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Dévalider/Valider</a><a href="#" class="dropdown-item btn-xs" id="btnReinitialiser"><i class="fas fa-sync mr-2"></i> Reinitialiser</a><div class="dropdown-divider"></div><a id="btnSupprimer" href="#" class="dropdown-item btn-xs"><i class="fas fa-trash mr-2"></i> Supprimer</a>';
+            $nestedData[6] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"><a href="#" id="btnDevalider" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Dévalider/Valider</a><a href="#" class="dropdown-item btn-xs" id="btnReinitialiser"><i class="fas fa-sync mr-2"></i> Reinitialiser</a>';
             $nestedData["DT_RowId"] = $cd;
             $nestedData["DT_RowClass"] = "";
             $data[] = $nestedData;
@@ -119,7 +119,7 @@ class UsersController extends AbstractController
     public function fournisseurs(ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager('ugouv')->getConnection();
-        $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1";
+        $query = "SELECT  id, ice_o , nom, prenom from u_p_partenaire Where active = 1";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $fournisseurs = $result->fetchAll();
@@ -129,7 +129,7 @@ class UsersController extends AbstractController
                 ->select('u.id')
                 ->from(User::class, 'u')
                 ->where('u.username = :username')
-                ->setParameter('username', $frs['code'])
+                ->setParameter('username', $frs['ice_o'])
                 ->getQuery()
                 ->getOneOrNullResult();
         
@@ -149,6 +149,7 @@ class UsersController extends AbstractController
     public function ajouter(Request $request, UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine): Response
     {
         $selectedValues = $request->get('codes');
+        // dd($selectedValues);
 
         if(!$selectedValues){
             return new JsonResponse('Vous devez selectionner un ou plusieurs fournisseurs!',500);
@@ -166,10 +167,13 @@ class UsersController extends AbstractController
         foreach ($codes as $code) {
             $entityManager = $doctrine->getManager('ugouv')->getConnection();
 
-        $query = "SELECT nom, prenom FROM `u_p_partenaire` where code ='" . $code ."';";
+        $query = "SELECT nom, prenom FROM `u_p_partenaire` where ice_o ='" . $code ."';";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $fournisseur = $result->fetchAll();
+        // dd($fournisseur);
+
+        if ($fournisseur) {
             $user = new User();
             $user->setUsername($code);
             $user->setNom($fournisseur[0]['nom']);
@@ -181,6 +185,11 @@ class UsersController extends AbstractController
             $user->setRoles(["ROLE_FRS"]);
 
             $this->em->persist($user);
+        }else{
+            return new JsonResponse('Ce fournisseur n\'a pas de ice',500);
+        }
+
+            
         }
     
         $this->em->flush();

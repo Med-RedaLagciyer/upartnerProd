@@ -17,18 +17,13 @@
                     <table id="datatables_gestion_fournisseurs" class="table table-condensed table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Id</th>
                                     <th>code</th>
                                     <th>nom</th>
                                     <th>prenom</th>
-                                    <th>email</th>
-                                    <th>tel1</th>
-                                    <th>adresse</th>
-                                    <th>pays</th>
-                                    <th>ville</th>
                                     <th>Societe</th>
                                     <th>ICE</th>
-                                    {# <th>Actions</th> #}
+                                    <th>Ice_o</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -40,7 +35,8 @@
 </div>
 
 <!-- #modal-dialog -->
-{# {% include 'admin/users/modals/modalAjouter.html.twig' %} #}
+{% include 'admin/fournisseurs/modals/detailsModal.html.twig' %}
+{% include 'admin/fournisseurs/modals/modifierModal.html.twig' %}
 
     
     {# {# <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" ></script>

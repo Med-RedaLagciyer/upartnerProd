@@ -54,11 +54,20 @@ class PartenaireValide
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $adresse = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $created = null;
 
     #[ORM\ManyToOne(inversedBy: 'partenaireValides')]
     private ?User $userCreated = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ice_o = null;
+
+    #[ORM\ManyToOne]
+    private ?User $userUpdated = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $Updated = null;
 
     public function getId(): ?int
     {
@@ -241,6 +250,42 @@ class PartenaireValide
     public function setUserCreated(?User $userCreated): self
     {
         $this->userCreated = $userCreated;
+
+        return $this;
+    }
+
+    public function getIceO(): ?string
+    {
+        return $this->ice_o;
+    }
+
+    public function setIceO(?string $ice_o): self
+    {
+        $this->ice_o = $ice_o;
+
+        return $this;
+    }
+
+    public function getUserUpdated(): ?User
+    {
+        return $this->userUpdated;
+    }
+
+    public function setUserUpdated(?User $userUpdated): self
+    {
+        $this->userUpdated = $userUpdated;
+
+        return $this;
+    }
+
+    public function getUpdated(): ?\DateTimeInterface
+    {
+        return $this->Updated;
+    }
+
+    public function setUpdated(?\DateTimeInterface $Updated): self
+    {
+        $this->Updated = $Updated;
 
         return $this;
     }

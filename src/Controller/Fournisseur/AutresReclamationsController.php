@@ -33,27 +33,27 @@ class AutresReclamationsController extends AbstractController
 
             $entityManager = $doctrine->getManager('ugouv')->getConnection();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $facturesCount = $result->fetchAll();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $facturesRegleCount = $result->fetchAll();
 
-            $query = "SELECT SUM(montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $query = "SELECT SUM(montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $montantTotal = $result->fetchAll();
 
-            $query = "SELECT SUM(cab.montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $query = "SELECT SUM(cab.montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $montantTotalRegle = $result->fetchAll();
 
-            $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1 and code like '".$this->getUser()->getUsername()."'";
+            $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1 and ice_o like '".$this->getUser()->getUsername()."'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $partenaire = $result->fetchAll();
