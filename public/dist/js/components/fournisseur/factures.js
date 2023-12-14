@@ -190,6 +190,7 @@ $(document).ready(function  () {
     });
 
     $("#formReclamer").on("submit", async function (e) {
+        const fac = $("body .checkfacture");
         console.log(factures);
         e.preventDefault();
 
@@ -210,7 +211,9 @@ $(document).ready(function  () {
                 title: response
             })
             factures = [];
+            $("#btnReclamer").prop("disabled", true);
             table.ajax.reload();
+            console.log(factures);
 
         } catch (error) {
             const message = error.response.data;

@@ -133,14 +133,18 @@ class ReclamationsController extends AbstractController
     #[Route('/details/{reclamation}', name: 'app_admin_reclamations_details')]
     public function details(ManagerRegistry $doctrine,Reclamation $reclamation): Response
     {
-        $reclamation->setAdminSeen(1);
+        // dd("hi");
+        // $reclamation = $this->em->getRepository(Reclamation::class)->find($reclamation);
+        $reclamation->setAdminSeen(0);
         $this->em->flush();
+        // dd(count($reclamation->getFactures()));
 
         $entityManager = $doctrine->getManager('ugouv')->getConnection();
+        // dd('tt');
+        // dd($reclamation);
 
-        if($reclamation->getFactures()){
+        if(count($reclamation->getFactures()) > 0){
             $factures = $reclamation->getFactures();
-            // dd($factures);
             $reclamation_infos = $this->render("admin/reclamations/pages/infos_reclamation.html.twig", [
                 'factures' => $factures,
                 'reclamation' => $reclamation,

@@ -164,6 +164,7 @@ class UsersController extends AbstractController
         
 
 
+        // dd($codes);
         foreach ($codes as $code) {
             $entityManager = $doctrine->getManager('ugouv')->getConnection();
 

@@ -33,32 +33,34 @@ class facturesController extends AbstractController
 
             $entityManager = $doctrine->getManager('ugouv')->getConnection();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
+
+            // dd($query);
             $facturesCount = $result->fetchAll();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $facturesRegleCount = $result->fetchAll();
 
-            $query = "SELECT SUM(montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
+            $query = "SELECT SUM(montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $montantTotal = $result->fetchAll();
 
-            $query = "SELECT SUM(cab.montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.ice_o like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
+            $query = "SELECT SUM(cab.montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 and cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $montantTotalRegle = $result->fetchAll();
 
-            $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1 and ice_o like '".$this->getUser()->getUsername()."'";
+            $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1 and code like '".$this->getUser()->getUsername()."'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $partenaire = $result->fetchAll();
 
-            // dd($facturesRegleCount);
+            // dd($facturesCount);
 
             $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
             $donnee = [
@@ -83,7 +85,7 @@ class facturesController extends AbstractController
         $code = $this->getUser()->getUsername();
         // dd($code);
 
-        $filtre = "where p.ice_o like '".$code."' and f.active = 1 and f.datefacture > '2023-01-01'";   
+        $filtre = "where p.code like '".$code."' and f.active = 1 and f.datefacture > '2023-01-01'";   
         // dd($params->all('columns')[0]);
             
         $columns = array(
@@ -312,13 +314,15 @@ class facturesController extends AbstractController
             }
 
         }else{
+            // dd($factureCab);
             $query = "SELECT cab.id_reclamation, cab.montant as montant, cab.datefacture as datefacture, cab.observation,  ar.titre as article, u.designation as unite, det.quantite, det.prixunitaire , det.tva FROM `ua_t_facturefrsdet` det
             INNER JOIN ua_t_facturefrscab cab on cab.id = det.ua_t_facturefrscab_id
-            INNER JOIN uarticle ar on ar.id = det.u_article_id
-            INNER JOIN p_unite u on u.id = det.p_unite_id where cab.id =" . $factureCab;
+            LEFT JOIN uarticle ar on ar.id = det.u_article_id
+            LEFT JOIN p_unite u on u.id = det.p_unite_id where cab.id =" . $factureCab;
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $dets = $result->fetchAll();
+            // dd($query);
             $reclamation = $this->em->getRepository(Reclamation::class)->findby(['id'=> $dets[0]['id_reclamation']]);
             if($reclamation){
                  // dd($reclamation);
@@ -370,8 +374,8 @@ class facturesController extends AbstractController
         }else{
             $query = "SELECT cab.id_reclamation, cab.montant as montant, cab.datefacture as datefacture, cab.observation,  ar.titre as article, u.designation as unite, det.quantite, det.prixunitaire , det.tva FROM `ua_t_facturefrsdet` det
             INNER JOIN ua_t_facturefrscab cab on cab.id = det.ua_t_facturefrscab_id
-            INNER JOIN uarticle ar on ar.id = det.u_article_id
-            INNER JOIN p_unite u on u.id = det.p_unite_id where cab.id =" . $factureCab;
+            LEFT JOIN uarticle ar on ar.id = det.u_article_id
+            LEFT JOIN p_unite u on u.id = det.p_unite_id where cab.id =" . $factureCab;
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $dets = $result->fetchAll();
