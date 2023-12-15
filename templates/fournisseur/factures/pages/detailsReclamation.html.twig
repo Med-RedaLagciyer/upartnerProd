@@ -1,69 +1,66 @@
-
 <div id="messages">
-<div class="row">
-          <div class="col-1">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label>Objet:</label>
-              
-              {# <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea> #}
-            </div>
-          </div>
-          <div class="col-11" style="padding-left: 1 !important; margin-bottom: 0;">
-            <div class="form-group">
-              <p>{{ reclamation.objet }}</p>
-            </div>
-          </div>
-</div>
-<div class="row">
-        <div class="col-9">
-            <div class="form-group">
-              <textarea style="background: #d9eeff;"     class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
-              <label style="float: left;" >{{ reclamation.created | date('d-m-Y') }}</label>
-            </div>
-          </div>
-</div>
-  {% for reponse in reclamation.reponses  %}
+	<div class="row">
+		<div class="col-1">
+			<div class="form-group" style="margin-bottom: 0;">
+				<label>Objet:</label>
 
-    {% if reponse.admin == true %}
-        <div class="row">   
-            <div class="col-3">
-              
-            </div>
-            <div class="col-9">
-              <div class="form-group">
-                <textarea class="form-control" rows="3" disabled="">{{ reponse.message }}</textarea>
-                <label style="float: right;" >{{ reponse.created | date('d-m-Y') }}</label>
-              </div>
-            </div>
-        </div>
-    {% else %}
-      <div class="row">   
-            <div class="col-9">
-              <div class="form-group">
-                <textarea  class="form-control" style="background: #d9eeff;" rows="3" disabled="">{{ reponse.message }}</textarea>
-                <label style="float: left;" >{{ reponse.created | date('d-m-Y') }}</label>
-              </div>
-            </div>
-            <div class="col-3">
-              
-            </div>
-      </div>
-    {% endif %}
-    
-  {% endfor %}
+				{# <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea> #}
+			</div>
+		</div>
+		<div class="col-11" style="padding-left: 1 !important; margin-bottom: 0;">
+			<div class="form-group">
+				<p>{{ reclamation.objet }}</p>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-9">
+			<div class="form-group">
+				<textarea style="background: #d9eeff;" class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+				<label style="float: left;">{{ reclamation.created | date('d-m-Y') }}</label>
+			</div>
+		</div>
+	</div>
+	{% for reponse in reclamation.reponses  %}
+
+		{% if reponse.admin == true %}
+			<div class="row">
+				<div class="col-3"></div>
+				<div class="col-9">
+					<div class="form-group">
+						<textarea class="form-control" rows="3" disabled="">{{ reponse.message }}</textarea>
+						<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
+					</div>
+				</div>
+			</div>
+		{% else %}
+			<div class="row">
+				<div class="col-9">
+					<div class="form-group">
+						<textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">{{ reponse.message }}</textarea>
+						<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
+					</div>
+				</div>
+				<div class="col-3"></div>
+			</div>
+		{% endif %}
+
+	{% endfor %}
 
 </div>
-<br>  
+<br>
 
 <form id="message_form" data-reclamation="{{reclamation.id}}">
-  <div class="row">
-    <div class="col-9">
-      <div class="form-group">
-        <textarea name="message" class="form-control" rows="1" placeholder="Ecrivez votre message ici"></textarea>
-      </div>
-    </div>
-    <div class="col-3">
-      <button type="submit" class="btn btn-sm btn-primary pull-right" style="float: right"><i class="fas fa-paper-plane"></i> Envoyer</button>
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-9">
+			<div class="form-group">
+				<textarea name="message" class="form-control" rows="1" placeholder="Ecrivez votre message ici"></textarea>
+			</div>
+		</div>
+		<div class="col-3">
+			<button type="submit" class="btn btn-sm btn-primary pull-right" style="float: right">
+				<i class="fas fa-paper-plane"></i>
+				Envoyer</button>
+		</div>
+	</div>
 </form>

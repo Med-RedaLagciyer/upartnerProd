@@ -14,24 +14,23 @@ use App\Entity\User;
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index(Security $security,ManagerRegistry $doctrine, Request $request): Response
+    public function index(Security $security, ManagerRegistry $doctrine, Request $request): Response
     {
         if (!$security->getUser()) {
             // Redirect to the login page
             return $this->redirectToRoute('app_login');
         }
 
-        if($security->getUser()->getValide() != 2 and $security->isGranted('ROLE_FRS')){
+        if ($security->getUser()->getValide() != 2 and $security->isGranted('ROLE_FRS')) {
             return $this->redirectToRoute('app_fournisseur_validation');
-           
-        } elseif ($security->isGranted('ROLE_FRS')){
+        } elseif ($security->isGranted('ROLE_FRS')) {
             $donnee = [];
 
             $reclamation = $doctrine->getRepository(Reclamation::class);
 
-            $entityManager = $doctrine->getManager('ugouv')->getConnection();
+            $entityManager = $doctrine->getManager('default')->getConnection();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '".$this->getUser()->getUsername()."' and cab.active = 1 ";
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '" . $this->getUser()->getUsername() . "' and cab.active = 1 ";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $facturesCount = $result->fetchAll();
@@ -48,13 +47,13 @@ class IndexController extends AbstractController
             return $this->render('index/indexfrs.html.twig', [
                 'donnee' => $donnee,
             ]);
-        }else {
+        } else {
             $donnee = [];
 
             $user = $doctrine->getRepository(User::class);
             $reclamation = $doctrine->getRepository(Reclamation::class);
 
-            $entityManager = $doctrine->getManager('ugouv')->getConnection();
+            $entityManager = $doctrine->getManager('default')->getConnection();
 
             $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab`";
             $statement = $entityManager->prepare($query);
@@ -65,8 +64,6 @@ class IndexController extends AbstractController
             $statement2 = $entityManager->prepare($query2);
             $result2 = $statement2->executeQuery();
             $fournisseurCount = $result2->fetchAll();
-
-            // dd($facturesCount);
 
 
             $userCount = $user->count([]);
@@ -82,7 +79,5 @@ class IndexController extends AbstractController
                 'donnee' => $donnee,
             ]);
         }
-        
-        
     }
 }
