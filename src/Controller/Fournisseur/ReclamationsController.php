@@ -258,7 +258,7 @@ class ReclamationsController extends AbstractController
         }
 
 
-        return new JsonResponse('Reclamations sont bien supprimer!', 200);
+        return new JsonResponse('SUPPRESSION TERMINÉE AVEC SUCCÈS', 200);
     }
 
     #[Route('/modifier/{reclamation}', name: 'app_fournisseur_reclamations_modifier')]
@@ -272,9 +272,9 @@ class ReclamationsController extends AbstractController
             $reclamation->setUpdated(new \DateTime());
             $this->em->flush();
 
-            return new JsonResponse('Reclamation a bien modifier!', 200);
+            return new JsonResponse('MISE À JOUR TERMINÉE AVEC SUCCÈS', 200);
         } else {
-            return new JsonResponse('vous devez remplir tous les champs!', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
     }
 
@@ -306,7 +306,7 @@ class ReclamationsController extends AbstractController
                 'date' => $reponse->getCreated()->format('d/m/Y'),
             ]);
         } else {
-            return new JsonResponse('vous devez remplir tous les champs!', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
     }
 }

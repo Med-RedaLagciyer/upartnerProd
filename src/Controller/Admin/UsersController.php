@@ -203,17 +203,15 @@ class UsersController extends AbstractController
         if ($user) {
             $currentValiderValue = $user->getValide();
             $newValiderValue = ($currentValiderValue == 1) ? 2 : 1;
-            $message = ($currentValiderValue == 1) ? "L'utilisateurs est bien validé!" : "L'utilisateurs est bien devalidé!";
+            $message = ($currentValiderValue == 1) ? "VALIDATION DU COMPTE TERMINÉE." : "COMPTE INVALIDE.";
             $user->setValide($newValiderValue);
 
             $this->em->flush();
         }
 
         $this->em->flush();
-
-        return $this->json([
-            'message' => $message,
-        ]);
+        // dd($message);
+        return new JsonResponse($message, 200);
     }
 
     #[Route('/delete/{user}', name: 'app_admin_users_delete')]
@@ -222,7 +220,7 @@ class UsersController extends AbstractController
         $user->setActive(0);
         $this->em->flush();
 
-        return new JsonResponse('Utilisateur bien supprimer!', 200);
+        return new JsonResponse('SUPPRESSION TERMINÉE AVEC SUCCÈS', 200);
     }
 
     #[Route('/reset/{user}', name: 'app_admin_users_reset')]
@@ -236,6 +234,6 @@ class UsersController extends AbstractController
         ));
         $this->em->flush();
 
-        return new JsonResponse('Le mot de pass a bien réinitialiser!', 200);
+        return new JsonResponse('MOT DE PASSE RÉINITIALISER AVEC SUCCÈS', 200);
     }
 }

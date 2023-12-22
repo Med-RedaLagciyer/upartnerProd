@@ -30,11 +30,32 @@ class facturesController extends AbstractController
 
         $partenaire = [];
 
-        $query = "SELECT id, code FROM `u_p_partenaire` WHERE ice_o = '" . $this->getUser()->getUsername() . "'";
+        // $query = "SELECT 
+        //     COUNT(*) AS totalInvoices,
+        //     SUM(CASE WHEN op.executer = 1 THEN 1 ELSE 0 END) AS totalExecutedInvoices,
+        //     SUM(cab.montant) AS totalAmount,
+        //     SUM(CASE WHEN op.executer = 1 THEN cab.montant ELSE 0 END) AS totalAmountExecuted
+        //     FROM 
+        //         `ua_t_facturefrscab` cab
+        //     INNER JOIN 
+        //         `u_p_partenaire` p ON p.id = cab.partenaire_id
+        //     LEFT JOIN 
+        //         `u_general_operation` op ON op.facture_fournisseur_id = cab.id
+        //     WHERE 
+        //         p.id = 'YOUR_PARTNER_ID'
+        //         AND cab.active = 1 
+        //         AND cab.datefacture > '2023-01-01'";
+        // $statement = $entityManager->prepare($query);
+        // $result = $statement->executeQuery();
+        // $data = $result->fetchAll();
+
+
+        // dd($this->getUser());
+        $query = "SELECT id, code FROM `u_p_partenaire` WHERE ice_o like '" . $this->getUser()->getUsername() . "'";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $infos = $result->fetchAll();
-
+        // dd($query);
         $idPartenaire = $infos[0]["id"];
 
         // dd($query);
@@ -321,7 +342,7 @@ class facturesController extends AbstractController
                     'infos' => $factures_infos
                 ]);
             } else {
-                return new JsonResponse('Y\'a aucune reclamation a cette facture!', 500);
+                return new JsonResponse('AUCUNE RÉCLAMATION', 500);
             }
         } else {
             // dd($factureCab);
@@ -383,7 +404,7 @@ class facturesController extends AbstractController
                     'infos' => $factures_infos
                 ]);
             } else {
-                return new JsonResponse('Y\'a aucune reclamation a cette facture!', 500);
+                return new JsonResponse('AUCUNE RÉCLAMATION', 500);
             }
         } else {
             $query = "SELECT id, id_reclamation FROM `ua_t_facturefrscab` where id =" . $factureCab;
@@ -413,7 +434,7 @@ class facturesController extends AbstractController
                     'infos' => $factures_infos
                 ]);
             } else {
-                return new JsonResponse('Y\'a aucune reclamation a cette facture!', 500);
+                return new JsonResponse('AUCUNE RÉCLAMATION', 500);
             }
         }
     }
@@ -449,9 +470,9 @@ class facturesController extends AbstractController
             }
 
 
-            return new JsonResponse('Votre reclamation a bien envoyer!', 200);
+            return new JsonResponse('RÉCLAMATION BIEN ENVOYÉE', 200);
         } else {
-            return new JsonResponse('vous devez remplir tous les champs!', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
     }
 
@@ -483,7 +504,7 @@ class facturesController extends AbstractController
                 'date' => $reponse->getCreated()->format('d/m/Y'),
             ]);
         } else {
-            return new JsonResponse('vous devez remplir tous les champs!', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
     }
 
@@ -524,9 +545,9 @@ class facturesController extends AbstractController
             $this->em->flush();
 
 
-            return new JsonResponse('Les factures sont bien envoyer!', 200);
+            return new JsonResponse('FACTURES BIEN ENVOYÉE', 200);
         } else {
-            return new JsonResponse('vous devez remplir tous les champs!', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
     }
 }

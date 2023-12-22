@@ -2,12 +2,22 @@ $(document).ready(function  () {
     // console.log('hi');
     reclamations = [];
 
-    var Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "progressBar": true,
+        "preventDuplicates": false,
+        "positionClass": "toast-top-right",
+        "onclick": null,
+        "showDuration": "400",
+        "hideDuration": "1000",
+        "timeOut": "7000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
 
     id_freclamation = false
     $('body').on('click','#btnDetails',async function(e) {
@@ -24,9 +34,10 @@ $(document).ready(function  () {
                 $('#reclamation_modal #infos_reclamation').html(response.infos);
                 $('#reclamation_modal #tableFactures').DataTable({
                     lengthMenu: [
-                        [10, 15, 25, 50, 100, 20000000000000],
-                        [10, 15, 25, 50, 100, "All"],
+                        [10, 15, 20 ,25, 50, 100, 20000000000000],
+                        [10, 15, 20, 25, 50, 100, "All"],
                     ],
+                    pageLength: 20,
                     order: [[0, "desc"]],
                     language: {
                         url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
@@ -37,10 +48,7 @@ $(document).ready(function  () {
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                  })
+                toastr.error(message);
             }
         
     })
@@ -59,9 +67,10 @@ $(document).ready(function  () {
                 $('#reclamation_modification_modal #modifier_reclamation').html(response.modification);
                 $('#reclamation_modification_modal #tableFactures').DataTable({
                     lengthMenu: [
-                        [10, 15, 25, 50, 100, 20000000000000],
-                        [10, 15, 25, 50, 100, "All"],
+                        [10, 15, 20 ,25, 50, 100, 20000000000000],
+                        [10, 15, 20, 25, 50, 100, "All"],
                     ],
+                    pageLength: 20,
                     order: [[0, "desc"]],
                     language: {
                         url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
@@ -72,10 +81,7 @@ $(document).ready(function  () {
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                  })
+                toastr.error(message);
             }
         
     })
@@ -97,9 +103,10 @@ $(document).ready(function  () {
                 tableReponse.ajax.reload();
                 $('#reponse_modal #tableFactures').DataTable({
                     lengthMenu: [
-                        [10, 15, 25, 50, 100, 20000000000000],
-                        [10, 15, 25, 50, 100, "All"],
+                        [10, 15, 20 ,25, 50, 100, 20000000000000],
+                        [10, 15, 20, 25, 50, 100, "All"],
                     ],
+                    pageLength: 20,
                     order: [[0, "desc"]],
                     language: {
                         url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
@@ -110,10 +117,7 @@ $(document).ready(function  () {
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                  })
+                toastr.error(message);
             }
         
     })
@@ -128,26 +132,21 @@ $(document).ready(function  () {
             const response = request.data;
             
             $("#reclamation_modification_modal").modal("hide")
-            Toast.fire({
-                icon: 'success',
-                title: response
-            })
+            toastr.success(response);
             table.ajax.reload();
         } catch (error) {
             console.log(error, error.response);
             const message = error.response.data;
-            Toast.fire({
-                icon: 'error',
-                title: message,
-              })
+            toastr.error(message);
         }
     })
 
     var table = $("#datatables_gestion_reclamations").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         ajax: "/fournisseur/reclamations/list",
         processing: true,
@@ -164,9 +163,10 @@ $(document).ready(function  () {
 
     var tableReponse = $("#datatables_gestion_reclamations_reponses").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         ajax: "/fournisseur/reclamations/listreponses",
         processing: true,
@@ -225,7 +225,7 @@ $(document).ready(function  () {
         rec.push(id);
         let formData = new FormData();
         formData.append("reclamations", JSON.stringify(rec));
-        var res = confirm('Vous voulez vraiment supprimer cet reclamation ?');
+        var res = confirm('VOULEZ-VOUS VRAIMENT SUPPRIMER LA RÉCLAMATION ?');
         if(res == 1){
             try {
                 // icon.remove('fa-trash').addClass("fa-spinner fa-spin ");
@@ -234,17 +234,11 @@ $(document).ready(function  () {
                 console.log(response);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
                 table.ajax.reload();
-                Toast.fire({
-                    icon: 'success',
-                    title: response
-                })
+                toastr.success(response);
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                })
+                toastr.error(message);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
             }
         }
@@ -253,17 +247,14 @@ $(document).ready(function  () {
     $('body').on('click','#btnSupprimerMulti',async function (e) {
         e.preventDefault();
         if (reclamations.length == 0) {
-            Toast.fire({
-                icon: "error",
-                title: "Veuillez cochez une ou plusieurs ligne!",
-            });
+            toastr.error("MERCI DE CHOISIR UNE OU PLUSIEURS RECLAMATIONS");
             return;
         }
 
         let formData = new FormData();
         formData.append("reclamations", JSON.stringify(reclamations));
 
-        var res = confirm('Vous voulez vraiment supprimer ces reclamations ?');
+        var res = confirm('VOULEZ-VOUS VRAIMENT SUPPRIMER CES RÉCLAMATIONS ?');
         if(res == 1){
             try {
                 // icon.remove('fa-trash').addClass("fa-spinner fa-spin ");
@@ -272,17 +263,11 @@ $(document).ready(function  () {
                 // console.log(response);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
                 table.ajax.reload();
-                Toast.fire({
-                    icon: 'success',
-                    title: response
-                })
+                toastr.success(response);
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                })
+                toastr.error(message);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
             }
         }
@@ -322,10 +307,7 @@ $(document).ready(function  () {
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
-            Toast.fire({
-                icon: "error",
-                title: message,
-            });
+            toastr.error(message);
         }
     });
     

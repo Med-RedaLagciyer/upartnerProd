@@ -1,12 +1,28 @@
 $(document).ready(function  () {
     // console.log($("#btnReponse").attr("data-value"));
 
-    var Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
+    // var Toast = Swal.mixin({
+    //     toast: true,
+    //     position: 'top-end',
+    //     showConfirmButton: false,
+    //     timer: 3000
+    // });
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "progressBar": true,
+        "preventDuplicates": false,
+        "positionClass": "toast-top-right",
+        "onclick": null,
+        "showDuration": "400",
+        "hideDuration": "1000",
+        "timeOut": "7000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
 
     // $("body #show_modal #infos_factures #datatables_detail_facture").DataTable({
     //     lengthMenu: [
@@ -31,9 +47,10 @@ $(document).ready(function  () {
     // });
     var table = $("#datatables_gestion_reclamation").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         ajax: "/fournisseur/autres/listreclamation",
         processing: true,
@@ -68,10 +85,7 @@ $(document).ready(function  () {
         } catch (error) {
             console.log(error, error.response);
             const message = error.response.data;
-            Toast.fire({
-                icon: 'error',
-                title: message,
-              })
+            toastr.error(message);
         }
         
     });
@@ -93,9 +107,10 @@ $(document).ready(function  () {
                 
                 $("#datatables_gestion_autres").DataTable({
                     lengthMenu: [
-                        [10, 15, 25, 50, 100, 20000000000000],
-                        [10, 15, 25, 50, 100, "All"],
+                        [10, 15, 20 ,25, 50, 100, 20000000000000],
+                        [10, 15, 20, 25, 50, 100, "All"],
                     ],
+                    pageLength: 20,
                     order: [[0, "desc"]],
                     // orderable: false, targets: [0] ,
                     columnDefs: [
@@ -111,10 +126,7 @@ $(document).ready(function  () {
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                  })
+                toastr.error(message);
             }
         
         $("#show_modal").modal("show")
@@ -140,10 +152,7 @@ $(document).ready(function  () {
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                  })
+                toastr.error(message);
             }
         
     });
@@ -183,10 +192,7 @@ $(document).ready(function  () {
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
-            Toast.fire({
-                icon: "error",
-                title: message,
-            });
+            toastr.error(message);
         }
     });
 
@@ -197,10 +203,11 @@ $(document).ready(function  () {
         e.preventDefault();
 
         if($('#numFacture').val() == "" || $('#date').val() == "" || $('#montant').val() == "" || $('#observation').val() == "" ){
-            Toast.fire({
-                icon: 'error',
-                title: "Veuillez remplire tous les informations du facture!"
-            })
+            // Toast.fire({
+            //     icon: 'error',
+            //     title: "DONNÉES FACTURE OBLIGATOIRES"
+            // })
+            toastr.error("DONNÉES FACTURE OBLIGATOIRES");
             return;
         }
 
@@ -261,20 +268,14 @@ $(document).ready(function  () {
             );
             const response = request.data;
             $("#ajouter_modal").modal("hide")
-            Toast.fire({
-                icon: 'success',
-                title: response
-            })
+            toastr.success(response);
             factureAjt = []
             table.ajax.reload();
 
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
-            Toast.fire({
-                icon: "error",
-                title: message,
-            });
+            toastr.error(message);
             icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
         }
     });

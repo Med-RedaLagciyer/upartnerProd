@@ -54,6 +54,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'userCreated', targetEntity: PartenaireValide::class)]
     private Collection $partenaireValides;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $partenaireId = null;
+
     public function __construct()
     {
         $this->reclamations = new ArrayCollection();
@@ -296,6 +299,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $partenaireValide->setUserCreated(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPartenaireId(): ?int
+    {
+        return $this->partenaireId;
+    }
+
+    public function setPartenaireId(?int $partenaireId): self
+    {
+        $this->partenaireId = $partenaireId;
 
         return $this;
     }

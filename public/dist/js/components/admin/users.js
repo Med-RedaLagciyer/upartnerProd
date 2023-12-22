@@ -1,18 +1,38 @@
 $(document).ready(function  () {
     // console.log('hi');
+    // alert("hello");
 
-    var Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
+    // var Toast = Swal.mixin({
+    //     toast: true,
+    //     position: 'top-end',
+    //     showConfirmButton: false,
+    //     timer: 3000
+    // });
+
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "progressBar": true,
+        "preventDuplicates": false,
+        "positionClass": "toast-top-right",
+        "onclick": null,
+        "showDuration": "400",
+        "hideDuration": "1000",
+        "timeOut": "7000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+    // toastr.success('Toastr is working!');
 
     var table = $("#datatables_gestion_users").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         ajax: "/admin/users/list",
         processing: true,
@@ -46,10 +66,7 @@ $(document).ready(function  () {
         } catch (error) {
             console.log(error, error.response);
             const message = error.response.data;
-            Toast.fire({
-                icon: 'error',
-                title: message,
-              })
+            toastr.error(message);
         }
     })
 
@@ -71,18 +88,12 @@ $(document).ready(function  () {
             // }
             
             $("#modalAjouter").modal("hide")
-            Toast.fire({
-                icon: 'success',
-                title: response.message
-            })
+            toastr.success(response);
             table.ajax.reload();
         } catch (error) {
             console.log(error, error.response);
             const message = error.response.data;
-            Toast.fire({
-                icon: 'error',
-                title: message,
-              })
+            toastr.error(message);
             // icon.addClass('fa-edit').removeClass("fa-spinner fa-spin ");
         }
     })
@@ -96,18 +107,12 @@ $(document).ready(function  () {
             const request = await axios.get('/admin/users/devalider/'+id);
             const response = request.data;
             table.ajax.reload();
-            Toast.fire({
-                icon: 'success',
-                title: response.message
-            })
+            toastr.success(response);
             
         } catch (error) {
             console.log(error, error.response);
             const message = error.response.data;
-            Toast.fire({
-                icon: 'error',
-                title: message,
-              })
+            toastr.error(message);
         }
     })
 
@@ -115,7 +120,7 @@ $(document).ready(function  () {
         e.preventDefault();
         // const icon = $("#supprimer i");
         const id = $(this).closest('tr').attr('id');
-        var res = confirm('Vous voulez vraiment supprimer cet utilisateur ?');
+        var res = confirm('VOULEZ-VOUS VRAIMENT SUPPRIMER L\'UTILISATEUR ?');
         if(res == 1){
             try {
                 // icon.remove('fa-trash').addClass("fa-spinner fa-spin ");
@@ -124,17 +129,11 @@ $(document).ready(function  () {
                 console.log(response);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
                 table.ajax.reload();
-                Toast.fire({
-                    icon: 'success',
-                    title: response
-                })
+                toastr.success(response);
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                })
+                toastr.error(message);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
             }
         }
@@ -144,7 +143,7 @@ $(document).ready(function  () {
         e.preventDefault();
         // const icon = $("#supprimer i");
         const id = $(this).closest('tr').attr('id');
-        var res = confirm('Vous voulez vraiment reinitialiser le mot de pass de cet utilisateur ?');
+        var res = confirm('VOUS CONFIRMEZ LA RÉINITIALISATION DU MOT DE PASSE ?');
         if(res == 1){
             try {
                 // icon.remove('fa-trash').addClass("fa-spinner fa-spin ");
@@ -153,17 +152,15 @@ $(document).ready(function  () {
                 console.log(response);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
                 table.ajax.reload();
-                Toast.fire({
-                    icon: 'success',
-                    title: response
-                })
+                // Toast.fire({
+                //     icon: 'success',
+                //     title: response
+                // })
+                toastr.success(response);
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                })
+                toastr.error(response);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
             }
         }
