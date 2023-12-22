@@ -38,9 +38,11 @@
 						{# <th class="text-truncate" title='{{fac.observation}}' width="25%">{{fac.observation}}</th> #}
 						<th width="25%">{{fac.dateFacture | date('d-m-Y')}}</th>
 						<th width="">
-							<a id="downloadFile" data-file="{{fac.file}}" class="btn btn-secondary btn-xs pull-right" style="width: 30px;">
-								<i class="fas fa-download"></i>
-							</a>
+							{% if fac.file %}
+								<a id="downloadFile" data-file="{{fac.file}}" class="btn btn-secondary btn-xs pull-right" style="width: 30px;">
+									<i class="fas fa-download"></i>
+								</a>
+							{% endif %}
 						</th>
 						<th>{{fac.statut.designation}}</th>
 					</tr>
