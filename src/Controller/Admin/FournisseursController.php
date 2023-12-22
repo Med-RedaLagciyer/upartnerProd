@@ -140,125 +140,153 @@ class FournisseursController extends AbstractController
         // dd($request);
         if ($request->get("nom") && $request->get("prenom") && $request->get("ice_o")) {
             if (strlen($request->get('ice_o')) !== 15) {
-                return new JsonResponse('ice doit contenir 15 chiffres!', 500);
+                return new JsonResponse('ICE DOIT AVOIR PLUS DE 15 CARACTÈRES', 500);
             }
-
+            // dd($request->get("ice_o"));
             $entityManager = $doctrine->getManager('default')->getConnection();
 
-            $query = "Update `u_p_partenaire` set ice_o = " . $request->get("ice_o") . " where id =" . $request->get("idfrs");
+            $query = "Update `u_p_partenaire` set societe = '".$request->get("societe")."', ice = '".$request->get("ice")."', nom = '".$request->get("nom")."', prenom = '".$request->get("prenom")."', tel1 = '".$request->get("tel1")."', tel2 = '".$request->get("tel2")."', mail1 = '".$request->get("mail1")."', mail2 = '".$request->get("mail2")."', pays = '".$request->get("pays")."', ville = '".$request->get("ville")."', adresse = '".$request->get("adresse")."', ice_o = '" . $request->get("ice_o") . "' where id =" . $request->get("idfrs");
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
 
-            $partenaire = $this->em->getRepository(PartenaireValide::class)->findby(["partenaireId" => $request->get("idfrs")]);
+            // $partenaire = $this->em->getRepository(PartenaireValide::class)->findby(["partenaireId" => $request->get("idfrs")]);
             // dd(!$partenaire);
+            $message = "MISE À JOUR TERMINÉE AVEC SUCCÈS";
+            $user = $this->em->getRepository(User::class)->findby(['partenaireId' => $request->get("idfrs")]);
 
-            if (!$partenaire) {
-                $partenaire = new PartenaireValide();
+            $defaultPassword = '0123456789';
+            if (!$user) {
+                // dd($request->get("idfrs"));
+                $user = new User();
+                $user->setUsername($request->get("ice_o"));
+                $user->setNom($request->get("nom"));
+                $user->setPrenom($request->get("prenom"));
+                $user->setPartenaireId($request->get("idfrs"));
+                $user->setPassword($passwordHasher->hashPassword(
+                    $user,
+                    $defaultPassword
+                ));
+                $user->setRoles(["ROLE_FRS"]);
 
-                $partenaire->setPartenaireId(intval($request->get("idfrs")));
-
-                $partenaire->setSociete($request->get("societe"));
-                $partenaire->setICE($request->get("ice"));
-                $partenaire->setNom($request->get("nom"));
-                $partenaire->setPrenom($request->get("prenom"));
-                $partenaire->setTel1($request->get("tel1"));
-                $partenaire->setContact1($request->get("contact1"));
-                $partenaire->setTel2($request->get("tel2"));
-                $partenaire->setContact2($request->get("contact2"));
-                $partenaire->setMail1($request->get("mail1"));
-                $partenaire->setPays($request->get("pays"));
-                $partenaire->setVille($request->get("ville"));
-                $partenaire->setAdresse($request->get("adresse"));
-                $partenaire->setIceO($request->get("ice_o"));
-
-
-                $partenaire->setUserCreated($this->getUser());
-                $partenaire->setCreated(new \DateTime());
-
-                $this->em->persist($partenaire);
-
+                $this->em->persist($user);
                 $this->em->flush();
-                $message = "Les information sont bien verifiés";
-                $user = $this->em->getRepository(User::class)->findby(['username' => $request->get("ice_o")]);
+                $message .= " ET LE COMPTE EST CRÉE.";
+            } 
+            // else {
+            //     $user->setUsername($request->get("ice_o"));
+            //     $user->setPassword($passwordHasher->hashPassword(
+            //         $user,
+            //         $defaultPassword
+            //     ));
+            //     $this->em->flush();
+            // }
+            
+            // if (!$partenaire) {
+            //     $partenaire = new PartenaireValide();
 
-                $defaultPassword = '0123456789';
-                if (!$user) {
-                    $user = new User();
-                    $user->setUsername($request->get("ice_o"));
-                    $user->setNom($request->get("nom"));
-                    $user->setPrenom($request->get("prenom"));
-                    $user->setPassword($passwordHasher->hashPassword(
-                        $user,
-                        $defaultPassword
-                    ));
-                    $user->setRoles(["ROLE_FRS"]);
+            //     $partenaire->setPartenaireId(intval($request->get("idfrs")));
 
-                    $this->em->persist($user);
-                    $this->em->flush();
-                    $message .= " et l'utlisateur a bien crée";
-                } else {
-                    $user->setUsername($request->get("ice_o"));
-                    $user->setPassword($passwordHasher->hashPassword(
-                        $user,
-                        $defaultPassword
-                    ));
-                    $this->em->flush();
-                }
-            } else {
-                $PartenaireValide = $this->em->getRepository(PartenaireValide::class)->find($partenaire[0]->getId());
-                // dd($PartenaireValide);
-                $PartenaireValide->setPartenaireId(intval($request->get("idfrs")));
+            //     $partenaire->setSociete($request->get("societe"));
+            //     $partenaire->setICE($request->get("ice"));
+            //     $partenaire->setNom($request->get("nom"));
+            //     $partenaire->setPrenom($request->get("prenom"));
+            //     $partenaire->setTel1($request->get("tel1"));
+            //     $partenaire->setContact1($request->get("contact1"));
+            //     $partenaire->setTel2($request->get("tel2"));
+            //     $partenaire->setContact2($request->get("contact2"));
+            //     $partenaire->setMail1($request->get("mail1"));
+            //     $partenaire->setPays($request->get("pays"));
+            //     $partenaire->setVille($request->get("ville"));
+            //     $partenaire->setAdresse($request->get("adresse"));
+            //     $partenaire->setIceO($request->get("ice_o"));
 
-                if ($request->get("societe") != "") $PartenaireValide->setSociete($request->get("societe"));
-                $PartenaireValide->setNom($request->get("nom"));
-                $PartenaireValide->setPrenom($request->get("prenom"));
-                if ($request->get("tel1") != "") $PartenaireValide->setTel1($request->get("tel1"));
-                if ($request->get("contact1") != "") $PartenaireValide->setContact1($request->get("contact1"));
-                if ($request->get("tel2") != "") $PartenaireValide->setTel2($request->get("tel2"));
-                if ($request->get("contact2") != "") $PartenaireValide->setContact2($request->get("contact2"));
-                if ($request->get("mail1") != "") $PartenaireValide->setMail1($request->get("mail1"));
-                if ($request->get("pays") != "") $PartenaireValide->setPays($request->get("pays"));
-                if ($request->get("ville") != "") $PartenaireValide->setVille($request->get("ville"));
-                if ($request->get("adresse") != "") $PartenaireValide->setAdresse($request->get("adresse"));
-                $PartenaireValide->setIceO($request->get("ice_o"));
-                $PartenaireValide->setUserUpdated($this->getUser());
-                $PartenaireValide->setUpdated(new \DateTime());
-                $this->em->flush();
 
-                $message = "Les information sont bien verifiés";
+            //     $partenaire->setUserCreated($this->getUser());
+            //     $partenaire->setCreated(new \DateTime());
 
-                $user = $this->em->getRepository(User::class)->findby(['username' => $request->get("ice_o")]);
+            //     $this->em->persist($partenaire);
 
-                $defaultPassword = '0123456789';
-                if (!$user) {
-                    $user = new User();
-                    $user->setUsername($request->get("ice_o"));
-                    $user->setNom($request->get("nom"));
-                    $user->setPrenom($request->get("prenom"));
-                    $user->setPassword($passwordHasher->hashPassword(
-                        $user,
-                        $defaultPassword
-                    ));
-                    $user->setRoles(["ROLE_FRS"]);
+            //     $this->em->flush();
+            //     $user = $this->em->getRepository(User::class)->findby(['username' => $request->get("ice_o")]);
 
-                    $this->em->persist($user);
-                    $this->em->flush();
-                    $message .= " et l'utlisateur a bien crée";
-                } else {
-                    $user->setUsername($request->get("ice_o"));
-                    $user->setPassword($passwordHasher->hashPassword(
-                        $user,
-                        $defaultPassword
-                    ));
-                    $this->em->flush();
-                }
-            }
+            //     $defaultPassword = '0123456789';
+            //     if (!$user) {
+            //         $user = new User();
+            //         $user->setUsername($request->get("ice_o"));
+            //         $user->setNom($request->get("nom"));
+            //         $user->setPrenom($request->get("prenom"));
+            //         $user->setPassword($passwordHasher->hashPassword(
+            //             $user,
+            //             $defaultPassword
+            //         ));
+            //         $user->setRoles(["ROLE_FRS"]);
+
+            //         $this->em->persist($user);
+            //         $this->em->flush();
+            //         $message .= " ET LE COMPTE EST CRÉE.";
+            //     } else {
+            //         $user->setUsername($request->get("ice_o"));
+            //         $user->setPassword($passwordHasher->hashPassword(
+            //             $user,
+            //             $defaultPassword
+            //         ));
+            //         $this->em->flush();
+            //     }
+            // } else {
+            //     $PartenaireValide = $this->em->getRepository(PartenaireValide::class)->find($partenaire[0]->getId());
+            //     // dd($PartenaireValide);
+            //     $PartenaireValide->setPartenaireId(intval($request->get("idfrs")));
+
+            //     if ($request->get("societe") != "") $PartenaireValide->setSociete($request->get("societe"));
+            //     $PartenaireValide->setNom($request->get("nom"));
+            //     $PartenaireValide->setPrenom($request->get("prenom"));
+            //     if ($request->get("tel1") != "") $PartenaireValide->setTel1($request->get("tel1"));
+            //     if ($request->get("contact1") != "") $PartenaireValide->setContact1($request->get("contact1"));
+            //     if ($request->get("tel2") != "") $PartenaireValide->setTel2($request->get("tel2"));
+            //     if ($request->get("contact2") != "") $PartenaireValide->setContact2($request->get("contact2"));
+            //     if ($request->get("mail1") != "") $PartenaireValide->setMail1($request->get("mail1"));
+            //     if ($request->get("pays") != "") $PartenaireValide->setPays($request->get("pays"));
+            //     if ($request->get("ville") != "") $PartenaireValide->setVille($request->get("ville"));
+            //     if ($request->get("adresse") != "") $PartenaireValide->setAdresse($request->get("adresse"));
+            //     $PartenaireValide->setIceO($request->get("ice_o"));
+            //     $PartenaireValide->setUserUpdated($this->getUser());
+            //     $PartenaireValide->setUpdated(new \DateTime());
+            //     $this->em->flush();
+
+            //     $message = "MISE À JOUR TERMINÉE AVEC SUCCÈS";
+
+            //     $user = $this->em->getRepository(User::class)->findby(['username' => $request->get("ice_o")]);
+
+            //     $defaultPassword = '0123456789';
+            //     if (!$user) {
+            //         $user = new User();
+            //         $user->setUsername($request->get("ice_o"));
+            //         $user->setNom($request->get("nom"));
+            //         $user->setPrenom($request->get("prenom"));
+            //         $user->setPassword($passwordHasher->hashPassword(
+            //             $user,
+            //             $defaultPassword
+            //         ));
+            //         $user->setRoles(["ROLE_FRS"]);
+
+            //         $this->em->persist($user);
+            //         $this->em->flush();
+            //         $message .= " ET LE COMPTE EST CRÉE.";
+            //     } else {
+            //         $user->setUsername($request->get("ice_o"));
+            //         $user->setPassword($passwordHasher->hashPassword(
+            //             $user,
+            //             $defaultPassword
+            //         ));
+            //         $this->em->flush();
+            //     }
+            // }
 
 
 
             return new JsonResponse($message, 200);
         } else {
-            return new JsonResponse('vous devez remplir tous les champs!', 500);
+            return new JsonResponse('CHAMP ICE_O OBLIGATOIRE', 500);
         }
     }
 }

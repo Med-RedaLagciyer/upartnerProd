@@ -1,12 +1,22 @@
 $(document).ready(function  () {
     // console.log('hi');
 
-    var Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "progressBar": true,
+        "preventDuplicates": false,
+        "positionClass": "toast-top-right",
+        "onclick": null,
+        "showDuration": "400",
+        "hideDuration": "1000",
+        "timeOut": "7000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
 
     
 
@@ -28,10 +38,7 @@ $(document).ready(function  () {
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                  })
+                toastr.error(message);
             }
         
     })
@@ -49,9 +56,10 @@ $(document).ready(function  () {
                 $('#show_modal #infos_factures').html(response.infos);
                 $("#datatables_detail_facture").DataTable({
                     lengthMenu: [
-                        [10, 15, 25, 50, 100, 20000000000000],
-                        [10, 15, 25, 50, 100, "All"],
+                        [10, 15, 20 ,25, 50, 100, 20000000000000],
+                        [10, 15, 20, 25, 50, 100, "All"],
                     ],
+                    pageLength: 20,
                     order: [[0, "desc"]],
                     // orderable: false, targets: [0] ,
                     columnDefs: [
@@ -66,19 +74,17 @@ $(document).ready(function  () {
             } catch (error) {
                 console.log(error, error.response);
                 const message = error.response.data;
-                Toast.fire({
-                    icon: 'error',
-                    title: message,
-                  })
+                toastr.error(message);
             }
         
     })
 
     $("body #show_modal #infos_factures #datatables_detail_facture").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
@@ -87,9 +93,10 @@ $(document).ready(function  () {
 
     var tableAjoute= $("#datatables_facture_ajoute").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
@@ -98,9 +105,10 @@ $(document).ready(function  () {
 
     var table = $("#datatables_gestion_factures").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         ajax: "/fournisseur/factures/list",
         processing: true,
@@ -117,9 +125,10 @@ $(document).ready(function  () {
 
     var table2 = $("#datatables_gestion_factures_2").DataTable({
         lengthMenu: [
-            [10, 15, 25, 50, 100, 20000000000000],
-            [10, 15, 25, 50, 100, "All"],
+            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, "All"],
         ],
+        pageLength: 20,
         order: [[0, "desc"]],
         ajax: "/fournisseur/factures/list2",
         processing: true,
@@ -206,10 +215,7 @@ $(document).ready(function  () {
             );
             const response = request.data;
             $("#reclamer_modal").modal("hide")
-            Toast.fire({
-                icon: 'success',
-                title: response
-            })
+            toastr.success(response);
             factures = [];
             $("#btnReclamer").prop("disabled", true);
             table.ajax.reload();
@@ -218,10 +224,7 @@ $(document).ready(function  () {
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
-            Toast.fire({
-                icon: "error",
-                title: message,
-            });
+            toastr.error(message);
             icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
         }
     });
@@ -261,10 +264,7 @@ $(document).ready(function  () {
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
-            Toast.fire({
-                icon: "error",
-                title: message,
-            });
+            toastr.error(message);
         }
     });
 
@@ -275,10 +275,7 @@ $(document).ready(function  () {
         e.preventDefault();
 
         if($('#numFacture').val() == "" || $('#date').val() == "" || $('#montant').val() == "" || $('#observation').val() == "" ){
-            Toast.fire({
-                icon: 'error',
-                title: "Veuillez remplire tous les informations du facture!"
-            })
+            toastr.error("DONNÉES FACTURE OBLIGATOIRES");
             return;
         }
 
@@ -339,20 +336,14 @@ $(document).ready(function  () {
             );
             const response = request.data;
             $("#ajouter_modal").modal("hide")
-            Toast.fire({
-                icon: 'success',
-                title: response
-            })
+            toastr.success(response);
             factureAjt = []
             table2.ajax.reload();
 
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
-            Toast.fire({
-                icon: "error",
-                title: message,
-            });
+            toastr.error(message);
             icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
         }
     });

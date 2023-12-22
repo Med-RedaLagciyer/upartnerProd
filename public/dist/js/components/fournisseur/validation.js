@@ -1,12 +1,22 @@
 $(document).ready(function  () {
     // console.log('hi');
 
-    var Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "progressBar": true,
+        "preventDuplicates": false,
+        "positionClass": "toast-top-right",
+        "onclick": null,
+        "showDuration": "400",
+        "hideDuration": "1000",
+        "timeOut": "7000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
 
     $("body").on("submit", "#formValider", async function (e) {
         e.preventDefault();
@@ -22,10 +32,7 @@ $(document).ready(function  () {
                 formData
                 );
                 const response = request.data;
-                Toast.fire({
-                    icon: 'success',
-                    title: response
-                })
+                toastr.success(response);
                 
                 // window.location.href= "{{ path('app_index') }}";
                 window.location = '/';  
@@ -33,10 +40,7 @@ $(document).ready(function  () {
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
-            Toast.fire({
-                icon: "error",
-                title: message,
-            });
+            toastr.error(message);
             icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
         }
     });

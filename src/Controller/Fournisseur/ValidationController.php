@@ -34,7 +34,7 @@ class ValidationController extends AbstractController
         // dd($infos);
 
         if (!$infos) {
-            return new JsonResponse("Votre compte n'est pas encore cree", 500);
+            return new JsonResponse("COMPTE PAS ENCORE CRÉE", 500);
         }
 
         return $this->render('fournisseur/valider.html.twig', [
@@ -48,7 +48,7 @@ class ValidationController extends AbstractController
 
         if ($request->get("societe") && $request->get("ice") && $request->get("nom") && $request->get("prenom") && $request->get("tel1") && $request->get("tel2") && $request->get("contact1") && $request->get("contact2") && $request->get("mail1") && $request->get("pays") && $request->get("ville") && $request->get("adresse")) {
             if (strlen($request->get('ice')) !== 15) {
-                return new JsonResponse('ice doit contenir 15 chiffres!', 500);
+                return new JsonResponse('ICE DOIT AVOIR PLUS DE 15 CARACTÈRES', 500);
             }
             $partenaire = $this->em->getRepository(PartenaireValide::class)->findby(["partenaireId" => $request->get("idfrs")]);
             // dd(!$partenaire);
@@ -99,9 +99,9 @@ class ValidationController extends AbstractController
             }
 
 
-            return new JsonResponse('Les information sont bien verifiés!', 200);
+            return new JsonResponse('MISE À JOUR RÉALISÉE AVEC SUSSE', 200);
         } else {
-            return new JsonResponse('vous devez remplir tous les champs!', 500);
+            return new JsonResponse('MISE À JOUR RÉALISÉE AVEC SUSSE', 500);
         }
     }
 }
