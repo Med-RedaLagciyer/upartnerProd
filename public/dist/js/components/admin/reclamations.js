@@ -140,12 +140,33 @@ $(document).ready(function  () {
                         </div>`
 
             $("body #messages").append(msg);
+            $(this)[0].reset();
 
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
             toastr.error(message);
         }
+    });
+
+    $('body').on('click', '#downloadFile', function() {
+        // alert("hi");
+        var fileName = $(this).data('file');
+        
+        var fileUrl = '/uploads/factures/' + fileName; 
+        // window.location.href = fileUrl;
+        var downloadLink = $('<a></a>');
+        downloadLink.attr('href', fileUrl);
+        downloadLink.attr('download', 'PieceJoint.pdf'); 
+        downloadLink.css('display', 'none');
+        
+        $('body').append(downloadLink);
+        
+        downloadLink[0].click();
+        
+        setTimeout(function() {
+            downloadLink.remove();
+        }, 100);
     });
 
     

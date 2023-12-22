@@ -28,76 +28,40 @@ class facturesController extends AbstractController
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
 
-        $partenaire = [];
 
-        // $query = "SELECT 
-        //     COUNT(*) AS totalInvoices,
-        //     SUM(CASE WHEN op.executer = 1 THEN 1 ELSE 0 END) AS totalExecutedInvoices,
-        //     SUM(cab.montant) AS totalAmount,
-        //     SUM(CASE WHEN op.executer = 1 THEN cab.montant ELSE 0 END) AS totalAmountExecuted
-        //     FROM 
-        //         `ua_t_facturefrscab` cab
-        //     INNER JOIN 
-        //         `u_p_partenaire` p ON p.id = cab.partenaire_id
-        //     LEFT JOIN 
-        //         `u_general_operation` op ON op.facture_fournisseur_id = cab.id
-        //     WHERE 
-        //         p.id = 'YOUR_PARTNER_ID'
-        //         AND cab.active = 1 
-        //         AND cab.datefacture > '2023-01-01'";
-        // $statement = $entityManager->prepare($query);
-        // $result = $statement->executeQuery();
-        // $data = $result->fetchAll();
-
-
-        // dd($this->getUser());
-        $query = "SELECT id, code FROM `u_p_partenaire` WHERE ice_o like '" . $this->getUser()->getUsername() . "'";
+        $query = "SELECT id, code , nom, prenom from u_p_partenaire Where active = 1 and ice_o like '" . $this->getUser()->getUsername() . "'";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $infos = $result->fetchAll();
-        // dd($query);
-        $idPartenaire = $infos[0]["id"];
 
-        // dd($query);
+        $query = "SELECT 
+            COUNT(*) AS totalInvoices,
+            SUM(CASE WHEN op.executer = 1 THEN 1 ELSE 0 END) AS totalExecutedInvoices,
+            SUM(cab.montant) AS totalAmount,
+            SUM(CASE WHEN op.executer = 1 THEN cab.montant ELSE 0 END) AS totalAmountExecuted
+            FROM 
+                `ua_t_facturefrscab` cab
+            INNER JOIN 
+                `u_p_partenaire` p ON p.id = cab.partenaire_id
+            LEFT JOIN 
+                `u_general_operation` op ON op.facture_fournisseur_id = cab.id
+            WHERE 
+                p.id = " . $infos[0]["id"] . "
+                AND cab.active = 1 
+                AND cab.datefacture > '2023-01-01'";
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $data = $result->fetchAll();
+
         $reclamation = $this->em->getRepository(Reclamation::class);
-
-
-        $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.id = '" . $idPartenaire . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-
-        // dd($query);
-        $facturesCount = $result->fetchAll();
-
-        $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.id = '" . $idPartenaire . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $facturesRegleCount = $result->fetchAll();
-
-        $query = "SELECT SUM(montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.id = '" . $idPartenaire . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $montantTotal = $result->fetchAll();
-
-        $query = "SELECT SUM(cab.montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.id = '" . $idPartenaire . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $montantTotalRegle = $result->fetchAll();
-
-        $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1 and id = '" . $idPartenaire . "'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $partenaire = $result->fetchAll();
-
-        // dd($facturesCount);
 
         $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
         $donnee = [
-            'partenaire' => $partenaire[0],
-            'montantTotal' => $montantTotal[0]["total_sum"],
-            'montantTotalRegle' => $montantTotalRegle[0]["total_sum"],
-            'factureCount' => $facturesCount[0]['COUNT(*)'],
-            'facturesRegleCount' => $facturesRegleCount[0]['COUNT(*)'],
+            'partenaire' => $infos[0],
+            'montantTotal' => $data[0]["totalAmount"],
+            'montantTotalRegle' => $data[0]["totalAmountExecuted"],
+            'factureCount' => $data[0]['totalInvoices'],
+            'facturesRegleCount' => $data[0]['totalExecutedInvoices'],
         ];
         return $this->render('fournisseur/factures/index.html.twig', [
             'donnee' => $donnee,
@@ -442,10 +406,15 @@ class facturesController extends AbstractController
     #[Route('/reclamer', name: 'app_fournisseur_factures_reclamer')]
     public function ajouter(Request $request, ManagerRegistry $doctrine): Response
     {
+        // dd($request->get("observation"), $request->get("objet"));
         if ($request->get("observation") && $request->get("objet")) {
-            $factures = array_unique(json_decode($request->get("factures")));
-            // dd(!$factures);
-            // dd('hi');
+            if ($request->get("factures")) {
+                $factures = array_unique(json_decode($request->get("factures")));
+            } else {
+                $factures = [];
+            }
+
+
             $reclamation = new Reclamation();
 
             $reclamation->setObservation($request->get("observation"));
@@ -458,6 +427,9 @@ class facturesController extends AbstractController
             $this->em->persist($reclamation);
 
             $this->em->flush();
+
+            $reclamationId = $reclamation->getId();
+
             if ($factures) {
                 foreach ($factures as $facture) {
                     // dd($facture);
@@ -465,12 +437,11 @@ class facturesController extends AbstractController
                     $query = "UPDATE ua_t_facturefrscab SET id_reclamation = " . $reclamation->getId() . ", statut_reclamation_id = 2 where id = " . $facture;
                     $statement = $entityManager->prepare($query);
                     $result = $statement->executeQuery();
-                    $fournisseurs = $result->fetchAll();
                 }
             }
 
 
-            return new JsonResponse('RÉCLAMATION BIEN ENVOYÉE', 200);
+            return new JsonResponse(['message' => 'RÉCLAMATION BIEN ENVOYÉE', 'reclamation_id' => $reclamationId], 200);
         } else {
             return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
@@ -511,36 +482,32 @@ class facturesController extends AbstractController
     #[Route('/ajouter', name: 'app_fournisseur_factures_ajouter')]
     public function ajouterFactures(Request $request, ManagerRegistry $doctrine): Response
     {
-        $factures = json_decode($request->get("factures"));
-        // dd($factures);
-        if ($request->get("objet") && $request->get("observation")) {
+        $numFacture = $request->request->get('numFacture');
+        $date = $request->request->get('date');
+        $montant = $request->request->get('montant');
+        $reclamationId = $request->request->get('reclamation_id');
+        $file = $request->files->get('file');
 
+        $uploadedDirectory = $this->getParameter('facture_directory');
+        $fileName = uniqid() . '.' . $file->guessExtension();
 
-            $reclamation = new Reclamation();
+        $file->move($uploadedDirectory, $fileName);
 
-            $reclamation->setObservation($request->get("observation"));
-            $reclamation->setObjet($request->get("objet"));
+        $reclamation = $this->em->getRepository(Reclamation::class)->find($reclamationId);
+        $statut = $this->em->getRepository(Statut::class)->find(2);
 
+        if ($request->get("numFacture") && $request->get("date") && $request->get("montant")) {
 
-            $reclamation->setUserCreated($this->getUser());
-            $reclamation->setCreated(new \DateTime());
-
-            $this->em->persist($reclamation);
-            $statut = $this->em->getRepository(Statut::class)->find(2);
-            // dd($statut);
-
-            foreach ($factures as $fac) {
-                $facture = new Facture();
-                $facture->setNumFacture($fac->numFacture);
-                $facture->setMontant($fac->montant);
-                $facture->setDateFacture(new \DateTime($fac->date));
-                $facture->setObservation($fac->observation);
-                $facture->setCreated(new \DateTime());
-                $facture->setUserCreated($this->getUser());
-                $facture->setReclamation($reclamation);
-                $facture->setStatut($statut);
-                $this->em->persist($facture);
-            }
+            $facture = new Facture();
+            $facture->setNumFacture($numFacture);
+            $facture->setMontant($montant);
+            $facture->setDateFacture(new \DateTime($date));
+            $facture->setCreated(new \DateTime());
+            $facture->setUserCreated($this->getUser());
+            $facture->setReclamation($reclamation);
+            $facture->setStatut($statut);
+            $this->em->persist($facture);
+            $facture->setFile($fileName);
 
             $this->em->flush();
 

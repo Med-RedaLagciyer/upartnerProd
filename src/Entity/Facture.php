@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\FactureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: FactureRepository::class)]
 #[ORM\Table(name: '`facture`')]
@@ -47,6 +49,9 @@ class Facture
 
     #[ORM\ManyToOne(inversedBy: 'factures')]
     private ?Statut $statut = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $file = null;
 
     public function getId(): ?int
     {
@@ -182,6 +187,18 @@ class Facture
     public function setStatut(?Statut $statut): self
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getFile(): ?string
+    {
+        return $this->file;
+    }
+
+    public function setFile(?string $file): self
+    {
+        $this->file = $file;
 
         return $this;
     }

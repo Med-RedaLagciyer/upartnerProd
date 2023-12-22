@@ -303,6 +303,7 @@ $(document).ready(function  () {
                         </div>`
 
             $("body #messages").append(msg);
+            $("#message_form")[0].reset();
 
         } catch (error) {
             const message = error.response.data;
