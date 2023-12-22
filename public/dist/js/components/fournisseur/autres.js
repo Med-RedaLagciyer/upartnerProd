@@ -187,6 +187,7 @@ $(document).ready(function  () {
                         </div>`
 
             $("body #messages").append(msg);
+            $("#message_form")[0].reset();
             table.ajax.reload();
 
         } catch (error) {
@@ -202,7 +203,7 @@ $(document).ready(function  () {
     $("#btnAjouterFacture").on("click", async function (e) {
         e.preventDefault();
 
-        if($('#numFacture').val() == "" || $('#date').val() == "" || $('#montant').val() == "" || $('#observation').val() == "" ){
+        if($('#numFacture').val() == "" || $('#date').val() == "" || $('#montant').val() == "" ){
             // Toast.fire({
             //     icon: 'error',
             //     title: "DONNÉES FACTURE OBLIGATOIRES"
@@ -214,22 +215,23 @@ $(document).ready(function  () {
         var numFacture = $('#numFacture').val();
         var date = $('#date').val();
         var montant = $('#montant').val();
-        var observation = $('#observation').val();
+        // var observation = $('#observation').val();
         var id = Math.random();
+        var file = $("#fileUpload")[0].files[0];
 
         factureAjt.push({
             'id' : id,
             "numFacture" : numFacture,
             "date" : date,
             "montant" : montant,
-            "observation" : observation,
+            "file" : file,
         });
 
         var newRow = `<tr>  
                         <td>${numFacture}</td>
                         <td>${date}</td>
                         <td>${montant}</td>
-                        <td>${observation}</td>
+                        <td>${montant}</td>
                         <td><a id="${id}" class="btnSupprimerFacture btn btn-danger btn-xs pull-right" style="width: 20px;"><i class="fas fa-minus"></i></a></td>
                     </tr>` ;
 
@@ -238,7 +240,7 @@ $(document).ready(function  () {
         $("#numFacture").val('')
         $("#date").val('')
         $("#montant").val('')
-        $("#observation").val('')
+        $("#fileUpload").val('')
     });
 
     $("body").on("click", ".btnSupprimerFacture", async function (e) {
@@ -255,29 +257,81 @@ $(document).ready(function  () {
     $("#formAjouter").on("submit", async function (e) {
         e.preventDefault();
         console.log(factureAjt);
-
-        // // $("#reclamer_modal").modal("show")
-        const formData = new FormData($("#formAjouter")[0]);
-        // let formData = new FormData([0]);
-        formData.append("factures", JSON.stringify(factureAjt));
-
+    
+        const formDataMain = new FormData($("#formAjouter")[0]);
+    
         try {
-            const request = await axios.post(
-                "/fournisseur/factures/ajouter",
-                formData
+            const mainRequest = await axios.post(
+                "/fournisseur/factures/reclamer",
+                formDataMain
             );
-            const response = request.data;
-            $("#ajouter_modal").modal("hide")
-            toastr.success(response);
-            factureAjt = []
-            table.ajax.reload();
+            const mainResponse = mainRequest.data;
+            console.log(mainResponse.reclamation_id);
+            reclamation_id = mainResponse.reclamation_id;
+            
+            factureAjt.forEach(async function(facture) {
+                const formData = new FormData();
+                formData.append('numFacture', facture.numFacture);
+                formData.append('date', facture.date);
+                formData.append('montant', facture.montant);
+                formData.append('file', facture.file);
+                formData.append('reclamation_id', reclamation_id);
+                console.log(facture.id);
+                
+                try {
+                    const request = await axios.post(
+                        "/fournisseur/factures/ajouter",
+                        formData,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            }
+                        }
+                    );
+                    const response = request.data;
+                    var row = $('body a[id="' + facture.id + '"]').parents('tr');
+                    let index = factureAjt.findIndex((f) => f.id = id);
 
+                    factureAjt.splice(index, 1);
+
+                    row.remove()
+                    
+                } catch (error) {
+                    const message = error.response.data;
+                    console.log(error, error.response);
+                    toastr.error(message);
+                    icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
+                }
+            });
+            factureAjt = [];
+            table.ajax.reload();
+            toastr.success("RÉCLAMATION BIEN ENVOYÉE");
         } catch (error) {
             const message = error.response.data;
             console.log(error, error.response);
             toastr.error(message);
             icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
         }
+    });
+    
+    $('body').on('click', '#downloadFile', function() {
+        // alert("hi");
+        var fileName = $(this).data('file');
+        
+        var fileUrl = '/uploads/factures/' + fileName; 
+        // window.location.href = fileUrl;
+        var downloadLink = $('<a></a>');
+        downloadLink.attr('href', fileUrl);
+        downloadLink.attr('download', 'PieceJoint.pdf'); 
+        downloadLink.css('display', 'none');
+        
+        $('body').append(downloadLink);
+        
+        downloadLink[0].click();
+        
+        setTimeout(function() {
+            downloadLink.remove();
+        }, 100);
     });
     
 })

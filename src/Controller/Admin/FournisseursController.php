@@ -36,7 +36,7 @@ class FournisseursController extends AbstractController
         $params = $request->query;
         // dd($params);
         $where = $totalRows = $sqlRequest = "";
-        $filtre = "where 1 = 1";
+        $filtre = "where 1 = 1 and active";
         // dd($params->all('columns')[0]);
 
         $columns = array(
@@ -145,7 +145,7 @@ class FournisseursController extends AbstractController
             // dd($request->get("ice_o"));
             $entityManager = $doctrine->getManager('default')->getConnection();
 
-            $query = "Update `u_p_partenaire` set societe = '".$request->get("societe")."', ice = '".$request->get("ice")."', nom = '".$request->get("nom")."', prenom = '".$request->get("prenom")."', tel1 = '".$request->get("tel1")."', tel2 = '".$request->get("tel2")."', mail1 = '".$request->get("mail1")."', mail2 = '".$request->get("mail2")."', pays = '".$request->get("pays")."', ville = '".$request->get("ville")."', adresse = '".$request->get("adresse")."', ice_o = '" . $request->get("ice_o") . "' where id =" . $request->get("idfrs");
+            $query = "Update `u_p_partenaire` set societe = '" . $request->get("societe") . "', ice = '" . $request->get("ice") . "', nom = '" . $request->get("nom") . "', prenom = '" . $request->get("prenom") . "', tel1 = '" . $request->get("tel1") . "', tel2 = '" . $request->get("tel2") . "', mail1 = '" . $request->get("mail1") . "', mail2 = '" . $request->get("mail2") . "', pays = '" . $request->get("pays") . "', ville = '" . $request->get("ville") . "', adresse = '" . $request->get("adresse") . "', ice_o = '" . $request->get("ice_o") . "' where id =" . $request->get("idfrs");
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
 
@@ -171,7 +171,7 @@ class FournisseursController extends AbstractController
                 $this->em->persist($user);
                 $this->em->flush();
                 $message .= " ET LE COMPTE EST CRÉE.";
-            } 
+            }
             // else {
             //     $user->setUsername($request->get("ice_o"));
             //     $user->setPassword($passwordHasher->hashPassword(
@@ -180,7 +180,7 @@ class FournisseursController extends AbstractController
             //     ));
             //     $this->em->flush();
             // }
-            
+
             // if (!$partenaire) {
             //     $partenaire = new PartenaireValide();
 

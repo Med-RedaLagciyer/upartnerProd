@@ -1,75 +1,73 @@
 <div class="row">
-          <div class="col-3">
-            <div class="form-group">
-              <label>Objet:</label>
-              <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea>
-            </div>
-          </div>
-          <div class="col-9">
-            <div class="form-group">
-              <label>Observation: </label>
-              <textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
-            </div>
-          </div>
+	<div class="col-3">
+		<div class="form-group">
+			<label>Objet:</label>
+			<textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea>
+		</div>
+	</div>
+	<div class="col-9">
+		<div class="form-group">
+			<label>Observation:
+			</label>
+			<textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+		</div>
+	</div>
 </div>
 <hr>
 <div class="row">
-          <div class="col-12">
-            <label>Liste des factures:</label>
+	<div class="col-12">
+		<label>Liste des factures:</label>
 
-            {% if local == true %}
-              <table
-              id="tableFactures"
-              class="table table-condensed table-bordered"
-              >
-                <thead>
-                  <tr>
-                    <th width="10%">N° facture</th>
-                    <th width="">Montant</th>
-                    <th width="10%">Date facture</th>
-                    <th width="10%">Observation</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for fac in factures %}
-                      <tr>
-                        <td width="" class="text-truncate" title="{{ fac.numFacture}}">{{ fac.numFacture}}</td>
-                        <td width="10%">{{ fac.montant}}</td>
-                        <td width="">{{ fac.dateFacture | date('d-m-Y')}}</td>
-                        <td width="">{{ fac.observation}}</td>
-                      </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <table
-              id="tableFactures"
-              class="table table-condensed table-bordered"
-              >
-                <thead>
-                  <tr>
-                    <th width="10%">N° facture</th>
-                    <th width="">N° facture frs</th>
-                    <th width="">Montant</th>
-                    <th width="10%">Date facture</th>
-                    <th width="10%">Date document frs</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for fac in factures %}
-                      <tr>
-                        <td width="" class="text-truncate" title="{{ fac.code}}">{{ fac.code}}</td>
-                        <td width="20%" class="text-truncate" title="{{ fac.refDocAsso}}">{{ fac.refDocAsso}}</td>
-                        <td width="10%">{{ fac.montant}}</td>
-                        <td width="">{{ fac.datefacture}}</td>
-                        <td width="">{{ fac.dateDocAsso}}</td>
-                      </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% endif %}
-            
-          </div>
-          
+		{% if local == true %}
+			<table id="tableFactures" class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th width="10%">N° facture</th>
+						<th width="">Montant</th>
+						<th width="10%">Date facture</th>
+						<th width="10%">Piece joint</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for fac in factures %}
+						<tr>
+							<td width="" class="text-truncate" title="{{ fac.numFacture}}">{{ fac.numFacture}}</td>
+							<td width="10%">{{ fac.montant}}</td>
+							<td width="">{{ fac.dateFacture | date('d-m-Y')}}</td>
+							<td width="">
+								<a id="downloadFile" data-file="{{fac.file}}" class="btn btn-secondary btn-xs pull-right" style="width: 30px;">
+									<i class="fas fa-download"></i>
+								</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% else %}
+			<table id="tableFactures" class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th width="10%">N° facture</th>
+						<th width="">N° facture frs</th>
+						<th width="">Montant</th>
+						<th width="10%">Date facture</th>
+						<th width="10%">Date document frs</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for fac in factures %}
+						<tr>
+							<td width="" class="text-truncate" title="{{ fac.code}}">{{ fac.code}}</td>
+							<td width="20%" class="text-truncate" title="{{ fac.refDocAsso}}">{{ fac.refDocAsso}}</td>
+							<td width="10%">{{ fac.montant}}</td>
+							<td width="">{{ fac.datefacture}}</td>
+							<td width="">{{ fac.dateDocAsso}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+
+	</div>
+
 </div>
-

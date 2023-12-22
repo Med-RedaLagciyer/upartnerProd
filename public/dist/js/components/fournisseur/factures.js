@@ -213,7 +213,7 @@ $(document).ready(function  () {
                 "/fournisseur/factures/reclamer",
                 formData
             );
-            const response = request.data;
+            const response = request.data.message;
             $("#reclamer_modal").modal("hide")
             toastr.success(response);
             factures = [];
@@ -260,6 +260,7 @@ $(document).ready(function  () {
                         </div>`
 
             $("body #messages").append(msg);
+            $("#message_form")[0].reset();
 
         } catch (error) {
             const message = error.response.data;

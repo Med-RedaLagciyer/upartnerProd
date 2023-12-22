@@ -27,47 +27,43 @@ class AutresReclamationsController extends AbstractController
     #[Route('/', name: 'app_fournisseur_autres')]
     public function index(ManagerRegistry $doctrine): Response
     {
-        $partenaire = [];
 
-        $reclamation = $this->em->getRepository(Reclamation::class);
 
         $entityManager = $doctrine->getManager('default')->getConnection();
 
-        $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
+        $query = "SELECT id, code , nom, prenom from u_p_partenaire Where active = 1 and ice_o like '" . $this->getUser()->getUsername() . "'";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
-        $facturesCount = $result->fetchAll();
+        $infos = $result->fetchAll();
 
-        $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
+        $query = "SELECT 
+            COUNT(*) AS totalInvoices,
+            SUM(CASE WHEN op.executer = 1 THEN 1 ELSE 0 END) AS totalExecutedInvoices,
+            SUM(cab.montant) AS totalAmount,
+            SUM(CASE WHEN op.executer = 1 THEN cab.montant ELSE 0 END) AS totalAmountExecuted
+            FROM 
+                `ua_t_facturefrscab` cab
+            INNER JOIN 
+                `u_p_partenaire` p ON p.id = cab.partenaire_id
+            LEFT JOIN 
+                `u_general_operation` op ON op.facture_fournisseur_id = cab.id
+            WHERE 
+                p.id = " . $infos[0]["id"] . "
+                AND cab.active = 1 
+                AND cab.datefacture > '2023-01-01'";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
-        $facturesRegleCount = $result->fetchAll();
+        $data = $result->fetchAll();
 
-        $query = "SELECT SUM(montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $montantTotal = $result->fetchAll();
 
-        $query = "SELECT SUM(cab.montant) AS total_sum FROM ua_t_facturefrscab cab inner join u_p_partenaire p on p.id = cab.partenaire_id inner join u_general_operation op on op.facture_fournisseur_id = cab.id WHERE op.executer = 1 and p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 and cab.datefacture > '2023-01-01'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $montantTotalRegle = $result->fetchAll();
-
-        $query = "SELECT  code , nom, prenom from u_p_partenaire Where active = 1 and ice_o like '" . $this->getUser()->getUsername() . "'";
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $partenaire = $result->fetchAll();
-
-        // dd($facturesRegleCount);
-
-        $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
         $donnee = [
-            'partenaire' => $partenaire[0],
-            'montantTotal' => $montantTotal[0]["total_sum"],
-            'montantTotalRegle' => $montantTotalRegle[0]["total_sum"],
-            'factureCount' => $facturesCount[0]['COUNT(*)'],
-            'facturesRegleCount' => $facturesRegleCount[0]['COUNT(*)'],
+            'partenaire' => $infos[0],
+            'montantTotal' => $data[0]["totalAmount"],
+            'montantTotalRegle' => $data[0]["totalAmountExecuted"],
+            'factureCount' => $data[0]['totalInvoices'],
+            'facturesRegleCount' => $data[0]['totalExecutedInvoices'],
         ];
+
         return $this->render('fournisseur/autres_reclamations/index.html.twig', [
             'donnee' => $donnee,
         ]);
