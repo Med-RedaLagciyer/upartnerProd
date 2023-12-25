@@ -72,19 +72,11 @@ class facturesController extends AbstractController
     public function list(ManagerRegistry $doctrine, Request $request): Response
     {
 
-        $query = "SELECT id, code FROM `u_p_partenaire` WHERE ice_o = '" . $this->getUser()->getUsername() . "'";
-        $statement = $doctrine->getmanager('default')->getConnection()->prepare($query);
-        $result = $statement->executeQuery();
-        $Partenaire = $result->fetchAll();
 
         $params = $request->query;
-        // dd($params);
         $where = $totalRows = $sqlRequest = "";
-        $idPartenaire = $Partenaire[0]["id"];
-        // dd($idPartenaire);
 
-        $filtre = "where p.id = '" . $idPartenaire . "' and f.active = 1 and f.datefacture > '2023-01-01'";
-        // dd($params->all('columns')[0]);
+        $filtre = "where f.partenaire_id  = " . $this->getUser()->getPartenaireId() . " and f.active = 1 and f.datefacture > '2023-01-01'";
 
         $columns = array(
             array('db' => 'f.id', 'dt' => 0),
@@ -102,40 +94,32 @@ class facturesController extends AbstractController
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
         
-        FROM ua_t_facturefrscab f 
-        inner join u_p_partenaire p on p.id = f.partenaire_id
+        FROM ua_t_facturefrscab f
         left join u_general_operation o on o.facture_fournisseur_id = f.id
         
         $filtre ";
-        // dd($sql);
         $totalRows .= $sql;
         $sqlRequest .= $sql;
         $stmt = $doctrine->getmanager('default')->getConnection()->prepare($sql);
         $newstmt = $stmt->executeQuery();
         $totalRecords = count($newstmt->fetchAll());
-        // dd($sql);
 
-        // search 
         $where = DatatablesController::Search($request, $columns);
         if (isset($where) && $where != '') {
             $sqlRequest .= $where;
         }
         $sqlRequest .= DatatablesController::Order($request, $columns);
-        // dd($sqlRequest);
         $stmt = $doctrine->getmanager('default')->getConnection()->prepare($sqlRequest);
         $resultSet = $stmt->executeQuery();
         $result = $resultSet->fetchAll();
 
 
         $data = array();
-        // dd($result);
         $i = 1;
         $etat_bg = "";
         foreach ($result as $key => $row) {
             $nestedData = array();
             $cd = $row['id'];
-            // dd($row);
-            // $nestedData[] = "<input type ='checkbox' class='checkfacture' id ='$cd' value='$cd'>";
             $nestedData[] = $row['id_reclamation'] == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
             $nestedData[] = $row['code'];
             $nestedData[] = $row['refDocAsso'];
@@ -146,7 +130,6 @@ class facturesController extends AbstractController
 
 
             $row['statut_reclamation_id'] != null ? $nestedData[] = $this->em->getRepository(Statut::class)->find($row['statut_reclamation_id'])->getDesignation() : $nestedData[] = "";
-            // dd('hi');
 
 
             $nestedData[] = $row['id_reclamation'] == null ? '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' : '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"  style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>';
@@ -156,7 +139,6 @@ class facturesController extends AbstractController
             if ($row['id_reclamation']) {
                 $reclamation = $this->em->getRepository(Reclamation::class)->find($row['id_reclamation']);
             }
-            // dd($reclamation[0]->getReponses());
 
             if ($row['id_reclamation'] != null && ($reclamation and count($reclamation->getReponses()) == 0)) {
                 $etat_bg = "etat_bg_disable";
@@ -168,7 +150,6 @@ class facturesController extends AbstractController
 
 
             if ($row['id_reclamation'] == null && $row['UPPER(o.id)'] != null && $row['executer'] == 1) {
-                // dd('hi');
                 $etat_bg = "etat_bg_vert";
             }
 
@@ -177,14 +158,12 @@ class facturesController extends AbstractController
             $data[] = $nestedData;
             $i++;
         }
-        // dd($data);
         $json_data = array(
             "draw" => intval($params->get('draw')),
             "recordsTotal" => intval($totalRecords),
             "recordsFiltered" => intval($totalRecords),
             "data" => $data
         );
-        // die;
         return new Response(json_encode($json_data));
     }
 

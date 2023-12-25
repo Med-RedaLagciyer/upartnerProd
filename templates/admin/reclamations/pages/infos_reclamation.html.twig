@@ -35,9 +35,11 @@
 							<td width="10%">{{ fac.montant}}</td>
 							<td width="">{{ fac.dateFacture | date('d-m-Y')}}</td>
 							<td width="">
+								{% if fac.file %}
 								<a id="downloadFile" data-file="{{fac.file}}" class="btn btn-secondary btn-xs pull-right" style="width: 30px;">
 									<i class="fas fa-download"></i>
 								</a>
+							{% endif %}
 							</td>
 						</tr>
 					{% endfor %}
