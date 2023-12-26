@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+use function PHPSTORM_META\type;
+
 #[Route('/fournisseur/factures')]
 class facturesController extends AbstractController
 {
@@ -28,6 +30,7 @@ class facturesController extends AbstractController
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
 
+        // dd($this->getUser());
 
         $query = "SELECT id, code , nom, prenom from u_p_partenaire Where active = 1 and ice_o like '" . $this->getUser()->getUsername() . "'";
         $statement = $entityManager->prepare($query);
@@ -75,27 +78,33 @@ class facturesController extends AbstractController
 
         $params = $request->query;
         $where = $totalRows = $sqlRequest = "";
+        // dd($this->getUser());
 
-        $filtre = "where f.partenaire_id  = " . $this->getUser()->getPartenaireId() . " and f.active = 1 and f.datefacture > '2023-01-01'";
+
+        $filtre = "WHERE EXISTS (SELECT 1 FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id) 
+        AND EXISTS (SELECT 1 FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id) 
+        AND c.u_p_partenaire_id = " . $this->getUser()->getPartenaireId() . " 
+        AND c.active = 1
+        AND (SELECT f.datefacture FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) > '2023-01-01'
+        AND (SELECT f.active FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) = 1";
+
+        // dd($filtre);
 
         $columns = array(
-            array('db' => 'f.id', 'dt' => 0),
-            array('db' => 'f.code', 'dt' => 1),
-            array('db' => 'f.refDocAsso', 'dt' => 2),
-            array('db' => 'f.montant', 'dt' => 3),
-            array('db' => 'f.datefacture', 'dt' => 4),
-            array('db' => 'f.dateDocAsso', 'dt' => 5),
-            array('db' => 'f.id_reclamation', 'dt' => 6),
-
-            array('db' => 'UPPER(o.id)', 'dt' => 7),
-            array('db' => 'o.executer', 'dt' => 8),
-            array('db' => 'f.statut_reclamation_id', 'dt' => 9),
+            array('db' => 'c.id', 'dt' => 0),
+            array('db' => 'c.code', 'dt' => 1),
+            array('db' => 'c.refDocAsso', 'dt' => 2),
+            array('db' => 'c.datecommande', 'dt' => 3),
+            array('db' => '(SELECT CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS receptioner', 'dt' => 4),
+            array('db' => '(SELECT CASE WHEN COUNT(f.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS facturer', 'dt' => 5),
+            array('db' => 'c.id_reclamation', 'dt' => 6),
+            array('db' => 'c.statut_reclamation_id', 'dt' => 7),
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
         
-        FROM ua_t_facturefrscab f
-        left join u_general_operation o on o.facture_fournisseur_id = f.id
+        FROM ua_t_commandefrscab c 
+        
         
         $filtre ";
         $totalRows .= $sql;
@@ -113,6 +122,8 @@ class facturesController extends AbstractController
         $resultSet = $stmt->executeQuery();
         $result = $resultSet->fetchAll();
 
+        // dd($sql);
+
 
         $data = array();
         $i = 1;
@@ -123,13 +134,19 @@ class facturesController extends AbstractController
             $nestedData[] = $row['id_reclamation'] == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
             $nestedData[] = $row['code'];
             $nestedData[] = $row['refDocAsso'];
-            $nestedData[] = "<div style='text-align:right !important; margin-right:5px !important'>" . number_format($row['montant'], 2, ',', ' ') . "</div>";
-            $nestedData[] = $row['datefacture'];
-            $nestedData[] = $row['dateDocAsso'];
+            // $nestedData[] = "<div style='text-align:right !important; margin-right:5px !important'>" . number_format($row['montant'], 2, ',', ' ') . "</div>";
+            $nestedData[] = $row['datecommande'];
+            // $nestedData[] = $row['dateDocAsso'];
 
+            if ($row['receptioner'] == 1 && $row['facturer'] != 1) {
+                $nestedData = "receptioné";
+            } elseif ($row['receptioner'] == 1 && $row['facturer'] == 1) {
+                $nestedData[] = "facturé";
+            } else {
+                $nestedData[] = "Creé";
+            }
 
-
-            $row['statut_reclamation_id'] != null ? $nestedData[] = $this->em->getRepository(Statut::class)->find($row['statut_reclamation_id'])->getDesignation() : $nestedData[] = "";
+            // $row['statut_reclamation_id'] != null ? $nestedData[] = $this->em->getRepository(Statut::class)->find($row['statut_reclamation_id'])->getDesignation() : $nestedData[] = "6";
 
 
             $nestedData[] = $row['id_reclamation'] == null ? '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' : '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"  style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>';
@@ -149,8 +166,14 @@ class facturesController extends AbstractController
             }
 
 
-            if ($row['id_reclamation'] == null && $row['UPPER(o.id)'] != null && $row['executer'] == 1) {
-                $etat_bg = "etat_bg_vert";
+            // if ($row['id_reclamation'] == null && $row['UPPER(o.id)'] != null && $row['executer'] == 1) {
+            //     $etat_bg = "etat_bg_vert";
+            // }
+            if ($row['id_reclamation'] == null && $row['receptioner'] == 1 && $row['facturer'] != 1) {
+                $etat_bg = "etat_bg_receptioner";
+            }
+            if ($row['id_reclamation'] == null && $row['receptioner'] == 1 && $row['facturer'] == 1) {
+                $etat_bg = "etat_bg_facturer";
             }
 
             $nestedData["DT_RowId"] = $cd;
@@ -326,21 +349,92 @@ class facturesController extends AbstractController
             }
         }
     }
+    #[Route('/detailsCommande/{commande_id}/{type}', name: 'app_fournisseur_factures_detailsCommande')]
+    public function detailsCommande(ManagerRegistry $doctrine, $commande_id, $type): Response
+    {
+        $entityManager = $doctrine->getManager('default')->getConnection();
 
-    #[Route('/reclamation/{factureCab}/{type}', name: 'app_fournisseur_factures_reclamation')]
-    public function reclamation(ManagerRegistry $doctrine, $factureCab, $type): Response
+        $query = "SELECT id, code, datecommande, refDocAsso FROM `ua_t_commandefrscab` WHERE id = " . $commande_id . ";";
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $commande = $result->fetchAll();
+
+        $query = "SELECT id, code, datelivraison, refDocAsso FROM `ua_t_livraisonfrscab` WHERE ua_t_commandefrscab_id  = " . $commande_id . ";";
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $reception = $result->fetchAll();
+
+        $query = "SELECT f.id, f.code, f.datefacture, f.refDocAsso, f.montant, o.executer FROM `ua_t_facturefrscab` f 
+        INNER JOIN ua_t_livraisonfrscab l on l.ua_t_facturefrscab_id = f.id
+        LEFT JOIN u_general_operation o on o.facture_fournisseur_id = f.id
+        where l.ua_t_commandefrscab_id =" . $commande_id . ";";
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $facture = $result->fetchAll();
+
+        // dd($commande, $reception, $facture);
+
+
+        $factures_infos = $this->render("fournisseur/factures/pages/detailsUgouv.html.twig", [
+            'facture' => $facture,
+            'commande' => $commande,
+            'reception' => $reception,
+        ])->getContent();
+        // dd($dets);
+        return new JsonResponse([
+            'infos' => $factures_infos
+        ]);
+    }
+    #[Route('/dets/{id}/{type}', name: 'app_fournisseur_factures_dets')]
+    public function dets(ManagerRegistry $doctrine, $id, $type): Response
+    {
+        $entityManager = $doctrine->getManager('default')->getConnection();
+
+        if ($type == "commandeDet") {
+            $query = "SELECT a.titre, d.tva, d.quantite, d.prixunitaire FROM `ua_t_commandefrsdet` d
+            INNER JOIN uarticle a on a.id = d.u_article_id
+            WHERE ua_t_commandefrscab_id =  " . $id . ";";
+        }
+        if ($type == "receptionDet") {
+            $query = "SELECT a.titre, d.tva, d.quantite, d.prixunitaire FROM `ua_t_livraisonfrsdet` d
+            INNER JOIN uarticle a on a.id = d.u_article_id
+            WHERE ua_t_livraisonfrscab_id =  " . $id . ";";
+        }
+        if ($type == "factureDet") {
+            $query = "SELECT a.titre, d.tva, d.quantite, d.prixunitaire FROM `ua_t_facturefrsdet` d
+            INNER JOIN uarticle a on a.id = d.u_article_id
+            WHERE ua_t_facturefrscab_id =  " . $id . ";";
+        }
+
+
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $dets = $result->fetchAll();
+
+        $factures_infos = $this->render("fournisseur/factures/pages/dets.html.twig", [
+            'dets' => $dets,
+        ])->getContent();
+        // dd($dets);
+        return new JsonResponse([
+            'infos' => $factures_infos
+        ]);
+    }
+
+    #[Route('/reclamation/{cab}/{type}', name: 'app_fournisseur_factures_reclamation')]
+    public function reclamation(ManagerRegistry $doctrine, $cab, $type): Response
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
 
         if ($type == "local") {
-            $facture = $this->em->getRepository(Facture::class)->find($factureCab);
+            $facture = $this->em->getRepository(Facture::class)->find($cab);
             $reclamation = $facture->getReclamation();
             if ($reclamation) {
 
                 $factures_infos = $this->render("fournisseur/factures/pages/detailsReclamation.html.twig", [
                     'facture' => $facture,
                     'reclamation' => $reclamation,
-                    'rec' => true
+                    'rec' => true,
+                    'type' => $type
                 ])->getContent();
 
                 return new JsonResponse([
@@ -350,27 +444,19 @@ class facturesController extends AbstractController
                 return new JsonResponse('AUCUNE RÉCLAMATION', 500);
             }
         } else {
-            $query = "SELECT id, id_reclamation FROM `ua_t_facturefrscab` where id =" . $factureCab;
+            $query = "SELECT id, id_reclamation FROM `ua_t_commandefrscab` where id =" . $cab;
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $cab = $result->fetchAll();
-            $query = "SELECT cab.id_reclamation, cab.montant as montant, cab.datefacture as datefacture, cab.observation,  ar.titre as article, u.designation as unite, det.quantite, det.prixunitaire , det.tva FROM `ua_t_facturefrsdet` det
-            INNER JOIN ua_t_facturefrscab cab on cab.id = det.ua_t_facturefrscab_id
-            LEFT JOIN uarticle ar on ar.id = det.u_article_id
-            LEFT JOIN p_unite u on u.id = det.p_unite_id where cab.id =" . $factureCab;
-            $statement = $entityManager->prepare($query);
-            $result = $statement->executeQuery();
-            $dets = $result->fetchAll();
-            $details = !empty($dets) ? $dets[0] : [];
             $reclamation = $this->em->getRepository(Reclamation::class)->findby(['id' => $cab[0]['id_reclamation']]);
 
             if ($reclamation) {
 
                 // dd($reclamation);
                 $factures_infos = $this->render("fournisseur/factures/pages/detailsReclamation.html.twig", [
-                    'dets' => $details,
                     'reclamation' => $reclamation[0],
-                    'rec' => true
+                    'rec' => true,
+                    'type' => $type
                 ])->getContent();
                 // dd($dets);
                 return new JsonResponse([
@@ -382,15 +468,15 @@ class facturesController extends AbstractController
         }
     }
 
-    #[Route('/reclamer', name: 'app_fournisseur_factures_reclamer')]
+    #[Route('/reclamer', name: 'app_fournisseur_commandes_reclamer')]
     public function ajouter(Request $request, ManagerRegistry $doctrine): Response
     {
         // dd($request->get("observation"), $request->get("objet"));
         if ($request->get("observation") && $request->get("objet")) {
-            if ($request->get("factures")) {
-                $factures = array_unique(json_decode($request->get("factures")));
+            if ($request->get("commandes")) {
+                $commandes = array_unique(json_decode($request->get("commandes")));
             } else {
-                $factures = [];
+                $factucommandesres = [];
             }
 
 
@@ -409,11 +495,11 @@ class facturesController extends AbstractController
 
             $reclamationId = $reclamation->getId();
 
-            if ($factures) {
-                foreach ($factures as $facture) {
+            if ($commandes) {
+                foreach ($commandes as $commande) {
                     // dd($facture);
                     $entityManager = $doctrine->getManager('default')->getConnection();
-                    $query = "UPDATE ua_t_facturefrscab SET id_reclamation = " . $reclamation->getId() . ", statut_reclamation_id = 2 where id = " . $facture;
+                    $query = "UPDATE ua_t_commandefrscab  SET id_reclamation = " . $reclamation->getId() . ", statut_reclamation_id = 2 where id = " . $commande;
                     $statement = $entityManager->prepare($query);
                     $result = $statement->executeQuery();
                 }

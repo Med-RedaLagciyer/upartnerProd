@@ -267,31 +267,75 @@ class AutresReclamationsController extends AbstractController
     }
 
     #[Route('/details/{reclamation}', name: 'app_fournisseur_reclamation_details')]
-    public function details(Reclamation $reclamation): Response
+    public function details(ManagerRegistry $doctrine, Reclamation $reclamation): Response
     {
 
-        $factures = $reclamation->getFactures();
-        // dd($factures);
+        // $factures = $reclamation->getFactures();
+        // // dd($factures);
 
-        $factures_infos = $this->render("fournisseur/autres_reclamations/pages/details.html.twig", [
-            'factures' => $factures,
-            'reclamation' => $reclamation,
-        ])->getContent();
+        // $factures_infos = $this->render("fournisseur/autres_reclamations/pages/details.html.twig", [
+        //     'factures' => $factures,
+        //     'reclamation' => $reclamation,
+        // ])->getContent();
 
-        $factures_repondre = $this->render("fournisseur/autres_reclamations/pages/repondre.html.twig", [
-            'factures' => $factures,
-            'reclamation' => $reclamation,
-        ])->getContent();
+        // $factures_repondre = $this->render("fournisseur/autres_reclamations/pages/repondre.html.twig", [
+        //     'factures' => $factures,
+        //     'reclamation' => $reclamation,
+        // ])->getContent();
 
-        return new JsonResponse([
-            'infos' => $factures_infos,
-            'repondre' => $factures_repondre
-        ]);
+        // return new JsonResponse([
+        //     'infos' => $factures_infos,
+        //     'repondre' => $factures_repondre
+        // ]);
         // else{
         //     return new JsonResponse('Y\'a aucune reclamation a cette facture!',500);
         // }
 
+        if (count($reclamation->getFactures()) > 0) {
+            $factures = $reclamation->getFactures();
+            $reclamation_infos = $this->render("fournisseur/autres_reclamations/pages/details.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local' => true
+            ])->getContent();
 
+            $reclamation_repondre = $this->render("fournisseur/autres_reclamations/pages/repondre.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local' => true
+            ])->getContent();
+            // dd($reclamation);
+            return new JsonResponse([
+                'infos' => $reclamation_infos,
+                'repondre' => $reclamation_repondre,
+                'local' => true
+            ]);
+        } else {
+            $entityManager = $doctrine->getManager('default')->getConnection();
 
+            $query = "SELECT id, code, datecommande, refDocAsso FROM `ua_t_commandefrscab` WHERE id_reclamation = " . $reclamation->getId() . ";";
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $commande = $result->fetchAll();
+            // dd($factures);
+            $reclamation_infos = $this->render("fournisseur/autres_reclamations/pages/details.html.twig", [
+                'commande' => $commande,
+                'reclamation' => $reclamation,
+                'local' => false
+            ])->getContent();
+
+            $reclamation_repondre = $this->render("fournisseur/autres_reclamations/pages/repondre.html.twig", [
+                'commande' => $commande,
+                'reclamation' => $reclamation,
+                'local' => false
+
+            ])->getContent();
+            // dd($reclamation);
+            return new JsonResponse([
+                'infos' => $reclamation_infos,
+                'repondre' => $reclamation_repondre,
+                'local' => false
+            ]);
+        }
     }
 }

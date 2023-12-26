@@ -1,45 +1,32 @@
-{% if reclamation is defined %}
-	<label>Reclamation:</label>
-	<div class="row">
-		<div class="col-3">
-			<div class="form-group">
-				<label>Objet:</label>
-				<textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea>
-			</div>
-		</div>
-		<div class="col-9">
-			<div class="form-group">
-				<label>Observation:
-				</label>
-				<textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
-			</div>
-		</div>
-	</div>
-	<hr>
-{% endif %}
-
 <div class="row">
 	<div class="col-12">
-		<label>Liste des articles:</label>
+		<label>Commande:</label>
 
-		<table id="datatables_detail_facture" style="width: 100% !important" class="table table-condensed table-bordered">
+		<table id="datatables_commande" style="width: 100% !important" class="table table-condensed table-bordered">
 			<thead>
 				<tr>
-					<th width="">Article</th>
-					<th width="10%">Unite</th>
-					<th width="10%">Quantite</th>
-					<th width="10%">Prix Unt</th>
-					<th width="10%">Tva</th>
+					<th width="">Code Piece</th>
+					<th>Date</th>
+					<th>RefDocAsso</th>
+					<th width="10%"></th>
 				</tr>
 			</thead>
 			<tbody>
-				{% for d in dets %}
-					<tr>
-						<td id="article">{{dets.article}}</td>
-						<td id="unite">{{dets.unite}}</td>
-						<td id="quantite">{{dets.quantite}}</td>
-						<td id="prixunitaire">{{dets.prixunitaire}}</td>
-						<td id="tva">{{dets.tva}}</td>
+				{% for c in commande %}
+					<tr id="{{c.id}}">
+						<td id="code">{{c.code}}</td>
+						<td id="datecommande">{{c.datecommande}}</td>
+						<td id="refDocAsso">{{c.refDocAsso}}</td>
+						<td id="actions">
+							<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+								<i class="fa fa-ellipsis-v" style="color: #000;"></i>
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+								<a data-value="local" id="commandeDet" class="btnDet dropdown-item btn-xs">
+									<i class="fas fa-eye mr-2"></i>
+									Details</a>
+							</th>
+						</td>
 					</tr>
 				{% endfor %}
 			</tbody>
@@ -47,3 +34,78 @@
 	</div>
 
 </div>
+<hr>
+<div class="row">
+	<div class="col-12">
+		<label>Reception:</label>
+
+		<table id="datatables_reception" style="width: 100% !important" class="table table-condensed table-bordered">
+			<thead>
+				<tr>
+					<th width="">Code Reception</th>
+					<th>Date</th>
+					<th>RefDocAsso</th>
+					<th width="10%"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for r in reception %}
+					<tr id="{{r.id}}">
+						<td>{{r.code}}</td>
+						<td>{{r.datelivraison}}</td>
+						<td>{{r.refDocAsso}}</td>
+						<td>
+							<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+								<i class="fa fa-ellipsis-v" style="color: #000;"></i>
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+								<a data-value="local" id="receptionDet" class="btnDet dropdown-item btn-xs">
+									<i class="fas fa-eye mr-2"></i>
+									Details</a>
+							</th>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+</div>
+<hr>
+<div class="row">
+	<div class="col-12">
+		<label>Facture:</label>
+
+		<table id="datatables_facture" style="width: 100% !important" class="table table-condensed table-bordered">
+			<thead>
+				<tr>
+					<th width="">Code</th>
+					<th>Date Facture</th>
+					<th>RefDocAsso</th>
+					<th>Montant</th>
+					<th width="10%"></th>
+				</tr>
+			</thead>
+		</th>
+	</tr>
+</thead>
+<tbody>
+	{% for f in facture %}
+		<tr {% if f.executer == 1 %} class="etat_bg_vert" {% endif %} id="{{f.id}}">
+			<td>{{f.code}}</td>
+			<td>{{f.datefacture}}</td>
+			<td>{{f.refDocAsso}}</td>
+			<td>{{f.montant}}</td>
+			<td>
+				<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+					<i class="fa fa-ellipsis-v" style="color: #000;"></i>
+				</a>
+				<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+					<a data-value="local" id="factureDet" class="btnDet dropdown-item btn-xs">
+						<i class="fas fa-eye mr-2"></i>
+						Details</a>
+				</td>
+			</td>
+		</tr>
+	{% endfor %}
+</tbody></table></div></div>
