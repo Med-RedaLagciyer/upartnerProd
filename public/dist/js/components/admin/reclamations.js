@@ -64,6 +64,16 @@ $(document).ready(function  () {
                         url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
                     },
                 });
+                $('#reclamation_modal #datatables_commande').DataTable({
+                    lengthMenu: [
+                        [10, 15, 25, 50, 100, 20000000000000],
+                        [10, 15, 25, 50, 100, "All"],
+                    ],
+                    order: [[0, "desc"]],
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                    },
+                });
                 $("#reclamation_modal").modal("show")
                 table.ajax.reload();
                 // $("#show_modal #designation").val(response.designation)
@@ -148,6 +158,49 @@ $(document).ready(function  () {
             toastr.error(message);
         }
     });
+
+    $('body').on('click','.btnDet',async function(e) {
+        // const input = $(this).find("input");
+        // alert('hi')
+        e.preventDefault();
+            type = $(this).attr('id');   
+            id = $(this).closest('tr').attr('id');  
+            // type = $(this).attr('data-value');
+            // alert(type);
+            // return;
+            // console.log(type);
+                try {
+                    const request = await axios.get('/admin/reclamations/dets/'+id+'/'+type);
+                    const response = request.data;
+                    $('#dets #infos_dets').html(response.infos);
+                    $("#datatables_dets").DataTable({
+                        lengthMenu: [
+                            [10, 15, 20 ,25, 50, 100, 20000000000000],
+                            [10, 15, 20, 25, 50, 100, "All"],
+                        ],
+                        pageLength: 15,
+                        order: [[0, "desc"]],
+                        // orderable: false, targets: [0] ,
+                        columnDefs: [
+                            { orderable: false, targets: 0 } // First column (index 0) is not orderable
+                          ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        },
+                    });
+                    
+                    $("#dets").modal("show")
+                    // $("#show_modal #designation").val(response.designation)
+                } catch (error) {
+                    console.log(error, error.response);
+                    const message = error.response.data;
+                    toastr.error(message);
+                }
+
+
+            
+        
+    })
 
     $('body').on('click', '#downloadFile', function() {
         // alert("hi");

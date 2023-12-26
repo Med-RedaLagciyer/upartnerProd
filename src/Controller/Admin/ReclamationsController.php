@@ -160,19 +160,19 @@ class ReclamationsController extends AbstractController
                 'local' => true
             ]);
         } else {
-            $query = "SELECT cab.* FROM `ua_t_facturefrscab` cab where id_reclamation =" . $reclamation->getId();
+            $query = "SELECT id, code, datecommande, refDocAsso FROM `ua_t_commandefrscab` WHERE id_reclamation = " . $reclamation->getId() . ";";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
-            $factures = $result->fetchAll();
+            $commande = $result->fetchAll();
             // dd($factures);
             $reclamation_infos = $this->render("admin/reclamations/pages/infos_reclamation.html.twig", [
-                'factures' => $factures,
+                'commande' => $commande,
                 'reclamation' => $reclamation,
                 'local' => false
             ])->getContent();
 
             $reclamation_repondre = $this->render("admin/reclamations/pages/repondre_reclamation.html.twig", [
-                'factures' => $factures,
+                'commande' => $commande,
                 'reclamation' => $reclamation,
                 'local' => false
 
@@ -186,6 +186,41 @@ class ReclamationsController extends AbstractController
         }
     }
 
+
+    #[Route('/dets/{id}/{type}', name: 'app_admin_factures_dets')]
+    public function dets(ManagerRegistry $doctrine, $id, $type): Response
+    {
+        $entityManager = $doctrine->getManager('default')->getConnection();
+
+        if ($type == "commandeDet") {
+            $query = "SELECT a.titre, d.tva, d.quantite, d.prixunitaire FROM `ua_t_commandefrsdet` d
+            INNER JOIN uarticle a on a.id = d.u_article_id
+            WHERE ua_t_commandefrscab_id =  " . $id . ";";
+        }
+        if ($type == "receptionDet") {
+            $query = "SELECT a.titre, d.tva, d.quantite, d.prixunitaire FROM `ua_t_livraisonfrsdet` d
+            INNER JOIN uarticle a on a.id = d.u_article_id
+            WHERE ua_t_livraisonfrscab_id =  " . $id . ";";
+        }
+        if ($type == "factureDet") {
+            $query = "SELECT a.titre, d.tva, d.quantite, d.prixunitaire FROM `ua_t_facturefrsdet` d
+            INNER JOIN uarticle a on a.id = d.u_article_id
+            WHERE ua_t_facturefrscab_id =  " . $id . ";";
+        }
+
+
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $dets = $result->fetchAll();
+
+        $factures_infos = $this->render("admin/reclamations/pages/dets.html.twig", [
+            'dets' => $dets,
+        ])->getContent();
+        // dd($dets);
+        return new JsonResponse([
+            'infos' => $factures_infos
+        ]);
+    }
 
 
 
