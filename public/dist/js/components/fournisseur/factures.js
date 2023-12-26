@@ -50,32 +50,139 @@ $(document).ready(function  () {
             type = $(this).attr('data-value');
             // console.log(type);
 
-            try {
-                const request = await axios.get('/fournisseur/factures/details/'+id_facture_cab+'/'+type);
-                const response = request.data;
-                $('#show_modal #infos_factures').html(response.infos);
-                $("#datatables_detail_facture").DataTable({
-                    lengthMenu: [
-                        [10, 15, 20 ,25, 50, 100, 20000000000000],
-                        [10, 15, 20, 25, 50, 100, "All"],
-                    ],
-                    pageLength: 20,
-                    order: [[0, "desc"]],
-                    // orderable: false, targets: [0] ,
-                    columnDefs: [
-                        { orderable: false, targets: 0 } // First column (index 0) is not orderable
-                      ],
-                    language: {
-                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
-                    },
-                });
-                $("#show_modal").modal("show")
-                // $("#show_modal #designation").val(response.designation)
-            } catch (error) {
-                console.log(error, error.response);
-                const message = error.response.data;
-                toastr.error(message);
+            if(type = "default"){
+                // alert(id_facture_cab);
+                // return;
+                try {
+                    const request = await axios.get('/fournisseur/factures/detailsCommande/'+id_facture_cab+'/'+type);
+                    const response = request.data;
+                    $('#detailsCommand #infos_Commande').html(response.infos);
+                    $("#datatables_commande").DataTable({
+                        lengthMenu: [
+                            [5, 10, 15, 20 ,25, 50, 100, 20000000000000],
+                            [5, 10, 15, 20, 25, 50, 100, "All"],
+                        ],
+                        pageLength: 5,
+                        order: [[0, "desc"]],
+                        // orderable: false, targets: [0] ,
+                        columnDefs: [
+                            { orderable: false, targets: 0 } // First column (index 0) is not orderable
+                          ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        },
+                    });
+                    $("#datatables_reception").DataTable({
+                        lengthMenu: [
+                            [5, 10, 15, 20 ,25, 50, 100, 20000000000000],
+                            [5, 10, 15, 20, 25, 50, 100, "All"],
+                        ],
+                        pageLength: 5,
+                        order: [[0, "desc"]],
+                        // orderable: false, targets: [0] ,
+                        columnDefs: [
+                            { orderable: false, targets: 0 } // First column (index 0) is not orderable
+                          ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        },
+                    });
+                    $("#datatables_facture").DataTable({
+                        lengthMenu: [
+                            [5, 10, 15, 20 ,25, 50, 100, 20000000000000],
+                            [5, 10, 15, 20, 25, 50, 100, "All"],
+                        ],
+                        pageLength: 5,
+                        order: [[0, "desc"]],
+                        // orderable: false, targets: [0] ,
+                        columnDefs: [
+                            { orderable: false, targets: 0 } // First column (index 0) is not orderable
+                          ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        },
+                    });
+                    $("#detailsCommand").modal("show")
+                    // $("#show_modal #designation").val(response.designation)
+                } catch (error) {
+                    console.log(error, error.response);
+                    const message = error.response.data;
+                    toastr.error(message);
+                }
+            }else{
+                try {
+                    const request = await axios.get('/fournisseur/factures/details/'+id_facture_cab+'/'+type);
+                    const response = request.data;
+                    $('#show_modal #infos_factures').html(response.infos);
+                    $("#datatables_detail_facture").DataTable({
+                        lengthMenu: [
+                            [10, 15, 20 ,25, 50, 100, 20000000000000],
+                            [10, 15, 20, 25, 50, 100, "All"],
+                        ],
+                        pageLength: 20,
+                        order: [[0, "desc"]],
+                        // orderable: false, targets: [0] ,
+                        columnDefs: [
+                            { orderable: false, targets: 0 } // First column (index 0) is not orderable
+                          ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        },
+                    });
+                    $("#show_modal").modal("show")
+                    // $("#show_modal #designation").val(response.designation)
+                } catch (error) {
+                    console.log(error, error.response);
+                    const message = error.response.data;
+                    toastr.error(message);
+                }
             }
+
+
+            
+        
+    })
+
+    $('body').on('click','.btnDet',async function(e) {
+        // const input = $(this).find("input");
+        // alert('hi')
+        e.preventDefault();
+            type = $(this).attr('id');   
+            id = $(this).closest('tr').attr('id');  
+            // type = $(this).attr('data-value');
+            // alert(type);
+            // return;
+            // console.log(type);
+                try {
+                    const request = await axios.get('/fournisseur/factures/dets/'+id+'/'+type);
+                    const response = request.data;
+                    $('#dets #infos_dets').html(response.infos);
+                    $("#datatables_dets").DataTable({
+                        lengthMenu: [
+                            [10, 15, 20 ,25, 50, 100, 20000000000000],
+                            [10, 15, 20, 25, 50, 100, "All"],
+                        ],
+                        pageLength: 15,
+                        order: [[0, "desc"]],
+                        // orderable: false, targets: [0] ,
+                        columnDefs: [
+                            { orderable: false, targets: 0 } // First column (index 0) is not orderable
+                          ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        },
+                    });
+                    
+                    $("#dets").modal("show")
+                    // $("#show_modal #designation").val(response.designation)
+                } catch (error) {
+                    console.log(error, error.response);
+                    const message = error.response.data;
+                    toastr.error(message);
+                }
+
+
+            
         
     })
 
@@ -143,37 +250,37 @@ $(document).ready(function  () {
         },
     });
 
-    factures = [];
+    commandes = [];
     $("body").on("click", "#checkfacture", function () {
         const input = $(this)
         // console.log(input.attr("data-id"))
         // input.prop("checked", true);
         if(input.is(":checked")){
             
-            factures.push(input.attr("data-id"));
+            commandes.push(input.attr("data-id"));
         }else{
-            const index = factures.indexOf(input.attr("data-id"));
-            factures.splice(index,1);
+            const index = commandes.indexOf(input.attr("data-id"));
+            commandes.splice(index,1);
         }
 
         var anyChecked = $(".checkfacture:checked").length > 0;
         $("#btnReclamer").prop("disabled", !anyChecked);
         
-        console.log(factures);
+        console.log(commandes);
     });
     // $("body").off("click", ".checkfacture");
 
     $("body").on("click", ".check_all_factures", function () {
         // alert('test')
         // e.stopPropagation();
-        factures = [];
+        commandes = [];
         const fac = $("body .checkfacture");
 
         fac.each(function () {
             if (!$(this).is(':disabled')) {
                 $(this).prop("checked", $(".check_all_factures").prop("checked"));
                 if ($(this).prop("checked")) {
-                    factures.push($(this).attr("data-id"));
+                    commandes.push($(this).attr("data-id"));
                 }
             }
         });
@@ -181,32 +288,32 @@ $(document).ready(function  () {
         var anyChecked = $(".checkfacture:checked").length > 0;
         $("#btnReclamer").prop("disabled", !anyChecked);
 
-        console.log(factures);
+        console.log(commandes);
     });
 
     $("#btnReclamer").on("click", async function (e) {
         e.preventDefault();
-        console.log(factures);
+        console.log(commandes);
         
         $("#reclamer_modal").modal("show")
     });
 
     $("#btnAjouter").on("click", async function (e) {
         e.preventDefault();
-        // console.log(factures);
+        // console.log(commandes);
         
         $("#ajouter_modal").modal("show")
     });
 
     $("#formReclamer").on("submit", async function (e) {
         const fac = $("body .checkfacture");
-        console.log(factures);
+        console.log(commandes);
         e.preventDefault();
 
         // $("#reclamer_modal").modal("show")
         const formData = new FormData($("#formReclamer")[0]);
         // let formData = new FormData([0]);
-        formData.append("factures", JSON.stringify(factures));
+        formData.append("commandes", JSON.stringify(commandes));
 
         try {
             const request = await axios.post(
@@ -216,10 +323,10 @@ $(document).ready(function  () {
             const response = request.data.message;
             $("#reclamer_modal").modal("hide")
             toastr.success(response);
-            factures = [];
+            commandes = [];
             $("#btnReclamer").prop("disabled", true);
             table.ajax.reload();
-            console.log(factures);
+            console.log(commandes);
 
         } catch (error) {
             const message = error.response.data;
