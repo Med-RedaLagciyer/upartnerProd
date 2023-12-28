@@ -138,6 +138,7 @@ class facturesController extends AbstractController
             $nestedData[] = $row['code'];
             $nestedData[] = $row['refDocAsso'];
             $nestedData[] = $row['ttc'];
+            $nestedData[] = "<div style='text-align:right !important'> " . number_format($row['ttc'], 2, '.', ' ') . "</div>";
             // $nestedData[] = $row['observation'];
             $nestedData[] = "<div class='text-truncate-commande' title='" . $row['observation'] . "' style='text-align:left !important'> " . $row['observation'] . "</div>";
             // $nestedData[] = "<div style='text-align:right !important; margin-right:5px !important'>" . number_format($row['montant'], 2, ',', ' ') . "</div>";
