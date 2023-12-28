@@ -205,6 +205,19 @@ body *{
     text-overflow: ellipsis;
 }
 
+.text-truncate-commande {
+    max-width: 150px; /* Adjust this value to fit your layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.text-truncatee-commande.objet {
+    max-width: 90px; /* Adjust this value to fit your layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* .text-truncate:hover {
     white-space: normal;
     overflow: visible;

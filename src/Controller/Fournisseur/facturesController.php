@@ -94,19 +94,21 @@ class facturesController extends AbstractController
             array('db' => 'c.id', 'dt' => 0),
             array('db' => 'c.code', 'dt' => 1),
             array('db' => 'c.refDocAsso', 'dt' => 2),
-            array('db' => 'c.datecommande', 'dt' => 3),
-            array('db' => '(SELECT CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS receptioner', 'dt' => 4),
-            array('db' => '(SELECT CASE WHEN COUNT(f.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS facturer', 'dt' => 5),
-            array('db' => 'c.id_reclamation', 'dt' => 6),
-            array('db' => 'c.statut_reclamation_id', 'dt' => 7),
+            array('db' => 'SUM(det.quantite * det.prixunitaire * (1+IFNULL(det.tva,0)/100) * (1-IFNULL(det.remise,0)/100)) ttc', 'dt' => 3),
+            array('db' => 'c.observation', 'dt' => 4),
+            array('db' => 'c.datecommande', 'dt' => 5),
+            array('db' => '(SELECT CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS receptioner', 'dt' => 6),
+            array('db' => '(SELECT CASE WHEN COUNT(f.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS facturer', 'dt' => 7),
+            array('db' => 'c.id_reclamation', 'dt' => 8),
+            array('db' => 'c.statut_reclamation_id', 'dt' => 9),
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
         
         FROM ua_t_commandefrscab c 
+        INNER JOIN ua_t_commandefrsdet det on det.ua_t_commandefrscab_id = c.id
         
-        
-        $filtre ";
+        $filtre GROUP BY c.id";
         $totalRows .= $sql;
         $sqlRequest .= $sql;
         $stmt = $doctrine->getmanager('default')->getConnection()->prepare($sql);
@@ -129,11 +131,15 @@ class facturesController extends AbstractController
         $i = 1;
         $etat_bg = "";
         foreach ($result as $key => $row) {
+            // dd($row['observation']);
             $nestedData = array();
             $cd = $row['id'];
             $nestedData[] = $row['id_reclamation'] == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
             $nestedData[] = $row['code'];
             $nestedData[] = $row['refDocAsso'];
+            $nestedData[] = $row['ttc'];
+            // $nestedData[] = $row['observation'];
+            $nestedData[] = "<div class='text-truncate-commande' title='" . $row['observation'] . "' style='text-align:left !important'> " . $row['observation'] . "</div>";
             // $nestedData[] = "<div style='text-align:right !important; margin-right:5px !important'>" . number_format($row['montant'], 2, ',', ' ') . "</div>";
             $nestedData[] = $row['datecommande'];
             // $nestedData[] = $row['dateDocAsso'];
