@@ -315,6 +315,10 @@ hr {
     background-color : #ffd3d3 !important;
     color :#000 !important;    
 }
+.etat_bg_regle{
+    background-color : #d4ffd8 !important;
+    color :#000000 !important;    
+}
 
 .etat_bg_receptioner{
     background-color : #f2fa88 !important;

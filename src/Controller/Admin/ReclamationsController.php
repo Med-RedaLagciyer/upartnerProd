@@ -57,7 +57,8 @@ class ReclamationsController extends AbstractController
             array('db' => 'r.observation', 'dt' => 2),
             array('db' => 'r.created', 'dt' => 3),
             array('db' => 'u.username', 'dt' => 4),
-            array('db' => 'r.adminSeen', 'dt' => 5)
+            array('db' => 'CONCAT( u.nom, " ", u.prenom )', 'dt' => 5),
+            array('db' => 'r.adminSeen', 'dt' => 6),
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -96,9 +97,11 @@ class ReclamationsController extends AbstractController
             // $nestedData[] = "<input type ='checkbox' class='checkreclamation' id ='$cd' value='$cd'>";
             foreach (array_values($row) as $key => $value) {
 
-                if ($key != 1 and $key != 5) {
-                    if ($key == 2) {
+                if ($key != 1 and $key != 6) {
+                    if ($key == 2 ) {
                         $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'><b >" . $row["objet"] . "</b><br>" . $value . "</div>";
+                    }elseif ($key == 5 ) {
+                        $nestedData[] = "<div class='text-truncate-commande' title='" . $value . "' style='text-align:left !important'>" . $value . "</div>";
                     } else {
                         $nestedData[] = $value;
                     }

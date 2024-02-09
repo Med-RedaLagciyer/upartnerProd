@@ -16,6 +16,7 @@ class IndexController extends AbstractController
     #[Route('/', name: 'app_index')]
     public function index(Security $security, ManagerRegistry $doctrine, Request $request): Response
     {
+        // dd($this->getUser()->getUsername());
         if (!$security->getUser()) {
             // Redirect to the login page
             return $this->redirectToRoute('app_login');
@@ -30,7 +31,7 @@ class IndexController extends AbstractController
 
             $entityManager = $doctrine->getManager('default')->getConnection();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.code like '" . $this->getUser()->getUsername() . "' and cab.active = 1 ";
+            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 AND cab.datefacture > '2023-01-01'";
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $facturesCount = $result->fetchAll();

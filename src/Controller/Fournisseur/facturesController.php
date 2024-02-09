@@ -137,21 +137,34 @@ class facturesController extends AbstractController
             $nestedData[] = $row['id_reclamation'] == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
             $nestedData[] = $row['code'];
             $nestedData[] = $row['refDocAsso'];
-            $nestedData[] = $row['ttc'];
-            $nestedData[] = "<div style='text-align:right !important'> " . number_format($row['ttc'], 2, '.', ' ') . "</div>";
+            // $nestedData[] = $row['ttc'];
+            $nestedData[] = "<div style='text-align:right !important; margin-right:20px;'> " . number_format($row['ttc'], 2, '.', ' ') . "</div>";
             // $nestedData[] = $row['observation'];
             $nestedData[] = "<div class='text-truncate-commande' title='" . $row['observation'] . "' style='text-align:left !important'> " . $row['observation'] . "</div>";
             // $nestedData[] = "<div style='text-align:right !important; margin-right:5px !important'>" . number_format($row['montant'], 2, ',', ' ') . "</div>";
             $nestedData[] = $row['datecommande'];
             // $nestedData[] = $row['dateDocAsso'];
 
-            if ($row['receptioner'] == 1 && $row['facturer'] != 1) {
-                $nestedData = "receptioné";
-            } elseif ($row['receptioner'] == 1 && $row['facturer'] == 1) {
+            
+
+            $sql = "SELECT * FROM u_general_operation o INNER JOIN ua_t_facturefrscab f on f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l on l.ua_t_facturefrscab_id = f.id where l.ua_t_commandefrscab_id = ".$row['id']." and o.executer = 1;";
+            $statement = $doctrine->getmanager('default')->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+            $op = $result->fetchAll();
+
+            if ($row['receptioner'] == 1 && $row['facturer'] != 1 && !$op) {
+                $nestedData[] = "receptioné";
+            } elseif ($row['receptioner'] == 1 && $row['facturer'] == 1 && !$op) {
                 $nestedData[] = "facturé";
-            } else {
+            } elseif ($op) {
+                $nestedData[] = "Réglé";
+            }else {
                 $nestedData[] = "Creé";
             }
+
+            
+
+            
 
             // $row['statut_reclamation_id'] != null ? $nestedData[] = $this->em->getRepository(Statut::class)->find($row['statut_reclamation_id'])->getDesignation() : $nestedData[] = "6";
 
@@ -171,6 +184,12 @@ class facturesController extends AbstractController
             } else {
                 $etat_bg = "";
             }
+            
+
+            
+
+            // dd($sql);
+
 
 
             // if ($row['id_reclamation'] == null && $row['UPPER(o.id)'] != null && $row['executer'] == 1) {
@@ -181,6 +200,12 @@ class facturesController extends AbstractController
             }
             if ($row['id_reclamation'] == null && $row['receptioner'] == 1 && $row['facturer'] == 1) {
                 $etat_bg = "etat_bg_facturer";
+            }
+
+            
+            if($op){
+                // dd("hi");
+                $etat_bg = "etat_bg_regle";
             }
 
             $nestedData["DT_RowId"] = $cd;
@@ -479,6 +504,7 @@ class facturesController extends AbstractController
     public function ajouter(Request $request, ManagerRegistry $doctrine): Response
     {
         // dd($request->get("observation"), $request->get("objet"));
+        $commandes = [];
         if ($request->get("observation") && $request->get("objet")) {
             if ($request->get("commandes")) {
                 $commandes = array_unique(json_decode($request->get("commandes")));
