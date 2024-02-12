@@ -1,37 +1,85 @@
-{% extends 'base.html.twig' %} {% block title %}Accueil{% endblock %} {% block
-pagetitle %} Accueil {% endblock %} {% block body %}
-<style>
-    .small-box{
-        font-size: 100% !important;
-    }
-</style>
-<div class="row">
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-              <div class="inner">
-                <h3>{{donnee.reclamationCount}}</h3>
+{% extends 'base.html.twig' %}
+{% block title %}Accueil
+{% endblock %}
+{% block
+pagetitle %}
+	Accueil
+{% endblock %}
+{% block stylesheets %}
+	{{parent()}}
+{% endblock %}
+{% block body %}
+	<style>
+		.small-box {
+			font-size: 100% !important;
+		}
+	</style>
+	<div class="row">
 
-                <p>Reclamations</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-exclamation-triangle" style="font-size: 50px !important;"></i>
-              </div>
+		<div class="col-md-3 col-6">
+      <a href="{{path('app_fournisseur_factures')}}" style="">
+        <div class="info-box">
+          <span class="info-box-icon bg-info" style="background-color: #90bad3 !important;">
+            <div class="icon">
+              <i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
+            </div>
+          </span>
+          <div class="info-box-content">
+            <span class="info-box-text" style="color: black;">Factures</span>
+            <span class="info-box-number" style="color: black;">{{donnee.factureCount}}</span>
+            <div class="progress">
+              <div class="progress-bar" id="facturesProgressBar" style="width: 0%; background-color: #90bad3;"></div>
+            </div>
+          </div>
+
         </div>
-    </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-              <div class="inner">
-                <h3>{{donnee.factureCount}}</h3>
+      </a>
+		</div>
 
-                <p>Factures</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
-              </div>
-        </div>
-    </div>
+		<div class="col-md-3 col-6">
+			<a href="{{path('app_fournisseur_autres')}}" style="">
+				<div class="info-box">
+					<span class="info-box-icon bg-info" style="background-color: #ff9999 !important;">
+						<div
+							class="icon">
+							{# <i class="fa fa-message" ></i> #}
+							<i class="fas fa-sticky-note" style="font-size: 50px !important;"></i>
+						</div>
+					</span>
+					<div class="info-box-content">
+						<span class="info-box-text" style="color: black;">Reclamations</span>
+						<span class="info-box-number" style="color: black;">{{donnee.reclamationCount}}</span>
+						<div class="progress">
+							<div class="progress-bar" id="reclamationProgressBar" style="width: 0%; background-color: #ff9999;"></div>
+						</div>
+					</div>
 
-    
-  </div>
+				</div>
+			</a>
+		</div>
+
+
+	</div>
+
+{% endblock %}
+{% block javascripts %}
+	{{parent()}}
+	<script>
+		$(document).ready(function () { // Fetch the reclamation count from your data (replace this with your actual data)
+var reclamationCount = {{ donnee.reclamationCount }};
+var facturesCount = {{ donnee.factureCount }};
+// Define the maximum value for the progress bar (replace this with your maximum value if applicable)
+var maxReclamations = 100;
+var maxFactures = 1000;
+
+// Calculate the percentage of completion
+var percentageRec = (reclamationCount / maxReclamations) * 100;
+var percentageFac = (facturesCount / maxFactures) * 100;
+
+// Set the width of the progress bar
+$('#reclamationProgressBar').css('width', percentageRec + '%');
+$('#facturesProgressBar').css('width', percentageFac + '%');
+});
+	</script>
 
 {% endblock %}
