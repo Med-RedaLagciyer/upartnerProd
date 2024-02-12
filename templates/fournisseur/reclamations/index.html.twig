@@ -10,11 +10,11 @@ stylesheets %}
 {% endblock %}
 {% block body %}
 	{#
-							<link
-							  rel="stylesheet"
-							  href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css"
-							/>
-							#}
+											<link
+											  rel="stylesheet"
+											  href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css"
+											/>
+											#}
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
 	<div class="row">
 		<div class="col-md-12">
@@ -26,9 +26,10 @@ stylesheets %}
 							<tr>
 								{# <th width="10%"><input type="checkbox" class="check_all_reclamation" /></th> #}
 								<th width="35%">Contenu</th>
-								<th width="35%">Reponse</th>
-								<th width="15%">Date</th>
-								<th width="15%">Actions</th>
+								<th width="30%">Reponse</th>
+								<th width="20%">Statut</th>
+								<th width="30%">Date</th>
+								<th width="10%">Actions</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -37,25 +38,25 @@ stylesheets %}
 			</div>
 		</div>
 		{# <div class="col-md-6">
-														    <div class="card card-success card-outline" style="height: 81.99vh; !important overflow: auto;">
-														      <div class="card-body">
-														      <label>Reclamation répondu:</label>
-														      <table
-														          id="datatables_gestion_reclamations_reponses"
-														          class="table table-condensed table-bordered"
-														        >
-														          <thead>
-														            <tr>
-														              <th width="35%" >Contenu</th>
-														              <th width="35%" >reponse</th>
-														              <th width="15%">Date</th>
-														              <th width="15%">Actions</th>
-														            </tr>
-														          </thead>
-														          <tbody></tbody>
-														      </table>
-														    </div>
-														  </div> #}
+																						    <div class="card card-success card-outline" style="height: 81.99vh; !important overflow: auto;">
+																						      <div class="card-body">
+																						      <label>Reclamation répondu:</label>
+																						      <table
+																						          id="datatables_gestion_reclamations_reponses"
+																						          class="table table-condensed table-bordered"
+																						        >
+																						          <thead>
+																						            <tr>
+																						              <th width="35%" >Contenu</th>
+																						              <th width="35%" >reponse</th>
+																						              <th width="15%">Date</th>
+																						              <th width="15%">Actions</th>
+																						            </tr>
+																						          </thead>
+																						          <tbody></tbody>
+																						      </table>
+																						    </div>
+																						  </div> #}
 	</div>
 	{% include 'fournisseur/reclamations/modals/modalDetails.html.twig' %}
 	{% include 'fournisseur/reclamations/modals/modalModifier.html.twig' %}

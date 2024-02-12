@@ -82,6 +82,7 @@ class ReclamationsController extends AbstractController
         $i = 1;
         $etat_bg = "";
         foreach ($result as $key => $row) {
+            $reponses = $this->em->getRepository(Reponse::class)->findby(['reclamation' => $row['id']], ["id" => "desc"]);
             $nestedData = array();
             $cd = $row['id'];
             // dd($row);
@@ -94,15 +95,24 @@ class ReclamationsController extends AbstractController
                         // }
                         $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'><b >" . $row["objet"] . "</b><br>" . $value . "</div>";
                     } elseif ($key == 3) {
-                        $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'>" . $value . "</div>";
+                        if ($reponses && $reponses[0]->getUserCreated() != $this->getUser()) {
+                            $etat_bg = "etat_bg_blue";
+                            $nestedData[] = "<div class='text-truncate' title='" . $reponses[0]->getMessage() . "' style='text-align:left !important'>" . $reponses[0]->getMessage() . "</div>";
+                            $nestedData[] = "A répondu";
+                        } else {
+                            $etat_bg = "etat_bg_disable";
+                            $nestedData[] = "";
+                            $nestedData[] = "En attente de réponse";
+                        }
                     } else {
                         $nestedData[] = $value;
-                        $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 7rem !important; min-width:unset !important"><a id="btnReponse" class="dropdown-item btn-xs"><i class="fas fa-comment mr-2"></i>Reponse</a><a id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a id="btnModifier" class="dropdown-item btn-xs"><i class="fas fa-pen mr-2"></i>Modifier</a><a id="btnSupprimer" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Supprimer</a>';
+                        $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" style="color: black;"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 7rem !important; min-width:unset !important"><a id="btnReponse" class="dropdown-item btn-xs"><i class="fas fa-comment mr-2"></i>Reponse</a><a id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a id="btnModifier" class="dropdown-item btn-xs"><i class="fas fa-pen mr-2"></i>Modifier</a><a id="btnSupprimer" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Supprimer</a>';
                     }
                 }
             }
+
             $nestedData["DT_RowId"] = $cd;
-            $nestedData["DT_RowClass"] = "";
+            $nestedData["DT_RowClass"] = $etat_bg;
             $data[] = $nestedData;
             $i++;
         }

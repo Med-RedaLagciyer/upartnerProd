@@ -6,15 +6,18 @@ use App\Entity\Statut;
 use App\Entity\Facture;
 use App\Entity\Reponse;
 use App\Entity\Reclamation;
+use function PHPSTORM_META\type;
 use App\Controller\DatatablesController;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use function PHPSTORM_META\type;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/fournisseur/factures')]
 class facturesController extends AbstractController
@@ -548,14 +551,25 @@ class facturesController extends AbstractController
     #[Route('/message', name: 'app_fournisseur_factures_message')]
     public function repondre(Request $request, ManagerRegistry $doctrine): Response
     {
-        // dd($request);
-        if ($request->get("message")) {
+        // dd($request->files->get('file'));
+        if ($request->get("message") || $request->files->get('file')) {
             $reclamation = $this->em->getRepository(Reclamation::class)->find($request->get("reclamation"));
             // dd($reclamation);
             // dd('hi');
             $reponse = new Reponse();
 
-            $reponse->setMessage($request->get("message"));
+
+
+            if ($request->get("message")) $reponse->setMessage($request->get("message"));
+            if ($request->files->get('file')) {
+                $file = $request->files->get('file');
+
+                $uploadedDirectory = $this->getParameter('message_directory');
+                $fileName = uniqid() . '.' . $file->guessExtension();
+
+                $file->move($uploadedDirectory, $fileName);
+                $reponse->setFile($fileName);
+            }
             $reponse->setReclamation($reclamation);
 
 
@@ -573,7 +587,7 @@ class facturesController extends AbstractController
                 'date' => $reponse->getCreated()->format('d/m/Y'),
             ]);
         } else {
-            return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES (MESSAGE / PIECE JOINTE)', 500);
         }
     }
 
@@ -614,5 +628,64 @@ class facturesController extends AbstractController
         } else {
             return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
+    }
+
+    #[Route('/extraction', name: 'extraction_factures')]
+    public function extraction_historique(ManagerRegistry $doctrine,)
+    {
+        $entityManager = $doctrine->getManager('default')->getConnection();
+
+        $query = "SELECT
+        c.CODE 'CODE BC',
+        c.datecommande,
+        c.autre_information 'AUTRE INFORMATION BC',
+        c.position_actuel 'POSITION ACTUEL BC',
+        r.CODE 'ID BR',
+        r.datelivraison,
+        r.description,
+        r.position_actuel 'POSITION ACTUEL BR',
+        f.CODE 'CODE FAF',
+        f.montant 'montant FAF',
+        f.datefacture,
+        f.created 'DATE CEATION FAF',
+        f.autre_information 'AUTRE INFORMATION FAF',
+        f.source,
+        f.position_actuel 'POSITION ACTUEL FAF',
+        f.observation,
+        f.refDocAsso
+        FROM
+        `ua_t_commandefrscab` c
+        INNER JOIN u_p_partenaire p2 ON p2.id = c.u_p_partenaire_id
+        LEFT JOIN ua_t_livraisonfrscab r ON r.ua_t_commandefrscab_id = c.id
+        LEFT JOIN ua_t_facturefrscab f ON f.id = r.ua_t_facturefrscab_id
+        
+        WHERE
+         c.u_p_partenaire_id = " . $this->getUser()->getPartenaireId() . " and f.active = 1 and f.datefacture > '2023-01-01';";
+
+
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $data = $result->fetchAll();
+
+        // dd($data);
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        $headerRow = ['CODE BC', 'Date Commande', 'Autre Information BC', 'Position Actuel BC', 'ID BR', 'Date Livraison', 'Description', 'Position Actuel BR', 'CODE FAF', 'Montant FAF', 'Date Facture', 'Date Creation FAF', 'Autre Information FAF', 'Source', 'Position Actuel FAF', 'Observation', 'RefDocAsso'];
+        $sheet->fromArray([$headerRow], null, 'A1');
+
+        // Add data rows
+        $dataRows = [];
+        foreach ($data as $row) {
+            $dataRows[] = array_values($row);
+        }
+        $sheet->fromArray($dataRows, null, 'A2');
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = "Extraction Factures Fournisseur:" . $this->getUser()->getPartenaireId() . ".xlsx";
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($temp_file);
+        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 }
