@@ -143,6 +143,11 @@ $(document).ready(function  () {
         
     })
 
+    $('body').on('click','#btnExtraction',function (e) {
+        e.preventDefault();
+        window.open('/fournisseur/factures/extraction', '_blank');
+    });
+
     $('body').on('click','.btnDet',async function(e) {
         // const input = $(this).find("input");
         // alert('hi')

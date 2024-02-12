@@ -39,6 +39,9 @@ class Reponse
     #[ORM\Column(nullable: true)]
     private ?bool $admin = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $file = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -136,6 +139,18 @@ class Reponse
     public function setAdmin(?bool $admin): self
     {
         $this->admin = $admin;
+
+        return $this;
+    }
+
+    public function getFile(): ?string
+    {
+        return $this->file;
+    }
+
+    public function setFile(?string $file): self
+    {
+        $this->file = $file;
 
         return $this;
     }

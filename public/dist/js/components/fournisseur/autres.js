@@ -221,7 +221,9 @@ $(document).ready(function  () {
         // return;
         
         // $("#reclamer_modal").modal("show")
+        var file = $("#fileUpload")[0].files[0];
         const formData = new FormData($("#message_form")[0]);
+        formData.append('file', file);
         // let formData = new FormData([0]);
         formData.append("reclamation", $(this).attr('data-reclamation'));
 
