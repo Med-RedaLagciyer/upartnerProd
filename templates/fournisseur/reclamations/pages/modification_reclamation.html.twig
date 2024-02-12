@@ -1,52 +1,114 @@
 <form id="modifier-form">
-    <div class="row">
-            <div class="col-3">
-                <div class="form-group">
-                <label>Objet:</label>
-                <textarea class="form-control" rows="3" name="objet">{{ reclamation.objet }}</textarea>
-                </div>
-            </div>
-            <div class="col-9">
-                <div class="form-group">
-                <label>Observation: </label>
-                <textarea class="form-control" rows="3" name="observation">{{ reclamation.observation }}</textarea>
-                </div>
-            </div>
-    </div>
+	<div class="row">
+		<div class="col-3">
+			<div class="form-group">
+				<label>Objet:</label>
+				<textarea class="form-control" rows="3" name="objet">{{ reclamation.objet }}</textarea>
+			</div>
+		</div>
+		<div class="col-9">
+			<div class="form-group">
+				<label>Observation:
+				</label>
+				<textarea class="form-control" rows="3" name="observation">{{ reclamation.observation }}</textarea>
+			</div>
+		</div>
+	</div>
 
-    <button type="submit" class="btn btn-xs btn-success">Modifier</button>
+	<button type="submit" class="btn btn-xs btn-success">Modifier</button>
 </form>
 
 <hr style="margin-top:0.5rem !important; margin-bottom:0.5rem !important;">
-<div class="row">
-          <div class="col-12">
-            <label>Liste des factures:</label>
-           <table
-              id="tableFactures"
-              class="table table-condensed table-bordered"
-            >
-              <thead>
-                <tr>
-                  <th width="10%">N° facture</th>
-                  <th width="">N° facture frs</th>
-                  <th width="">Montant</th>
-                  <th width="10%">Date facture</th>
-                  <th width="10%">Date document frs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for fac in factures %}
-                    <tr>
-                      <td width="" class="text-truncate" title="{{ fac.code}}">{{ fac.code}}</td>
-                      <td width="20%" class="text-truncate" title="{{ fac.refDocAsso}}">{{ fac.refDocAsso}}</td>
-                      <td width="10%">{{ fac.montant}}</td>
-                      <td width="">{{ fac.datefacture}}</td>
-                      <td width="">{{ fac.dateDocAsso}}</td>
-                    </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-            </table>
-          </div>
-          
-</div>
+{% if local == true %}
+	<div class="row">
+		<div class="col-12">
+			<label>Liste des factures:</label>
+			<label>Liste des Factures:</label>
+
+			<table id="datatables_facture_ajoute" style="width: 100% !important" class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th width="">N° Facture</th>
+						<th width="30%">Date</th>
+						<th width="20%">Montant</th>
+						<th width="">Piece joint</th>
+						<th width="5%"></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for fac in factures %}
+						<tr>
+							<td width="" class="text-truncate" title="{{ fac.numFacture}}">{{ fac.numFacture}}</td>
+							<td width="10%">{{ fac.montant}}</td>
+							<td width="">{{ fac.dateFacture | date('d-m-Y')}}</td>
+							<td width="">
+								{% if fac.file %}
+									<a id="downloadFile" data-file="{{fac.file}}" class="btn btn-secondary btn-xs pull-right" style="width: 30px;">
+										<i class="fas fa-download"></i>
+									</a>
+								{% endif %}
+							</td>
+							<td>
+								<a id="{{fac.id}}" class="btnSupprimerFactureExsist btn btn-danger btn-xs pull-right" style="width: 20px;">
+									<i class="fas fa-minus"></i>
+								</a>
+							</td>
+						</tr>
+					{% endfor %}
+					<tr>
+						<td><input class="form-control" id="numFacture" placeholder="N° Facture"></td>
+						<td width="15%"><input class="form-control" type="date" id="date" placeholder="Date"></td>
+						<td><input class="form-control" type="number" step="0.01" id="montant" placeholder="Montant"></td>
+						{# <td><input class="form-control" id="observation"  placeholder="Observation"></td> #}
+						<td><input type="file" class="form-control-file" id="fileUpload" accept=".pdf, .doc, .docx, .txt, .png, .jpeg"></td>
+						<td style="width:4% !important">
+							<a id="btnAjouterFacture" class="btn btn-secondary btn-xs pull-right" style="width: 20px;">
+								<i class="fas fa-plus"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+
+		</div>
+
+	</div>
+{% else %}
+	<div class="row">
+		<div class="col-12">
+			<label>Commande:</label>
+
+			<table id="datatables_commande" style="width: 100% !important" class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th width="">Code Piece</th>
+						<th>Date</th>
+						<th>RefDocAsso</th>
+						<th width="10%"></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for c in commande %}
+						<tr id="{{c.id}}">
+							<td id="code">{{c.code}}</td>
+							<td id="datecommande">{{c.datecommande}}</td>
+							<td id="refDocAsso">{{c.refDocAsso}}</td>
+							<td id="actions">
+								<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+									<i class="fa fa-ellipsis-v" style="color: #000;"></i>
+								</a>
+								<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+									<a data-value="local" id="commandeDet" class="btnDet dropdown-item btn-xs">
+										<i class="fas fa-eye mr-2"></i>
+										Details</a>
+								</th>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endif %}

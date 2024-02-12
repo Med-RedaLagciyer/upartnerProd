@@ -5,6 +5,7 @@ namespace App\Controller\Fournisseur;
 use App\Entity\Reponse;
 use App\Entity\Reclamation;
 use App\Controller\DatatablesController;
+use App\Entity\Facture;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,14 +39,17 @@ class ReclamationsController extends AbstractController
         $code = $this->getUser()->getUsername();
         // dd($code);
 
-        $filtre = "where active = 1 and r.userCreated_id = " . $this->getUser()->getId() . " and rep.id is null";
+        $filtre = "where active = 1 and r.userCreated_id = " . $this->getUser()->getId() . " ";
         // dd($params->all('columns')[0]);
 
         $columns = array(
             array('db' => 'r.id', 'dt' => 0),
             array('db' => 'r.objet', 'dt' => 1),
             array('db' => 'r.observation', 'dt' => 2),
-            array('db' => 'r.created', 'dt' => 3)
+            array('db' => 'rep.message', 'dt' => 3),
+            array('db' => 'r.created', 'dt' => 4),
+            array('db' => 'rep.userSeen', 'dt' => 5)
+
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -83,15 +87,17 @@ class ReclamationsController extends AbstractController
             // dd($row);
             foreach (array_values($row) as $key => $value) {
 
-                if ($key != 1 and $key != 0) {
+                if ($key != 1 and $key != 0 and $key != 5) {
                     if ($key == 2) {
                         // if(strlen($value) > 50){
                         //     $value = substr($value, 0, 50) . "...";
                         // }
                         $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'><b >" . $row["objet"] . "</b><br>" . $value . "</div>";
+                    } elseif ($key == 3) {
+                        $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'>" . $value . "</div>";
                     } else {
                         $nestedData[] = $value;
-                        $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 7rem !important; min-width:unset !important"><a id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a id="btnModifier" class="dropdown-item btn-xs"><i class="fas fa-pen mr-2"></i>Modifier</a><a id="btnSupprimer" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Supprimer</a>';
+                        $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 7rem !important; min-width:unset !important"><a id="btnReponse" class="dropdown-item btn-xs"><i class="fas fa-comment mr-2"></i>Reponse</a><a id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a id="btnModifier" class="dropdown-item btn-xs"><i class="fas fa-pen mr-2"></i>Modifier</a><a id="btnSupprimer" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Supprimer</a>';
                     }
                 }
             }
@@ -128,9 +134,9 @@ class ReclamationsController extends AbstractController
             array('db' => 'r.id', 'dt' => 0),
             array('db' => 'r.objet', 'dt' => 1),
             array('db' => 'r.observation', 'dt' => 2),
-            array('db' => 'rep.message', 'dt' => 2),
-            array('db' => 'r.created', 'dt' => 3),
-            array('db' => 'rep.userSeen', 'dt' => 4)
+            array('db' => 'rep.message', 'dt' => 3),
+            array('db' => 'r.created', 'dt' => 4),
+            array('db' => 'rep.userSeen', 'dt' => 5)
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -176,6 +182,8 @@ class ReclamationsController extends AbstractController
                         //     $value = substr($value, 0, 50) . "...";
                         // }
                         $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'><b >" . $row["objet"] . "</b><br>" . $value . "</div>";
+                    } elseif ($key == 3) {
+                        $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'><b >" . $value . "</b><br>" . $value . "</div>";
                     } else {
                         $nestedData[] = $value;
                     }
@@ -204,39 +212,122 @@ class ReclamationsController extends AbstractController
     #[Route('/details/{reclamation}', name: 'app_fournisseur_reclamations_details')]
     public function details(ManagerRegistry $doctrine, Reclamation $reclamation, Request $request): Response
     {
-        // dd();
+        // dd($request->get('reponse') == "yes");
 
+        $reclamation->setAdminSeen(0);
+        $this->em->flush();
+        // dd(count($reclamation->getFactures()));
 
         $entityManager = $doctrine->getManager('default')->getConnection();
+        // dd('tt');
+        // dd($reclamation);
 
-        $query = "SELECT cab.* FROM `ua_t_facturefrscab` cab where id_reclamation =" . $reclamation->getId();
-        $statement = $entityManager->prepare($query);
-        $result = $statement->executeQuery();
-        $factures = $result->fetchAll();
-        // dd($factures);
-        $reclamation_infos = $this->render("fournisseur/reclamations/pages/infos_reclamation.html.twig", [
-            'factures' => $factures,
-            'reclamation' => $reclamation,
-        ])->getContent();
-        $reclamation_modification = $this->render("fournisseur/reclamations/pages/modification_reclamation.html.twig", [
-            'factures' => $factures,
-            'reclamation' => $reclamation,
-        ])->getContent();
-        $reclamation_reponse = false;
-        if ($request->get('reponse')) {
-            $reponse = $this->em->getRepository(Reponse::class)->findBy(['reclamation' => $reclamation]);
-            $reponse[0]->setUserSeen(1);
-            $this->em->flush();
-            $reclamation_reponse = $this->render("fournisseur/reclamations/pages/reponse_reclamation.html.twig", [
+        if (count($reclamation->getFactures()) > 0) {
+            $factures = $this->em->getRepository(Facture::class)->findby(['reclamation' => $reclamation->getId(), 'active' => 1]);
+            $reclamation_infos = $this->render("fournisseur/reclamations/pages/infos_reclamation.html.twig", [
                 'factures' => $factures,
                 'reclamation' => $reclamation,
+                'local' => true
             ])->getContent();
+
+            $reclamation_repondre = $this->render("fournisseur/reclamations/pages/reponse_reclamation.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local' => true
+            ])->getContent();
+
+            $reclamation_modification = $this->render("fournisseur/reclamations/pages/modification_reclamation.html.twig", [
+                'factures' => $factures,
+                'reclamation' => $reclamation,
+                'local' => true
+            ])->getContent();
+
+            if ($request->get('reponse')) {
+                // dd("hi");
+                $reponse = $this->em->getRepository(Reponse::class)->findBy(['reclamation' => $reclamation]);
+                if ($reponse) {
+                    $reponse[0]->setUserSeen(1);
+                    $this->em->flush();
+                }
+            }
+            // dd($reclamation);
+            return new JsonResponse([
+                'infos' => $reclamation_infos,
+                'reclamation_reponse' => $reclamation_repondre,
+                'modification' => $reclamation_modification,
+                'local' => true
+            ]);
+        } else {
+            $query = "SELECT id, code, datecommande, refDocAsso FROM `ua_t_commandefrscab` WHERE id_reclamation = " . $reclamation->getId() . ";";
+            $statement = $entityManager->prepare($query);
+            $result = $statement->executeQuery();
+            $commande = $result->fetchAll();
+            // dd($factures);
+            $reclamation_infos = $this->render("fournisseur/reclamations/pages/infos_reclamation.html.twig", [
+                'commande' => $commande,
+                'reclamation' => $reclamation,
+                'local' => false
+            ])->getContent();
+
+            $reclamation_repondre = $this->render("fournisseur/reclamations/pages/reponse_reclamation.html.twig", [
+                'commande' => $commande,
+                'reclamation' => $reclamation,
+                'local' => false
+
+            ])->getContent();
+            $reclamation_modification = $this->render("fournisseur/reclamations/pages/modification_reclamation.html.twig", [
+                'commande' => $commande,
+                'reclamation' => $reclamation,
+                'local' => false
+            ])->getContent();
+
+            if ($request->get('reponse')) {
+                $reponse = $this->em->getRepository(Reponse::class)->findBy(['reclamation' => $reclamation]);
+                if ($reponse) {
+                    $reponse[0]->setUserSeen(1);
+                    $this->em->flush();
+                }
+            }
+            // dd($reclamation);
+            return new JsonResponse([
+                'infos' => $reclamation_infos,
+                'reclamation_reponse' => $reclamation_repondre,
+                'modification' => $reclamation_modification,
+                'local' => false
+            ]);
         }
-        return new JsonResponse([
-            'infos' => $reclamation_infos,
-            'modification' => $reclamation_modification,
-            'reclamation_reponse' => $reclamation_reponse
-        ]);
+
+
+        // $entityManager = $doctrine->getManager('default')->getConnection();
+
+        // $query = "SELECT cab.* FROM `ua_t_facturefrscab` cab where id_reclamation =" . $reclamation->getId();
+        // $statement = $entityManager->prepare($query);
+        // $result = $statement->executeQuery();
+        // $factures = $result->fetchAll();
+        // // dd($factures);
+        // $reclamation_infos = $this->render("fournisseur/reclamations/pages/infos_reclamation.html.twig", [
+        //     'factures' => $factures,
+        //     'reclamation' => $reclamation,
+        // ])->getContent();
+        // $reclamation_modification = $this->render("fournisseur/reclamations/pages/modification_reclamation.html.twig", [
+        //     'factures' => $factures,
+        //     'reclamation' => $reclamation,
+        // ])->getContent();
+        // $reclamation_reponse = false;
+        // if ($request->get('reponse')) {
+        //     $reponse = $this->em->getRepository(Reponse::class)->findBy(['reclamation' => $reclamation]);
+        //     $reponse[0]->setUserSeen(1);
+        //     $this->em->flush();
+        //     $reclamation_reponse = $this->render("fournisseur/reclamations/pages/reponse_reclamation.html.twig", [
+        //         'factures' => $factures,
+        //         'reclamation' => $reclamation,
+        //     ])->getContent();
+        // }
+        // return new JsonResponse([
+        //     'infos' => $reclamation_infos,
+        //     'modification' => $reclamation_modification,
+        //     'reclamation_reponse' => $reclamation_reponse
+        // ]);
     }
 
     #[Route('/delete', name: 'app_fournisseur_reclamations_delete')]
@@ -261,10 +352,22 @@ class ReclamationsController extends AbstractController
         return new JsonResponse('SUPPRESSION TERMINÉE AVEC SUCCÈS', 200);
     }
 
+    #[Route('/deleteFacture', name: 'app_fournisseur_reclamations_deleteFacture')]
+    public function deleteFacture(ManagerRegistry $doctrine, Request $request): Response
+    {
+        $idFacture = $request->request->get('id');
+        $facture = $this->em->getRepository(Facture::class)->find($idFacture);
+        // dd($facture);
+        $facture->setActive(0);
+        $this->em->flush();
+
+        return new JsonResponse('SUPPRESSION TERMINÉE AVEC SUCCÈS', 200);
+    }
+
     #[Route('/modifier/{reclamation}', name: 'app_fournisseur_reclamations_modifier')]
     public function modifier(ManagerRegistry $doctrine, Request $request, Reclamation $reclamation): Response
     {
-        // dd($request->get('objet'));
+        // dd($request);
         if ($request->get("observation") && $request->get("objet")) {
             $reclamation->setObjet($request->get('objet'));
             $reclamation->setObservation($request->get('observation'));

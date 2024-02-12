@@ -1,5 +1,7 @@
 $(document).ready(function  () {
     // console.log('hi');
+    var factureAjt = []
+    var factureSupp = []
     reclamations = [];
 
     toastr.options = {
@@ -124,8 +126,75 @@ $(document).ready(function  () {
 
     $("body #modifier_reclamation ").on("submit","#modifier-form", async function (e) {
         e.preventDefault();
+        console.log(factureAjt);
+        // console.log(factureSupp);
+        // return;
         // alert(id_freclamation)
         // console.log(id_freclamation);
+
+        factureAjt.forEach(async function(facture) {
+            const formData = new FormData();
+            formData.append('numFacture', facture.numFacture);
+            formData.append('date', facture.date);
+            formData.append('montant', facture.montant);
+            formData.append('file', facture.file);
+            formData.append('reclamation_id', id_freclamation);
+            console.log(facture.id);
+            
+            try {
+                const request = await axios.post(
+                    "/fournisseur/factures/ajouter",
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        }
+                    }
+                );
+                const response = request.data;
+                let index = factureAjt.findIndex((f) => f.id = id);
+
+                factureAjt.splice(index, 1);
+                
+            } catch (error) {
+                const message = error.response.data;
+                console.log(error, error.response);
+                toastr.error(message);
+                // icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
+            }
+        });
+        factureAjt = [];
+
+        factureSupp.forEach(async function(facture) {
+            const formData = new FormData();
+            formData.append('id', facture.id);
+            formData.append('reclamation_id', id_freclamation);
+            console.log(facture.id);
+            
+            try {
+                const request = await axios.post(
+                    "/fournisseur/reclamations/deleteFacture",
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        }
+                    }
+                );
+                const response = request.data;
+                let index = factureSupp.findIndex((f) => f.id = id);
+
+                factureSupp.splice(index, 1);
+                
+            } catch (error) {
+                const message = error.response.data;
+                console.log(error, error.response);
+                toastr.error(message);
+                // icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
+            }
+        });
+        factureSupp = [];
+
         const formData = new FormData($("#modifier-form")[0]);
         try {
             const request = await axios.post('/fournisseur/reclamations/modifier/'+id_freclamation, formData);
@@ -275,7 +344,8 @@ $(document).ready(function  () {
 
     $("body").on("submit", "#message_form", async function (e) {
         e.preventDefault();
-        // console.log();
+        // console.log(factureAjt);
+        // console.log(factureSupp);
         // return;
         
         // $("#reclamer_modal").modal("show")
@@ -310,6 +380,110 @@ $(document).ready(function  () {
             console.log(error, error.response);
             toastr.error(message);
         }
+    });
+
+    $("body").on("click", "#btnAjouterFacture", async function (e) {
+        e.preventDefault();
+
+        if($('#numFacture').val() == "" || $('#date').val() == "" || $('#montant').val() == "" ){
+            // Toast.fire({
+            //     icon: 'error',
+            //     title: "DONNÉES FACTURE OBLIGATOIRES"
+            // })
+            toastr.error("DONNÉES FACTURE OBLIGATOIRES");
+            return;
+        }
+
+        var numFacture = $('#numFacture').val();
+        var date = $('#date').val();
+        var montant = $('#montant').val();
+        // var observation = $('#observation').val();
+        var id = Math.random();
+        var file = $("#fileUpload")[0].files[0];
+        console.log(file);
+        // return;
+        
+
+        factureAjt.push({
+            'id' : id,
+            "numFacture" : numFacture,
+            "date" : date,
+            "montant" : montant,
+            "file" : file,
+        });
+
+        var newRow = `<tr>  
+                        <td>${numFacture}</td>
+                        <td>${date}</td>
+                        <td>${montant}</td>
+                        <td>
+                        ${file.name}
+                        </td>
+                        <td><a id="${id}" class="btnSupprimerFacture btn btn-danger btn-xs pull-right" style="width: 20px;"><i class="fas fa-minus"></i></a></td>
+                    </tr>` ;
+
+        $('#datatables_facture_ajoute tbody').prepend(newRow);
+
+        $("#numFacture").val('')
+        $("#date").val('')
+        $("#montant").val('')
+        $("#fileUpload").val('')
+    });
+
+    $("body").on("click", ".btnSupprimerFactureExsist", async function (e) {
+        e.preventDefault();
+        var id = $(this).attr('id');
+        var row = $(this).parents('tr');
+        // console.log(index);
+        // return;
+        
+
+        var numFacture = $('#numFacture').val();
+        var date = $('#date').val();
+        var montant = $('#montant').val();
+        var file = $("#fileUpload")[0].files[0];
+
+        factureSupp.push({
+            'id' : id,
+            "numFacture" : numFacture,
+            "date" : date,
+            "montant" : montant,
+            "file" : file,
+        });
+
+
+        row.remove()
+    });
+
+    $("body").on("click", ".btnSupprimerFacture", async function (e) {
+        e.preventDefault();
+        var id = $(this).attr('id');
+        var row = $(this).parents('tr');
+        let index = factureAjt.findIndex((f) => f.id = id);
+
+        factureAjt.splice(index, 1);
+
+        row.remove()
+    });
+
+    $('body').on('click', '#downloadFile', function() {
+        // alert("hi");
+        var fileName = $(this).data('file');
+        
+        var fileUrl = '/uploads/factures/' + fileName; 
+        // window.location.href = fileUrl;
+        var downloadLink = $('<a></a>');
+        downloadLink.attr('href', fileUrl);
+        downloadLink.attr('download', 'PieceJoint.pdf'); 
+        downloadLink.css('display', 'none');
+        
+        $('body').append(downloadLink);
+        
+        downloadLink[0].click();
+        
+        setTimeout(function() {
+            downloadLink.remove();
+        }, 100);
     });
     
 })

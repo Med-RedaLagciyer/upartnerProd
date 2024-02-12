@@ -145,9 +145,9 @@ class facturesController extends AbstractController
             $nestedData[] = $row['datecommande'];
             // $nestedData[] = $row['dateDocAsso'];
 
-            
 
-            $sql = "SELECT * FROM u_general_operation o INNER JOIN ua_t_facturefrscab f on f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l on l.ua_t_facturefrscab_id = f.id where l.ua_t_commandefrscab_id = ".$row['id']." and o.executer = 1;";
+
+            $sql = "SELECT * FROM u_general_operation o INNER JOIN ua_t_facturefrscab f on f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l on l.ua_t_facturefrscab_id = f.id where l.ua_t_commandefrscab_id = " . $row['id'] . " and o.executer = 1;";
             $statement = $doctrine->getmanager('default')->getConnection()->prepare($sql);
             $result = $statement->executeQuery();
             $op = $result->fetchAll();
@@ -158,13 +158,13 @@ class facturesController extends AbstractController
                 $nestedData[] = "facturé";
             } elseif ($op) {
                 $nestedData[] = "Réglé";
-            }else {
+            } else {
                 $nestedData[] = "Creé";
             }
 
-            
 
-            
+
+
 
             // $row['statut_reclamation_id'] != null ? $nestedData[] = $this->em->getRepository(Statut::class)->find($row['statut_reclamation_id'])->getDesignation() : $nestedData[] = "6";
 
@@ -184,9 +184,9 @@ class facturesController extends AbstractController
             } else {
                 $etat_bg = "";
             }
-            
 
-            
+
+
 
             // dd($sql);
 
@@ -202,8 +202,8 @@ class facturesController extends AbstractController
                 $etat_bg = "etat_bg_facturer";
             }
 
-            
-            if($op){
+
+            if ($op) {
                 // dd("hi");
                 $etat_bg = "etat_bg_regle";
             }
@@ -503,7 +503,7 @@ class facturesController extends AbstractController
     #[Route('/reclamer', name: 'app_fournisseur_commandes_reclamer')]
     public function ajouter(Request $request, ManagerRegistry $doctrine): Response
     {
-        // dd($request->get("observation"), $request->get("objet"));
+        // dd($request->get("file"));
         $commandes = [];
         if ($request->get("observation") && $request->get("objet")) {
             if ($request->get("commandes")) {
