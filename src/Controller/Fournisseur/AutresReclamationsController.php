@@ -292,7 +292,8 @@ class AutresReclamationsController extends AbstractController
         // }
 
         if (count($reclamation->getFactures()) > 0) {
-            $factures = $reclamation->getFactures();
+            // $factures = $reclamation->getFactures();
+            $factures = $this->em->getRepository(Facture::class)->findby(['reclamation' => $reclamation->getId(), 'active' => 1]);
             $reclamation_infos = $this->render("fournisseur/autres_reclamations/pages/details.html.twig", [
                 'factures' => $factures,
                 'reclamation' => $reclamation,
