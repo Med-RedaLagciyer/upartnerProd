@@ -6,56 +6,114 @@ pagetitle %} Accueil {% endblock %} {% block body %}
     }
 </style>
 <div class="row">
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-              <div class="inner">
-                <h3>{{donnee.userCount}}</h3>
+    <div class="col-md-3 col-6">
+			<a href="{{path('app_admin_users')}}" style="">
+				<div class="info-box">
+				<span class="info-box-icon bg-info" style="background-color: #90bad3 !important;">
+					<div class="icon">
+					<i class="fas fa-users" style="font-size: 50px !important;"></i>
+					</div>
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text" style="color: black;">Utilisateurs</span>
+					<span class="info-box-number" style="color: black;">{{donnee.userCount}}</span>
+					<div class="progress">
+					<div class="progress-bar" id="usersProgressBar" style="width: 0%; background-color: #90bad3;"></div>
+					</div>
+				</div>
 
-                <p>Utilisateurs</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-users" style="font-size: 50px !important;"></i>
-              </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-              <div class="inner">
-                <h3>{{donnee.factureCount}}</h3>
+				</div>
+			</a>
+		</div>
+    <div class="col-md-3 col-6">
+			{# <a href="{{path('app_admin_users')}}" style=""> #}
+				<div class="info-box">
+				<span class="info-box-icon bg-info" style="background-color: #71a797 !important;">
+					<div class="icon">
+					<i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
+					</div>
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text" style="color: black;">Factures</span>
+					<span class="info-box-number" style="color: black;">{{donnee.factureCount}}</span>
+					<div class="progress">
+					<div class="progress-bar" id="facturesProgressBar" style="width: 0%; background-color: #90bad3;"></div>
+					</div>
+				</div>
 
-                <p>Factures</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
-              </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-              <div class="inner">
-                <h3>{{donnee.fournisseurCount}}</h3>
+				</div>
+			{# </a> #}
+		</div>
+    
+    <div class="col-md-3 col-6">
+			<a href="{{path('app_admin_fournisseurs')}}" style="">
+				<div class="info-box">
+				<span class="info-box-icon bg-info" style="background-color: #67758e !important;">
+					<div class="icon">
+					<i class="fas fa-user" style="font-size: 50px !important;"></i>
+					</div>
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text" style="color: black;">Fournisseurs</span>
+					<span class="info-box-number" style="color: black;">{{donnee.fournisseurCount}}</span>
+					<div class="progress">
+					<div class="progress-bar" id="fournisseurProgressBar" style="width: 0%; background-color: #90bad3;"></div>
+					</div>
+				</div>
 
-                <p>Fournisseurs</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-user" style="font-size: 50px !important;"></i>
-              </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-              <div class="inner">
-                <h3>{{donnee.reclamationCount}}</h3>
+				</div>
+			</a>
+		</div>
+     <div class="col-md-3 col-6">
+			<a href="{{path('app_admin_reclamations')}}" style="">
+				<div class="info-box">
+				<span class="info-box-icon bg-info" style="background-color: #f0a5a5 !important;">
+					<div class="icon">
+					<i class="fas fa-exclamation-triangle" style="font-size: 50px !important;"></i>
+					</div>
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text" style="color: black;">Reclamations</span>
+					<span class="info-box-number" style="color: black;">{{donnee.reclamationCount}}</span>
+					<div class="progress">
+					<div class="progress-bar" id="reclamationProgressBar" style="width: 0%; background-color: #90bad3;"></div>
+					</div>
+				</div>
 
-                <p>Reclamations</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-exclamation-triangle" style="font-size: 50px !important;"></i>
-              </div>
-        </div>
-    </div>
+				</div>
+			</a>
+		</div>
 
     
   </div>
+
+{% endblock %}
+{% block javascripts %}
+	{{parent()}}
+	<script>
+		$(document).ready(function () { // Fetch the reclamation count from your data (replace this with your actual data)
+var reclamationCount = {{ donnee.reclamationCount }};
+var facturesCount = {{ donnee.factureCount }};
+var userCount = {{ donnee.userCount }};
+var fournisseurCount = {{ donnee.fournisseurCount }};
+// Define the maximum value for the progress bar (replace this with your maximum value if applicable)
+var maxReclamations = 1000;
+var maxFactures = 1000000;
+var maxUsers = 100;
+var maxFournisseurs = 100000;
+
+// Calculate the percentage of completion
+var percentageRec = (reclamationCount / maxReclamations) * 100;
+var percentageFac = (facturesCount / maxFactures) * 100;
+var percentageUser = (userCount / maxUsers) * 100;
+var percentageFrs = (fournisseurCount / maxFournisseurs) * 100;
+
+// Set the width of the progress bar
+$('#reclamationProgressBar').css('width', percentageRec + '%');
+$('#facturesProgressBar').css('width', percentageFac + '%');
+$('#usersProgressBar').css('width', percentageUser + '%');
+$('#fournisseurProgressBar').css('width', percentageFrs + '%');
+});
+	</script>
 
 {% endblock %}

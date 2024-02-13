@@ -114,6 +114,7 @@ class facturesController extends AbstractController
         $filtre GROUP BY c.id";
         $totalRows .= $sql;
         $sqlRequest .= $sql;
+        // dd($sql);
         $stmt = $doctrine->getmanager('default')->getConnection()->prepare($sql);
         $newstmt = $stmt->executeQuery();
         $totalRecords = count($newstmt->fetchAll());
@@ -123,11 +124,11 @@ class facturesController extends AbstractController
             $sqlRequest .= $where;
         }
         $sqlRequest .= DatatablesController::Order($request, $columns);
+        // dd($sqlRequest);
         $stmt = $doctrine->getmanager('default')->getConnection()->prepare($sqlRequest);
         $resultSet = $stmt->executeQuery();
         $result = $resultSet->fetchAll();
 
-        // dd($sql);
 
 
         $data = array();
@@ -180,9 +181,16 @@ class facturesController extends AbstractController
                 $reclamation = $this->em->getRepository(Reclamation::class)->find($row['id_reclamation']);
             }
 
-            if ($row['id_reclamation'] != null && ($reclamation and count($reclamation->getReponses()) == 0)) {
+            $reponse = $this->em->getRepository(Reponse::class)->findBy(
+                ['reclamation' => $reclamation],
+                ['created' => 'DESC'], // Order by date in descending order
+                1 // Limit to only 1 result
+            );
+            // dd($reponse[0]->getUserCreated() != $this->getUser());
+
+            if ($row['id_reclamation'] != null && ($reclamation and (count($reclamation->getReponses()) == 0 || $reponse[0]->getUserCreated() == $this->getUser() ))) {
                 $etat_bg = "etat_bg_disable";
-            } else if ($row['id_reclamation'] != null && ($reclamation and $reclamation->getReponses())) {
+            } else if ($row['id_reclamation'] != null && ($reclamation and $reponse[0] and $reponse[0]->getUserCreated() != $this->getUser())) {
                 $etat_bg = "etat_bg_blue";
             } else {
                 $etat_bg = "";
@@ -585,6 +593,7 @@ class facturesController extends AbstractController
             return new JsonResponse([
                 'message' => $reponse->getMessage(),
                 'date' => $reponse->getCreated()->format('d/m/Y'),
+                'file' => $reponse->getFile()
             ]);
         } else {
             return new JsonResponse('CHAMPS OBLIGATOIRES (MESSAGE / PIECE JOINTE)', 500);

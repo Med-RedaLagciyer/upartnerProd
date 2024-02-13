@@ -232,7 +232,7 @@ class ReclamationsController extends AbstractController
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
         // dd($request);
-        if ($request->get("message")) {
+        if ($request->get("message") || $request->files->get('file')) {
             $reclamation = $this->em->getRepository(Reclamation::class)->find($request->get("reclamation"));
             // dd($reclamation);
 
@@ -241,8 +241,17 @@ class ReclamationsController extends AbstractController
 
 
             $reponse = new Reponse();
+            if ($request->get("message")) $reponse->setMessage($request->get("message"));
+            if ($request->files->get('file')) {
+                $file = $request->files->get('file');
 
-            $reponse->setMessage($request->get("message"));
+                $uploadedDirectory = $this->getParameter('message_directory');
+                $fileName = uniqid() . '.' . $file->guessExtension();
+
+                $file->move($uploadedDirectory, $fileName);
+                $reponse->setFile($fileName);
+            }
+            // $reponse->setMessage($request->get("message"));
             $reponse->setReclamation($reclamation);
 
 
@@ -291,9 +300,10 @@ class ReclamationsController extends AbstractController
             return new JsonResponse([
                 'message' => $reponse->getMessage(),
                 'date' => $reponse->getCreated()->format('d/m/Y'),
+                'file' => $reponse->getFile()
             ]);
         } else {
-            return new JsonResponse('CHAMPS OBLIGATOIRES.', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES (MESSAGE / PIECE JOINTE)', 500);
         }
     }
 }

@@ -47,6 +47,7 @@ class FournisseursController extends AbstractController
             array('db' => 'p.ice_o', 'dt' => 4),
             array('db' => 'p.societe', 'dt' => 5),
             array('db' => 'p.ice', 'dt' => 6),
+            array('db' => 'p.rib', 'dt' => 7),
 
         );
         $sql = "SELECT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -82,11 +83,11 @@ class FournisseursController extends AbstractController
             $cd = $row['id'];
             // dd($row);
             $nestedData[] = $row['code'];
-            $nestedData[] = $row['nom'];
-            $nestedData[] = $row['prenom'];
+            // $nestedData[] = $row['nom'];
+            // $nestedData[] = $row['prenom'];
             $nestedData[] = $row['societe'];
             $nestedData[] = $row['ice'];
-            $nestedData[] = $row['ice_o'];
+            $nestedData[] = $row['rib'];
 
 
             $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a  id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a id="btnModification" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Modifier</a>';

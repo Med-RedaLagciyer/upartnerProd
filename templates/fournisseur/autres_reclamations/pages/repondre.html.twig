@@ -36,24 +36,42 @@
 					{% endif %}
 					{% if reponse.file %}
 						<div class="form-group">
-							<a id="downloadFile" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right" style="width: 30px;">
-								<i class="fas fa-download">Piece jointe</i>
+							<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+								<i class="fas fa-download"></i> Piece jointe
 							</a>
+							<br>
 							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
 						</div>
 					{% endif %}
 				</div>
 			</div>
 		{% else %}
-			<div class="row">
-				<div class="col-9">
-					<div class="form-group">
-						<textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">{{ reponse.message }}</textarea>
-						<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
+			
+			{% if reponse.message %}
+				<div class="row">
+					<div class="col-9">
+							<div class="form-group">
+								<textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">{{ reponse.message }}</textarea>
+								<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
+							</div>
 					</div>
+					<div class="col-3"></div>
 				</div>
-				<div class="col-3"></div>
-			</div>
+			{% endif %} 
+			{% if reponse.file %}
+				<div class="row">
+					<div class="col-9">
+							<div class="form-group">
+								<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+									<i class="fas fa-download"></i> Piece jointe
+								</a>
+								<br>
+								<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
+							</div>
+					</div>
+					<div class="col-3"></div>
+				</div>
+			{% endif %}
 		{% endif %}
 
 	{% endfor %}
