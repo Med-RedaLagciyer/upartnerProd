@@ -27,21 +27,26 @@ class IndexController extends AbstractController
         } elseif ($security->isGranted('ROLE_FRS')) {
             $donnee = [];
 
-            $reclamation = $doctrine->getRepository(Reclamation::class);
+            // $reclamation = $doctrine->getRepository(Reclamation::class);
 
             $entityManager = $doctrine->getManager('default')->getConnection();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_facturefrscab` cab inner join u_p_partenaire p on p.id = cab.partenaire_id WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 AND cab.datefacture > '2023-01-01'";
+            $query = "SELECT COUNT(*) FROM `ua_t_commandefrscab` cab inner join u_p_partenaire p on p.id = cab.u_p_partenaire_id
+            inner join ua_t_livraisonfrscab liv on liv.ua_t_commandefrscab_id = cab.id
+            INNER join ua_t_facturefrscab f on f.id = liv.ua_t_facturefrscab_id
+            WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 AND f.datefacture > '2023-01-01'";
+            // dd($query);
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $facturesCount = $result->fetchAll();
 
             // dd($facturesCount);
-
-            $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
+            $reclamations = $doctrine->getRepository(Reclamation::class)->findBySansReponse($this->getUser());
+            // dd($reclamations);
+            // $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
             $donnee = [
                 // 'userCount' => $userCount,
-                'reclamationCount' => $reclamationCount,
+                'reclamationCount' => count($reclamations),
                 'factureCount' => $facturesCount[0]['COUNT(*)'],
                 // 'fournisseurCount' => $fournisseurCount[0]['COUNT(*)'],
             ];

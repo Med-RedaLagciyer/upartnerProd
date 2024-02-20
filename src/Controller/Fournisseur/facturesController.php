@@ -35,39 +35,39 @@ class facturesController extends AbstractController
 
         // dd($this->getUser());
 
-        $query = "SELECT id, code , nom, prenom from u_p_partenaire Where active = 1 and ice_o like '" . $this->getUser()->getUsername() . "'";
+        $query = "SELECT id, code , nom, prenom, societe from u_p_partenaire Where active = 1 and ice_o like '" . $this->getUser()->getUsername() . "'";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $infos = $result->fetchAll();
 
-        $query = "SELECT 
-            COUNT(*) AS totalInvoices,
-            SUM(CASE WHEN op.executer = 1 THEN 1 ELSE 0 END) AS totalExecutedInvoices,
-            SUM(cab.montant) AS totalAmount,
-            SUM(CASE WHEN op.executer = 1 THEN cab.montant ELSE 0 END) AS totalAmountExecuted
-            FROM 
-                `ua_t_facturefrscab` cab
-            INNER JOIN 
-                `u_p_partenaire` p ON p.id = cab.partenaire_id
-            LEFT JOIN 
-                `u_general_operation` op ON op.facture_fournisseur_id = cab.id
-            WHERE 
-                p.id = " . $infos[0]["id"] . "
-                AND cab.active = 1 
-                AND cab.datefacture > '2023-01-01'";
+        // $query = "SELECT COUNT(*) FROM `ua_t_commandefrscab` cab inner join u_p_partenaire p on p.id = cab.u_p_partenaire_id
+        //     inner join ua_t_livraisonfrscab liv on liv.ua_t_commandefrscab_id = cab.id
+        //     INNER join ua_t_facturefrscab f on f.id = liv.ua_t_facturefrscab_id
+        //     WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 AND f.datefacture > '2023-01-01'";
+        $query = "SELECT COUNT(*)
+        FROM `ua_t_commandefrscab` cab
+        WHERE cab.active = 1
+        AND EXISTS (
+            SELECT 1
+            FROM u_p_partenaire p
+            INNER JOIN ua_t_livraisonfrscab liv ON liv.ua_t_commandefrscab_id = cab.id
+            INNER JOIN ua_t_facturefrscab f ON f.id = liv.ua_t_facturefrscab_id
+            WHERE p.id = cab.u_p_partenaire_id
+            AND p.ice_o = '" . $this->getUser()->getUsername() . "'
+            AND f.datefacture > '2023-01-01'
+        )";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $data = $result->fetchAll();
+
+        // dd($data);
 
         $reclamation = $this->em->getRepository(Reclamation::class);
 
         $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
         $donnee = [
             'partenaire' => $infos[0],
-            'montantTotal' => $data[0]["totalAmount"],
-            'montantTotalRegle' => $data[0]["totalAmountExecuted"],
-            'factureCount' => $data[0]['totalInvoices'],
-            'facturesRegleCount' => $data[0]['totalExecutedInvoices'],
+            'commandes' => $data[0]["COUNT(*)"],
         ];
         return $this->render('fournisseur/factures/index.html.twig', [
             'donnee' => $donnee,
@@ -221,7 +221,7 @@ class facturesController extends AbstractController
             );
             // dd($reponse[0]->getUserCreated() != $this->getUser());
 
-            if ($row['id_reclamation'] != null && ($reclamation and (count($reclamation->getReponses()) == 0 || $reponse[0]->getUserCreated() == $this->getUser() ))) {
+            if ($row['id_reclamation'] != null && ($reclamation and (count($reclamation->getReponses()) == 0 || $reponse[0]->getUserCreated() == $this->getUser()))) {
                 $etat_bg = "etat_bg_disable";
             } else if ($row['id_reclamation'] != null && ($reclamation and $reponse[0] and $reponse[0]->getUserCreated() != $this->getUser())) {
                 $etat_bg = "etat_bg_blue";
@@ -547,7 +547,7 @@ class facturesController extends AbstractController
     #[Route('/reclamer', name: 'app_fournisseur_commandes_reclamer')]
     public function ajouter(Request $request, ManagerRegistry $doctrine): Response
     {
-        // dd($request->get("file"));
+        // dd($request->get("observation"), $request->get("objet"));
         $commandes = [];
         if ($request->get("observation") && $request->get("objet")) {
             if ($request->get("commandes")) {
@@ -640,12 +640,9 @@ class facturesController extends AbstractController
         $date = $request->request->get('date');
         $montant = $request->request->get('montant');
         $reclamationId = $request->request->get('reclamation_id');
+
         $file = $request->files->get('file');
 
-        $uploadedDirectory = $this->getParameter('facture_directory');
-        $fileName = uniqid() . '.' . $file->guessExtension();
-
-        $file->move($uploadedDirectory, $fileName);
 
         $reclamation = $this->em->getRepository(Reclamation::class)->find($reclamationId);
         $statut = $this->em->getRepository(Statut::class)->find(2);
@@ -660,15 +657,19 @@ class facturesController extends AbstractController
             $facture->setUserCreated($this->getUser());
             $facture->setReclamation($reclamation);
             $facture->setStatut($statut);
-            $this->em->persist($facture);
-            $facture->setFile($fileName);
+            if ($file) {
+                $uploadedDirectory = $this->getParameter('facture_directory');
+                $fileName = uniqid() . '.' . $file->guessExtension();
 
+                $file->move($uploadedDirectory, $fileName);
+                $facture->setFile($fileName);
+            }
+
+            $this->em->persist($facture);
             $this->em->flush();
 
 
             return new JsonResponse('FACTURES BIEN ENVOYÉE', 200);
-        } else {
-            return new JsonResponse('CHAMPS OBLIGATOIRES', 500);
         }
     }
 

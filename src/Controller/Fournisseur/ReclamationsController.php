@@ -56,7 +56,12 @@ class ReclamationsController extends AbstractController
         
         FROM reclamation r LEFT JOIN reponse rep on rep.reclamation_id = r.id
         
-        $filtre ";
+        $filtre ORDER BY
+        CASE 
+            WHEN rep.id IS NULL THEN 0
+            ELSE 1
+        END,
+        r.created ASC ";
         // dd($sql);
         $totalRows .= $sql;
         $sqlRequest .= $sql;
@@ -98,11 +103,11 @@ class ReclamationsController extends AbstractController
                         if ($reponses && $reponses[0]->getUserCreated() != $this->getUser()) {
                             $etat_bg = "etat_bg_blue";
                             $nestedData[] = "<div class='text-truncate' title='" . $reponses[0]->getMessage() . "' style='text-align:left !important'>" . $reponses[0]->getMessage() . "</div>";
-                            $nestedData[] = "A répondu";
+                            $nestedData[] = "Traitée";
                         } else {
                             $etat_bg = "etat_bg_disable";
                             $nestedData[] = "";
-                            $nestedData[] = "En attente de réponse";
+                            $nestedData[] = "Non traitée";
                         }
                     } else {
                         $nestedData[] = $value;

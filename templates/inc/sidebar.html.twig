@@ -2,8 +2,10 @@
 	class="main-sidebar sidebar-dark-primary elevation-4 text-sm">
 	<!-- Brand Logo -->
 	<a href="{{path('app_index')}}" class="brand-link">
-		<img src="{{asset('dist/img/fcz.png')}}" alt="Fcz" class="brand-image " style="margin-left: 0;opacity: .8">
-		<span class="brand-text font-weight-light">Espace Fournisseur</span>
+		<img src="{{asset('dist/img/upharma.png')}}" alt="Fcz" class="brand-image " style="margin-left: 0;opacity: .8">
+		<span style="vertical-align: middle; font-family: 'Oswald',sans-serif;font-size: 40px;font-weight: bold;color: #CDDFF2;">
+			U-PARTENAIRE
+		</span>
 	</a>
 
 	<!-- Sidebar -->
@@ -62,19 +64,19 @@
 							<li class="nav-item">
 								<a href="{{path('app_fournisseur_factures')}}" class="nav-link {% if 'app_fournisseur_factures' in app.request.get('_route') %}active{% endif %}">
 									<i class="fas fa-chevron-right nav-icon"></i>
-									<p>Reclamer une facture</p>
+									<p>Nouvelle réclamation</p>
 								</a>
 							</li>
-							<li class="nav-item">
-								<a href="{{path('app_fournisseur_autres')}}" class="nav-link {% if 'app_fournisseur_autres' in app.request.get('_route') %}active{% endif %}">
-									<i class="fas fa-chevron-right nav-icon"></i>
-									<p>autres factures</p>
-								</a>
-							</li>
+							{# <li class="nav-item">
+																						<a href="{{path('app_fournisseur_autres')}}" class="nav-link {% if 'app_fournisseur_autres' in app.request.get('_route') %}active{% endif %}">
+																							<i class="fas fa-chevron-right nav-icon"></i>
+																							<p>autres factures</p>
+																						</a>
+																					</li> #}
 							<li class="nav-item">
 								<a href="{{path('app_fournisseur_reclamations')}}" class="nav-link {% if 'app_fournisseur_reclamations' in app.request.get('_route') %}active{% endif %}">
 									<i class="fas fa-chevron-right nav-icon"></i>
-									<p>List reclamations</p>
+									<p>Suivi réclamations</p>
 								</a>
 							</li>
 						</ul>
@@ -90,37 +92,37 @@
 					</li>
 				{% endif %}
 				{# <li class="nav-item {% if 'app_fournisseurs' in app.request.get('_route') %}menu-is-opening menu-open{% endif %}">
-																				            <a href="#" class="nav-link">
-																				              <i class="nav-icon fas fa-users-cog"></i>
-																				              <p>
-																				                Administration
-																				                <i class="right fas fa-angle-left"></i>
-																				              </p>
-																				            </a>
-																				            <ul class="nav nav-treeview">
-																				              <li class="nav-item">
-																				                <a href="{{path('app_admin_users')}}" class="nav-link {% if 'app_admin_users' in app.request.get('_route') %}active{% endif %}">
-																				                  <i class="fas fa-chevron-right nav-icon"></i>
-																				                  <p>Utilisateurs</p>
-																				                </a>
-																				              </li>
-																				              <li class="nav-item">
-																				                <a href="{{path('app_admin_fournisseurs')}}" class="nav-link {% if 'app_admin_fournisseurs' in app.request.get('_route') %}active{% endif %}">
-																				                  <i class="fas fa-chevron-right nav-icon"></i>
-																				                  <p>Fournisseurs</p>
-																				                </a>
-																				              </li>
-																				            </ul>
-																				          </li>
-																				          <li class="nav-item">
-																				            <a href="../widgets.html" class="nav-link">
-																				              <i class="nav-icon fas fa-th"></i>
-																				              <p>
-																				                Widgets
-																				                <span class="right badge badge-danger">New</span>
-																				              </p>
-																				            </a>
-																				          </li> #}
+																																																				            <a href="#" class="nav-link">
+																																																				              <i class="nav-icon fas fa-users-cog"></i>
+																																																				              <p>
+																																																				                Administration
+																																																				                <i class="right fas fa-angle-left"></i>
+																																																				              </p>
+																																																				            </a>
+																																																				            <ul class="nav nav-treeview">
+																																																				              <li class="nav-item">
+																																																				                <a href="{{path('app_admin_users')}}" class="nav-link {% if 'app_admin_users' in app.request.get('_route') %}active{% endif %}">
+																																																				                  <i class="fas fa-chevron-right nav-icon"></i>
+																																																				                  <p>Utilisateurs</p>
+																																																				                </a>
+																																																				              </li>
+																																																				              <li class="nav-item">
+																																																				                <a href="{{path('app_admin_fournisseurs')}}" class="nav-link {% if 'app_admin_fournisseurs' in app.request.get('_route') %}active{% endif %}">
+																																																				                  <i class="fas fa-chevron-right nav-icon"></i>
+																																																				                  <p>Fournisseurs</p>
+																																																				                </a>
+																																																				              </li>
+																																																				            </ul>
+																																																				          </li>
+																																																				          <li class="nav-item">
+																																																				            <a href="../widgets.html" class="nav-link">
+																																																				              <i class="nav-icon fas fa-th"></i>
+																																																				              <p>
+																																																				                Widgets
+																																																				                <span class="right badge badge-danger">New</span>
+																																																				              </p>
+																																																				            </a>
+																																																				          </li> #}
 
 			</ul>
 		</nav>

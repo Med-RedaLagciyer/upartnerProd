@@ -9,37 +9,74 @@ pagetitle %}
 	{{parent()}}
 {% endblock %}
 {% block body %}
+
+
+	<script src="https://kit.fontawesome.com/f8496f65dc.js" crossorigin="anonymous"></script>
 	<style>
-		.small-box {
-			font-size: 100% !important;
+		.card img {
+			margin-top: 20px;
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			width: 100px;
+			color: #666;
+		}
+		.card h5 {
+			text-align: center;
+			color: #233645;
+		}
+		.card .card-title i {
+			font-size: 100px;
+			color: #233645;
+		}
+
+		a {
+			text-decoration: none !important;
+		}
+		.dash {
+			left: 109px !important;
+			position: fixed;
+			display: inline-block;
+			transform: rotate(-90deg);
+			-webkit-transform-origin-y: bottom;
+			font-size: 92px !important;
+			color: #c5c5c5;
+			-moz-transform-origin: bottom;
+			top: 229px;
+			left: -10px;
+			text-transform: uppercase;
+			letter-spacing: 8px;
+			font-weight: 700;
 		}
 	</style>
-	<div class="row">
 
-		<div class="col-md-3 col-6">
+	<div class="dash">
+		dashboard
+	</div>
+	<div class="row" style="margin:3% auto 0; width:70%">
+		<div class="col-5  mb-5 ml-5">
 			<a href="{{path('app_fournisseur_factures')}}" style="">
-				<div class="info-box">
-				<span class="info-box-icon bg-info" style="background-color: #90bad3 !important;">
-					<div class="icon">
-					<i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
+				<div class="info-box" style="height:100px">
+					<span class="info-box-icon bg-info" style="background-color: #90bad3 !important;width:100px">
+						<div class="icon">
+							<i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
+						</div>
+					</span>
+					<div class="info-box-content">
+						<span class="info-box-text" style="color: black;">Commandes</span>
+						<span class="info-box-number" style="color: black;">{{donnee.factureCount}}</span>
+						<div class="progress">
+							<div class="progress-bar" id="facturesProgressBar" style="width: 0%; background-color: #90bad3;"></div>
+						</div>
 					</div>
-				</span>
-				<div class="info-box-content">
-					<span class="info-box-text" style="color: black;">Factures</span>
-					<span class="info-box-number" style="color: black;">{{donnee.factureCount}}</span>
-					<div class="progress">
-					<div class="progress-bar" id="facturesProgressBar" style="width: 0%; background-color: #90bad3;"></div>
-					</div>
-				</div>
 
 				</div>
 			</a>
 		</div>
-
-		<div class="col-md-3 col-6">
+		<div class="col-5  mb-5 ml-5">
 			<a href="{{path('app_fournisseur_autres')}}" style="">
-				<div class="info-box">
-					<span class="info-box-icon bg-info" style="background-color: #ff9999 !important;">
+				<div class="info-box" style="height:100px">
+					<span class="info-box-icon bg-info" style="background-color: #ff9999 !important;width:100px">
 						<div
 							class="icon">
 							{# <i class="fa fa-message" ></i> #}
@@ -60,7 +97,6 @@ pagetitle %}
 
 
 	</div>
-
 {% endblock %}
 {% block javascripts %}
 	{{parent()}}

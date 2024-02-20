@@ -90,6 +90,9 @@ $(document).ready(function  () {
         
     });
 
+    
+    
+
     factures = [];
 
     $("body").on("click","#btnDetails", async function (e) {
