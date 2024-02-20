@@ -50,7 +50,7 @@ $(document).ready(function  () {
             [10, 15, 20 ,25, 50, 100, 20000000000000],
             [10, 15, 20, 25, 50, 100, "All"],
         ],
-        pageLength: 20,
+        pageLength: 10,
         order: [[0, "desc"]],
         ajax: "/fournisseur/autres/listreclamation",
         processing: true,
@@ -233,18 +233,37 @@ $(document).ready(function  () {
                 formData
             );
             const response = request.data;
-
-            var msg = `<div class="row">   
-                            <div class="col-7">
-                                <div class="form-group">
-                                    <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
-                                    <label style="float: left;" >${response.date}</label>
+            console.log(response);
+            var msg="";
+            if(response.message){
+                msg +=`<div class="row">   
+                                <div class="col-7">
+                                    <div class="form-group">
+                                        <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
+                                        <label style="float: left;" >${response.date}</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-5">
-                            
-                            </div>
-                        </div>`
+                                <div class="col-5">
+                                
+                                </div>
+                            </div>`;
+            }
+            if(response.file){
+                msg +=`<div class="row">   
+                    <div class="col-7">
+                        <div class="form-group">
+                            <a id="downloadPiece" data-file="${response.file}" class="btn btn-primary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+                                <i class="fas fa-download"></i> Piece jointe
+                            </a>
+                            <br>
+                            <label style="float: left;" >${response.date}</label>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                    
+                    </div>
+                </div>`;
+            }
 
             $("body #messages").append(msg);
             $("#message_form")[0].reset();
@@ -379,6 +398,26 @@ $(document).ready(function  () {
         var fileName = $(this).data('file');
         
         var fileUrl = '/uploads/factures/' + fileName; 
+        // window.location.href = fileUrl;
+        var downloadLink = $('<a></a>');
+        downloadLink.attr('href', fileUrl);
+        downloadLink.attr('download', 'PieceJoint.pdf'); 
+        downloadLink.css('display', 'none');
+        
+        $('body').append(downloadLink);
+        
+        downloadLink[0].click();
+        
+        setTimeout(function() {
+            downloadLink.remove();
+        }, 100);
+    });
+
+    $('body').on('click', '#downloadPiece', function() {
+        // alert("hi");
+        var fileName = $(this).data('file');
+        
+        var fileUrl = '/uploads/message/' + fileName; 
         // window.location.href = fileUrl;
         var downloadLink = $('<a></a>');
         downloadLink.attr('href', fileUrl);

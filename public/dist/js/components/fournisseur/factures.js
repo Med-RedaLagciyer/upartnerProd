@@ -217,22 +217,31 @@ $(document).ready(function  () {
 
     var table = $("#datatables_gestion_factures").DataTable({
         lengthMenu: [
-            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, 20000000000000],
             [10, 15, 20, 25, 50, 100, "All"],
         ],
         pageLength: 20,
         order: [[0, "desc"]],
-        ajax: "/fournisseur/factures/list",
+        ajax: {
+            url: "/fournisseur/factures/list",
+            type: "GET",
+            data: function (d) {
+                d.status = $('#status-filter').val(); // Add status filter value to request data
+            }
+        },
         processing: true,
         serverSide: true,
         deferRender: true,
-        // orderable: false, targets: [0] ,
         columnDefs: [
-            { orderable: false, targets: [0] } // First column (index 0) is not orderable
-          ],
+            { orderable: false, targets: [0,6,7] } // First column (index 0) is not orderable
+        ],
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
         },
+    });
+
+    $('#status-filter').on('change', function () {
+        table.ajax.reload(); // Reload table data when filter changes
     });
 
     var table2 = $("#datatables_gestion_factures_2").DataTable({
@@ -348,7 +357,9 @@ $(document).ready(function  () {
         // return;
         
         // $("#reclamer_modal").modal("show")
+        var file = $("#fileUpload")[0].files[0];
         const formData = new FormData($("#message_form")[0]);
+        formData.append('file', file);
         // let formData = new FormData([0]);
         formData.append("reclamation", $(this).attr('data-reclamation'));
 
@@ -359,17 +370,36 @@ $(document).ready(function  () {
             );
             const response = request.data;
 
-            var msg = `<div class="row">   
-                            <div class="col-7">
-                                <div class="form-group">
-                                    <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
-                                    <label style="float: left;" >${response.date}</label>
+            var msg="";
+            if(response.message){
+                msg +=`<div class="row">   
+                                <div class="col-7">
+                                    <div class="form-group">
+                                        <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
+                                        <label style="float: left;" >${response.date}</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-5">
-                            
-                            </div>
-                        </div>`
+                                <div class="col-5">
+                                
+                                </div>
+                            </div>`;
+            }
+            if(response.file){
+                msg +=`<div class="row">   
+                    <div class="col-7">
+                        <div class="form-group">
+                            <a id="downloadPiece" data-file="${response.file}" class="btn btn-primary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+                                <i class="fas fa-download"></i> Piece jointe
+                            </a>
+                            <br>
+                            <label style="float: left;" >${response.date}</label>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                    
+                    </div>
+                </div>`;
+            }
 
             $("body #messages").append(msg);
             $("#message_form")[0].reset();
@@ -459,6 +489,26 @@ $(document).ready(function  () {
             toastr.error(message);
             icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
         }
+    });
+
+    $('body').on('click', '#downloadPiece', function() {
+        // alert("hi");
+        var fileName = $(this).data('file');
+        
+        var fileUrl = '/uploads/message/' + fileName; 
+        // window.location.href = fileUrl;
+        var downloadLink = $('<a></a>');
+        downloadLink.attr('href', fileUrl);
+        downloadLink.attr('download', 'PieceJoint.pdf'); 
+        downloadLink.css('display', 'none');
+        
+        $('body').append(downloadLink);
+        
+        downloadLink[0].click();
+        
+        setTimeout(function() {
+            downloadLink.remove();
+        }, 100);
     });
     
 })

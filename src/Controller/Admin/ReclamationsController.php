@@ -42,14 +42,17 @@ class ReclamationsController extends AbstractController
 
         $filtre = "where r.active = 1 and ( rep.id is null or rep.admin != 1 )";
         // dd($params->all('columns')[0]);
-
+        $etat_bg = "etat_bg_disable";
         if (!empty($params->all('columns')[0]['search']['value'])) {
             if ($params->all('columns')[0]['search']['value'] == "Oui") {
                 $filtre = "where r.active = 1 and rep.admin = 1 ";
+                $etat_bg = "etat_bg_blue";
             } else {
+                $etat_bg = "etat_bg_disable";
                 $filtre = "where r.active = 1 and ( rep.id is null or rep.admin != 1 )";
             }
         }
+        
 
         $columns = array(
             array('db' => 'r.id', 'dt' => 0),
@@ -63,9 +66,12 @@ class ReclamationsController extends AbstractController
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
         
-        FROM reclamation r LEFT JOIN reponse rep on rep.reclamation_id = r.id LEFT JOIN user u on u.id = r.userCreated_id
+        FROM reclamation r LEFT JOIN (SELECT * FROM reponse rep1 WHERE rep1.id IN (SELECT MAX(rep2.id) FROM reponse rep2 GROUP BY rep2.reclamation_id )) rep ON rep.reclamation_id = r.id LEFT JOIN user u ON u.id = r.userCreated_id $filtre ";
+        // $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
         
-        $filtre ";
+        // FROM reclamation r LEFT JOIN reponse rep on rep.reclamation_id = r.id LEFT JOIN user u on u.id = r.userCreated_id
+        
+        // $filtre ";
         // dd($sql);
         $totalRows .= $sql;
         $sqlRequest .= $sql;
@@ -114,7 +120,7 @@ class ReclamationsController extends AbstractController
             $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a id="btnRepondre" class="dropdown-item btn-xs"><i class="fas fa-pen mr-2"></i> Repondre</a><a data-value="local" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a></div>';
 
             $nestedData["DT_RowId"] = $cd;
-            $nestedData["DT_RowClass"] = $seen_bg;
+            $nestedData["DT_RowClass"] = $seen_bg ." ". $etat_bg;
             $data[] = $nestedData;
             $i++;
         }
@@ -232,7 +238,7 @@ class ReclamationsController extends AbstractController
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
         // dd($request);
-        if ($request->get("message")) {
+        if ($request->get("message") || $request->files->get('file')) {
             $reclamation = $this->em->getRepository(Reclamation::class)->find($request->get("reclamation"));
             // dd($reclamation);
 
@@ -241,8 +247,17 @@ class ReclamationsController extends AbstractController
 
 
             $reponse = new Reponse();
+            if ($request->get("message")) $reponse->setMessage($request->get("message"));
+            if ($request->files->get('file')) {
+                $file = $request->files->get('file');
 
-            $reponse->setMessage($request->get("message"));
+                $uploadedDirectory = $this->getParameter('message_directory');
+                $fileName = uniqid() . '.' . $file->guessExtension();
+
+                $file->move($uploadedDirectory, $fileName);
+                $reponse->setFile($fileName);
+            }
+            // $reponse->setMessage($request->get("message"));
             $reponse->setReclamation($reclamation);
 
 
@@ -291,9 +306,10 @@ class ReclamationsController extends AbstractController
             return new JsonResponse([
                 'message' => $reponse->getMessage(),
                 'date' => $reponse->getCreated()->format('d/m/Y'),
+                'file' => $reponse->getFile()
             ]);
         } else {
-            return new JsonResponse('CHAMPS OBLIGATOIRES.', 500);
+            return new JsonResponse('CHAMPS OBLIGATOIRES (MESSAGE / PIECE JOINTE)', 500);
         }
     }
 }

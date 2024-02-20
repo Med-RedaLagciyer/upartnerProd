@@ -125,7 +125,9 @@ $(document).ready(function  () {
         // return;
         
         // $("#reclamer_modal").modal("show")
+        var file = $("#fileUpload")[0].files[0];
         const formData = new FormData($(this)[0]);
+        formData.append('file', file);
         // let formData = new FormData([0]);
         formData.append("reclamation", $(this).attr('data-reclamation'));
 
@@ -136,19 +138,38 @@ $(document).ready(function  () {
             );
             const response = request.data;
             table.ajax.reload();
-            var msg = `<div class="row">  
-                            <div class="col-5">
-                            
-                            </div> 
-                            <div class="col-7">
-                                <div class="form-group">
-                                    <textarea class="form-control" rows="3" disabled="">${response.message}</textarea>
-                                    <label style="float: left;" >${response.date}</label>
+            var msg="";
+            if(response.message){
+                msg +=`<div class="row"> 
+                                <div class="col-3">
+                                    
+                                </div>  
+                                <div class="col-9">
+                                    <div class="form-group">
+                                        <textarea class="form-control" rows="3" disabled="">${response.message}</textarea>
+                                        <label style="float: left;" >${response.date}</label>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                        </div>`
-
+                                
+                            </div>`;
+            }
+            if(response.file){
+                msg +=`<div class="row"> 
+                <div class="col-3">
+                    
+                    </div>  
+                    <div class="col-9">
+                        <div class="form-group">
+                            <a id="downloadPiece" data-file="${response.file}" class="btn btn-primary btn-xs pull-right" style="background-color: #e9ecef; color: #515151;border: 1px solid #ced4da;">
+                                <i class="fas fa-download"></i> Piece jointe
+                            </a>
+                            <br>
+                            <label style="float: right;" >${response.date}</label>
+                        </div>
+                    </div>
+                    
+                </div>`;
+            }
             $("body #messages").append(msg);
             $(this)[0].reset();
 
@@ -222,5 +243,24 @@ $(document).ready(function  () {
         }, 100);
     });
 
+    $('body').on('click', '#downloadPiece', function() {
+        // alert("hi");
+        var fileName = $(this).data('file');
+        
+        var fileUrl = '/uploads/message/' + fileName; 
+        // window.location.href = fileUrl;
+        var downloadLink = $('<a></a>');
+        downloadLink.attr('href', fileUrl);
+        downloadLink.attr('download', 'PieceJoint.pdf'); 
+        downloadLink.css('display', 'none');
+        
+        $('body').append(downloadLink);
+        
+        downloadLink[0].click();
+        
+        setTimeout(function() {
+            downloadLink.remove();
+        }, 100);
+    });
     
 })

@@ -92,18 +92,36 @@ class facturesController extends AbstractController
         AND (SELECT f.active FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) = 1";
 
         // dd($filtre);
+        $statusFilter = $request->query->get('status');
+        if ($statusFilter) {
+            switch ($statusFilter) {
+                case 'facturer':
+                    $filtre .= " AND (SELECT CASE WHEN COUNT(f.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) = 1 and (SELECT CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) = 1 and (SELECT COUNT(o.id) FROM u_general_operation o INNER JOIN ua_t_facturefrscab f ON f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id AND o.executer = 1) != 1";
+                    break;
+                case 'reception':
+                    $filtre .= " AND (SELECT CASE WHEN COUNT(f.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) != 1 and (SELECT CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) = 1 and (SELECT COUNT(o.id) FROM u_general_operation o INNER JOIN ua_t_facturefrscab f ON f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id AND o.executer = 1) != 1";
+                    break;
+                case 'regle':
+                    $filtre .= " AND (SELECT COUNT(o.id) FROM u_general_operation o INNER JOIN ua_t_facturefrscab f ON f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id AND o.executer = 1) = 1";
+                    break;
+                case 'cree':
+                    $filtre .= " AND 1=1";
+                    break;
+            }
+        }
 
         $columns = array(
             array('db' => 'c.id', 'dt' => 0),
             array('db' => 'c.code', 'dt' => 1),
             array('db' => 'c.refDocAsso', 'dt' => 2),
-            array('db' => 'SUM(det.quantite * det.prixunitaire * (1+IFNULL(det.tva,0)/100) * (1-IFNULL(det.remise,0)/100)) ttc', 'dt' => 3),
+            array('db' => 'SUM(det.quantite * det.prixunitaire * (1+IFNULL(det.tva,0)/100) * (1-IFNULL(det.remise,0)/100)) AS ttc', 'dt' => 3),
             array('db' => 'c.observation', 'dt' => 4),
             array('db' => 'c.datecommande', 'dt' => 5),
             array('db' => '(SELECT CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS receptioner', 'dt' => 6),
             array('db' => '(SELECT CASE WHEN COUNT(f.id) > 0 THEN 1 ELSE 0 END FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) AS facturer', 'dt' => 7),
             array('db' => 'c.id_reclamation', 'dt' => 8),
             array('db' => 'c.statut_reclamation_id', 'dt' => 9),
+            array('db' => '(SELECT COUNT(o.id) FROM u_general_operation o INNER JOIN ua_t_facturefrscab f ON f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id AND o.executer = 1) AS operation_count', 'dt' => 10),
 
         );
         $sql = "SELECT DISTINCT " . implode(", ", DatatablesController::Pluck($columns, 'db')) . "
@@ -111,23 +129,38 @@ class facturesController extends AbstractController
         FROM ua_t_commandefrscab c 
         INNER JOIN ua_t_commandefrsdet det on det.ua_t_commandefrscab_id = c.id
         
-        $filtre GROUP BY c.id";
+        $filtre";
+        $grp_by = " GROUP BY c.id";
         $totalRows .= $sql;
         $sqlRequest .= $sql;
+        $sql .= $grp_by;
+        // dd($sql,$sqlRequest);
         $stmt = $doctrine->getmanager('default')->getConnection()->prepare($sql);
         $newstmt = $stmt->executeQuery();
         $totalRecords = count($newstmt->fetchAll());
 
-        $where = DatatablesController::Search($request, $columns);
+        // dd($newstmt->fetchAll());
+
+        $searchCollumns = array(
+            array('db' => 'c.id', 'dt' => 0),
+            array('db' => 'c.code', 'dt' => 1),
+            array('db' => 'c.refDocAsso', 'dt' => 2),
+            array('db' => 'c.observation', 'dt' => 4),
+            array('db' => 'c.datecommande', 'dt' => 5),
+        );
+
+        $where = DatatablesController::Search($request, $searchCollumns);
         if (isset($where) && $where != '') {
             $sqlRequest .= $where;
         }
+        $sqlRequest .= $grp_by;
+        // dd($request->get('order'));
         $sqlRequest .= DatatablesController::Order($request, $columns);
+        // dd($sqlRequest);
         $stmt = $doctrine->getmanager('default')->getConnection()->prepare($sqlRequest);
         $resultSet = $stmt->executeQuery();
         $result = $resultSet->fetchAll();
 
-        // dd($sql);
 
 
         $data = array();
@@ -150,16 +183,17 @@ class facturesController extends AbstractController
 
 
 
-            $sql = "SELECT * FROM u_general_operation o INNER JOIN ua_t_facturefrscab f on f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l on l.ua_t_facturefrscab_id = f.id where l.ua_t_commandefrscab_id = " . $row['id'] . " and o.executer = 1;";
-            $statement = $doctrine->getmanager('default')->getConnection()->prepare($sql);
-            $result = $statement->executeQuery();
-            $op = $result->fetchAll();
+            // $sql = "SELECT * FROM u_general_operation o INNER JOIN ua_t_facturefrscab f on f.id = o.facture_fournisseur_id INNER JOIN ua_t_livraisonfrscab l on l.ua_t_facturefrscab_id = f.id where l.ua_t_commandefrscab_id = " . $row['id'] . " and o.executer = 1;";
+            // // dd($sql);
+            // $statement = $doctrine->getmanager('default')->getConnection()->prepare($sql);
+            // $result = $statement->executeQuery();
+            // $op = $result->fetchAll();
 
-            if ($row['receptioner'] == 1 && $row['facturer'] != 1 && !$op) {
+            if ($row['receptioner'] == 1 && $row['facturer'] != 1 && $row['operation_count'] != 1) {
                 $nestedData[] = "receptioné";
-            } elseif ($row['receptioner'] == 1 && $row['facturer'] == 1 && !$op) {
+            } elseif ($row['receptioner'] == 1 && $row['facturer'] == 1 && $row['operation_count'] != 1) {
                 $nestedData[] = "facturé";
-            } elseif ($op) {
+            } elseif ($row['operation_count'] == 1) {
                 $nestedData[] = "Réglé";
             } else {
                 $nestedData[] = "Creé";
@@ -180,9 +214,16 @@ class facturesController extends AbstractController
                 $reclamation = $this->em->getRepository(Reclamation::class)->find($row['id_reclamation']);
             }
 
-            if ($row['id_reclamation'] != null && ($reclamation and count($reclamation->getReponses()) == 0)) {
+            $reponse = $this->em->getRepository(Reponse::class)->findBy(
+                ['reclamation' => $reclamation],
+                ['created' => 'DESC'], // Order by date in descending order
+                1 // Limit to only 1 result
+            );
+            // dd($reponse[0]->getUserCreated() != $this->getUser());
+
+            if ($row['id_reclamation'] != null && ($reclamation and (count($reclamation->getReponses()) == 0 || $reponse[0]->getUserCreated() == $this->getUser() ))) {
                 $etat_bg = "etat_bg_disable";
-            } else if ($row['id_reclamation'] != null && ($reclamation and $reclamation->getReponses())) {
+            } else if ($row['id_reclamation'] != null && ($reclamation and $reponse[0] and $reponse[0]->getUserCreated() != $this->getUser())) {
                 $etat_bg = "etat_bg_blue";
             } else {
                 $etat_bg = "";
@@ -206,7 +247,7 @@ class facturesController extends AbstractController
             }
 
 
-            if ($op) {
+            if ($row['operation_count'] == 1) {
                 // dd("hi");
                 $etat_bg = "etat_bg_regle";
             }
@@ -585,6 +626,7 @@ class facturesController extends AbstractController
             return new JsonResponse([
                 'message' => $reponse->getMessage(),
                 'date' => $reponse->getCreated()->format('d/m/Y'),
+                'file' => $reponse->getFile()
             ]);
         } else {
             return new JsonResponse('CHAMPS OBLIGATOIRES (MESSAGE / PIECE JOINTE)', 500);

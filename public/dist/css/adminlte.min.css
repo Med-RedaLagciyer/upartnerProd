@@ -350,12 +350,12 @@ hr {
 
 
 .seen_bg{
-    background-color : #fafafa !important;
+    /* background-color : #fafafa !important; */
     color :#000 !important;
   }
 
 .unseen_bg{
-    background-color : #ffffff !important;
+    /* background-color : #ffffff !important; */
     color :#000 !important;
     font-weight: bold;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
