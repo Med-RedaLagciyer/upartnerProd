@@ -31,19 +31,42 @@ class DatatablesController extends AbstractController {
      *      
      */
 
+    // static function Search($request, $columns) {
+    //     $where = "";
+    //     $params = $request->query;
+    //     if (!empty($params->all('search')['value'])) {
+    //         $search = trim($params->all('search')['value']);
+    //         foreach ($columns as $key => $value) {
+    //             if ($key == 0) {
+    //                 $where = "and (" . $value['db'] . " LIKE '%$search%' ";
+    //             } else {
+    //                 $where .= " OR " . $value['db'] . " LIKE '%$search%' ";
+    //             }
+    //         }
+    //         $where .= " )";
+    //     }
+    //     return $where;
+    // }
+
     static function Search($request, $columns) {
         $where = "";
         $params = $request->query;
         if (!empty($params->all('search')['value'])) {
             $search = trim($params->all('search')['value']);
             foreach ($columns as $key => $value) {
+                $dbColumnName = $value['db'];
+                // Check if the column has an alias
+                if (strpos($dbColumnName, ' AS ') !== false) {
+                    // If alias is found, extract the column name from the alias
+                    $dbColumnName = explode(' AS ', $dbColumnName)[0];
+                }
                 if ($key == 0) {
-                    $where = "and (" . $value['db'] . " LIKE '%$search%' ";
+                    $where = " AND (" . $dbColumnName . " LIKE '%$search%' ";
                 } else {
-                    $where .= " OR " . $value['db'] . " LIKE '%$search%' ";
+                    $where .= " OR " . $dbColumnName . " LIKE '%$search%' ";
                 }
             }
-            $where .= " )";
+            $where .= ")";
         }
         return $where;
     }

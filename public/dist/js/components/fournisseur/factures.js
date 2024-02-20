@@ -217,22 +217,31 @@ $(document).ready(function  () {
 
     var table = $("#datatables_gestion_factures").DataTable({
         lengthMenu: [
-            [10, 15, 20 ,25, 50, 100, 20000000000000],
+            [10, 15, 20, 25, 50, 100, 20000000000000],
             [10, 15, 20, 25, 50, 100, "All"],
         ],
         pageLength: 20,
         order: [[0, "desc"]],
-        ajax: "/fournisseur/factures/list",
+        ajax: {
+            url: "/fournisseur/factures/list",
+            type: "GET",
+            data: function (d) {
+                d.status = $('#status-filter').val(); // Add status filter value to request data
+            }
+        },
         processing: true,
         serverSide: true,
         deferRender: true,
-        // orderable: false, targets: [0] ,
         columnDefs: [
-            { orderable: false, targets: [0] } // First column (index 0) is not orderable
-          ],
+            { orderable: false, targets: [0,6,7] } // First column (index 0) is not orderable
+        ],
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
         },
+    });
+
+    $('#status-filter').on('change', function () {
+        table.ajax.reload(); // Reload table data when filter changes
     });
 
     var table2 = $("#datatables_gestion_factures_2").DataTable({
