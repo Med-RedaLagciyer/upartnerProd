@@ -1,0 +1,37 @@
+
+
+<div class="modal fade" id="modalAccess">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h6 class="modal-title">Historique d'accès</h6>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+			<form id="access">
+            	<div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="categorie">Date début:</label>
+                            <input class="form-control" type="date" id="dateDebut" name="dateDebut"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="categorie">Date fin:</label>
+                            <input class="form-control" type="date" id="dateFin" name="dateFin"/>
+                        </div>
+                    </div>
+                    {# <label for="categorie">Date d'accès:</label>
+                    <input type="date" id="dateAccess" name="dateAccess"/>
+                    <label for="categorie">Date d'accès:</label>
+                    <input type="date" id="dateAccess" name="dateAccess"/> #}
+                    <br>
+                    <button type="submit" id="btnExtractionAccess" class="btn btn-success btn-xs"><i class="fa fa-check"></i> Extraction d'accès</button>
+                
+				</div>
+			</form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+</div>

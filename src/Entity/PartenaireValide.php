@@ -46,6 +46,9 @@ class PartenaireValide
     private ?string $mail1 = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    private ?string $mail2 = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $pays = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -190,6 +193,18 @@ class PartenaireValide
     public function setMail1(?string $mail1): self
     {
         $this->mail1 = $mail1;
+
+        return $this;
+    }
+
+    public function getMail2(): ?string
+    {
+        return $this->mail2;
+    }
+
+    public function setMail2(?string $mail2): self
+    {
+        $this->mail2 = $mail2;
 
         return $this;
     }

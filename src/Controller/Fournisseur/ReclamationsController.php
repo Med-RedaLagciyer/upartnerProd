@@ -46,9 +46,10 @@ class ReclamationsController extends AbstractController
             array('db' => 'r.id', 'dt' => 0),
             array('db' => 'r.objet', 'dt' => 1),
             array('db' => 'r.observation', 'dt' => 2),
-            array('db' => 'rep.message', 'dt' => 3),
-            array('db' => 'r.created', 'dt' => 4),
-            array('db' => 'rep.userSeen', 'dt' => 5)
+            array('db' => '(SELECT message FROM reponse WHERE reclamation_id = r.id ORDER BY created DESC LIMIT 1) AS latest_response_message', 'dt' => 3),
+            array('db' => '(SELECT userCreated_id FROM reponse WHERE reclamation_id = r.id ORDER BY created DESC LIMIT 1) AS latest_response_user_id', 'dt' => 4),
+            array('db' => 'r.created', 'dt' => 5),
+            // array('db' => 'rep.userSeen', 'dt' => 6)
 
 
         );
@@ -56,31 +57,26 @@ class ReclamationsController extends AbstractController
         
         FROM reclamation r LEFT JOIN reponse rep on rep.reclamation_id = r.id
         
-        $filtre ORDER BY
-        CASE 
-            WHEN rep.id IS NULL THEN 0
-            ELSE 1
-        END,
-        r.created ASC ";
+        $filtre";
         // dd($sql);
         $totalRows .= $sql;
         $sqlRequest .= $sql;
         $stmt = $this->em->getConnection()->prepare($sql);
         $newstmt = $stmt->executeQuery();
         $totalRecords = count($newstmt->fetchAll());
-        // dd($sql);
+        // dd($newstmt->fetchAll());
 
         // search 
         $where = DatatablesController::Search($request, $columns);
         if (isset($where) && $where != '') {
             $sqlRequest .= $where;
         }
-        $sqlRequest .= DatatablesController::Order($request, $columns);
+        $sqlRequest .= DatatablesController::Order($request, $columns, 'rec', $this->getUser()->getId());
+        // dd(DatatablesController::Order($request, $columns, 'rec'));
         // dd($sqlRequest);
         $stmt = $this->em->getConnection()->prepare($sqlRequest);
         $resultSet = $stmt->executeQuery();
         $result = $resultSet->fetchAll();
-
 
         $data = array();
         // dd($result);
@@ -93,13 +89,14 @@ class ReclamationsController extends AbstractController
             // dd($row);
             foreach (array_values($row) as $key => $value) {
 
-                if ($key != 1 and $key != 0 and $key != 5) {
-                    if ($key == 2) {
-                        // if(strlen($value) > 50){
-                        //     $value = substr($value, 0, 50) . "...";
-                        // }
-                        $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'><b >" . $row["objet"] . "</b><br>" . $value . "</div>";
-                    } elseif ($key == 3) {
+                if ($key != 0 and $key != 4 and $key != 6) {
+                    // if ($key == 2) {
+                    //     // if(strlen($value) > 50){
+                    //     //     $value = substr($value, 0, 50) . "...";
+                    //     // }
+                    //     // $nestedData[] = "<div class='text-truncate' title='" . $value . "' style='text-align:left !important'><b >" . $row["objet"] . "</b><br>" . $value . "</div>";
+                    // } else
+                    if ($key == 3) {
                         if ($reponses && $reponses[0]->getUserCreated() != $this->getUser()) {
                             $etat_bg = "etat_bg_blue";
                             $nestedData[] = "<div class='text-truncate' title='" . $reponses[0]->getMessage() . "' style='text-align:left !important'>" . $reponses[0]->getMessage() . "</div>";
@@ -111,13 +108,14 @@ class ReclamationsController extends AbstractController
                         }
                     } else {
                         $nestedData[] = $value;
-                        $nestedData[] = '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" style="color: black;"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 7rem !important; min-width:unset !important"><a id="btnReponse" class="dropdown-item btn-xs"><i class="fas fa-comment mr-2"></i>Reponse</a><a id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a id="btnModifier" class="dropdown-item btn-xs"><i class="fas fa-pen mr-2"></i>Modifier</a><a id="btnSupprimer" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-2"></i> Supprimer</a>';
                     }
                 }
             }
+            $nestedData[] = '<div cl="" class="'.$etat_bg.'"><a data-toggle="dropdown" href="#" aria-expanded="false" style="color: black;"><i class="fa fa-ellipsis-v"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 7rem !important; min-width:unset !important"><a id="btnReponse" class="dropdown-item btn-xs"><i class="fas fa-comment mr-2"></i>Réponse</a><a id="btnDetailsReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-1"></i> Détails</a><a id="btnModifier" class="dropdown-item btn-xs"><i class="fas fa-pen mr-2"></i>Modifier</a><a id="btnSupprimer" class="dropdown-item btn-xs"><i class="fas fa-times-circle mr-1"></i> Supprimer</a></div>';
+            // $nestedData[] = '';
 
             $nestedData["DT_RowId"] = $cd;
-            $nestedData["DT_RowClass"] = $etat_bg;
+            // $nestedData["DT_RowClass"] = $etat_bg;
             $data[] = $nestedData;
             $i++;
         }
@@ -129,6 +127,7 @@ class ReclamationsController extends AbstractController
             "data" => $data
         );
         // die;
+        // dd($json_data);
         return new Response(json_encode($json_data));
     }
 
@@ -270,6 +269,7 @@ class ReclamationsController extends AbstractController
                 'infos' => $reclamation_infos,
                 'reclamation_reponse' => $reclamation_repondre,
                 'modification' => $reclamation_modification,
+                'objetReclamation' => $reclamation->getObjet(),
                 'local' => true
             ]);
         } else {
@@ -308,6 +308,7 @@ class ReclamationsController extends AbstractController
                 'infos' => $reclamation_infos,
                 'reclamation_reponse' => $reclamation_repondre,
                 'modification' => $reclamation_modification,
+                'objetReclamation' => $reclamation->getObjet(),
                 'local' => false
             ]);
         }

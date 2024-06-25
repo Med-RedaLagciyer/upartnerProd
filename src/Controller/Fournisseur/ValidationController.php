@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\User;
 
 
 #[Route('/fournisseur/validation')]
@@ -27,7 +28,7 @@ class ValidationController extends AbstractController
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
 
-        $query = "SELECT id, nom, prenom, societe, adresse, pays, ville, tel1, tel2, mail1, ice FROM `u_p_partenaire` WHERE ice_o = '" . $this->getUser()->getUsername() . "'";
+        $query = "SELECT id, nom, prenom, societe, adresse, pays, ville, tel1, tel2, mail1, mail2, contact1, contact2, ice_o FROM `u_p_partenaire` WHERE ice_o = '" . $this->getUser()->getUsername() . "'";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $infos = $result->fetchAll();
@@ -42,66 +43,72 @@ class ValidationController extends AbstractController
         ]);
     }
 
+    #[Route('/await', name: 'app_fournisseur_await')]
+    public function await(Security $security, ManagerRegistry $doctrine): Response
+    {
+        return $this->render('fournisseur/await.html.twig', [
+        ]);
+    }
+
     #[Route('/valider', name: 'app_fournisseur_valider')]
     public function ajouter(Request $request, ManagerRegistry $doctrine): Response
     {
 
-        if ($request->get("societe") && $request->get("ice") && $request->get("nom") && $request->get("prenom") && $request->get("tel1") && $request->get("tel2") && $request->get("contact1") && $request->get("contact2") && $request->get("mail1") && $request->get("pays") && $request->get("ville") && $request->get("adresse")) {
-            if (strlen($request->get('ice')) !== 15) {
-                return new JsonResponse('ICE DOIT AVOIR PLUS DE 15 CARACTÈRES', 500);
-            }
+        // dd($request);
+        if ($request->get("tel1") && $request->get("mail1") && $request->get("ville") && $request->get("contact1")) {
+            // if (strlen($request->get('ice')) !== 15) {
+            //     return new JsonResponse('ICE DOIT AVOIR PLUS DE 15 CARACTÈRES', 500);
+            // }
             $partenaire = $this->em->getRepository(PartenaireValide::class)->findby(["partenaireId" => $request->get("idfrs")]);
             // dd(!$partenaire);
+            $user = $this->em->getRepository(User::class)->find($this->getUser());
 
+            // dd($partenaire);
             if (!$partenaire) {
                 $partenaire = new PartenaireValide();
 
-                // dd($partenaire);
 
                 $partenaire->setPartenaireId(intval($request->get("idfrs")));
-                $partenaire->setSociete($request->get("societe"));
-                $partenaire->setICE($request->get("ice"));
-                $partenaire->setNom($request->get("nom"));
-                $partenaire->setPrenom($request->get("prenom"));
-                $partenaire->setTel1($request->get("tel1"));
-                $partenaire->setContact1($request->get("contact1"));
-                $partenaire->setTel2($request->get("tel2"));
-                $partenaire->setContact2($request->get("contact2"));
-                $partenaire->setMail1($request->get("mail1"));
-                $partenaire->setPays($request->get("pays"));
-                $partenaire->setVille($request->get("ville"));
-                $partenaire->setAdresse($request->get("adresse"));
+                if($request->get("nom"))$partenaire->setNom($request->get("nom"));
+                if($request->get("prenom"))$partenaire->setPrenom($request->get("prenom"));
+                if($request->get("tel1"))$partenaire->setTel1($request->get("tel1"));
+                if($request->get("contact1"))$partenaire->setContact1($request->get("contact1"));
+                if($request->get("tel2"))$partenaire->setTel2($request->get("tel2"));
+                if($request->get("contact2"))$partenaire->setContact2($request->get("contact2"));
+                if($request->get("mail1"))$partenaire->setMail1($request->get("mail1"));
+                if($request->get("mail2"))$partenaire->setMail2($request->get("mail2"));
+                if($request->get("ville"))$partenaire->setVille($request->get("ville"));
+                if($request->get("adresse"))$partenaire->setAdresse($request->get("adresse"));
                 $partenaire->setUserCreated($this->getUser());
                 $partenaire->setCreated(new \DateTime());
 
                 $this->em->persist($partenaire);
 
+                $user->setValide(1);
+
                 $this->em->flush();
             } else {
                 $PartenaireValide = $this->em->getRepository(PartenaireValide::class)->find($partenaire[0]->getId());
-                // dd($PartenaireValide);
-                $PartenaireValide->setPartenaireId(intval($request->get("idfrs")));
-                $PartenaireValide->setSociete($request->get("societe"));
-                $PartenaireValide->setNom($request->get("nom"));
-                $PartenaireValide->setPrenom($request->get("prenom"));
-                $PartenaireValide->setICE($request->get("ice"));
-                $PartenaireValide->setTel1($request->get("tel1"));
-                $PartenaireValide->setContact1($request->get("contact1"));
-                $PartenaireValide->setTel2($request->get("tel2"));
-                $PartenaireValide->setContact2($request->get("contact2"));
-                $PartenaireValide->setMail1($request->get("mail1"));
-                $PartenaireValide->setPays($request->get("pays"));
-                $PartenaireValide->setVille($request->get("ville"));
-                $PartenaireValide->setAdresse($request->get("adresse"));
+                if($request->get("nom"))$PartenaireValide->setNom($request->get("nom"));
+                if($request->get("prenom"))$PartenaireValide->setPrenom($request->get("prenom"));
+                if($request->get("tel1"))$PartenaireValide->setTel1($request->get("tel1"));
+                if($request->get("contact1"))$PartenaireValide->setContact1($request->get("contact1"));
+                if($request->get("tel2"))$PartenaireValide->setTel2($request->get("tel2"));
+                if($request->get("contact2"))$PartenaireValide->setContact2($request->get("contact2"));
+                if($request->get("mail1"))$PartenaireValide->setMail1($request->get("mail1"));
+                if($request->get("mail2"))$PartenaireValide->setMail2($request->get("mail2"));
+                if($request->get("ville"))$PartenaireValide->setVille($request->get("ville"));
+                if($request->get("adresse"))$PartenaireValide->setAdresse($request->get("adresse"));
                 $PartenaireValide->setUserUpdated($this->getUser());
                 $PartenaireValide->setUpdated(new \DateTime());
+                $user->setValide(1);
                 $this->em->flush();
             }
 
-
-            return new JsonResponse('MISE À JOUR RÉALISÉE AVEC SUSSE', 200);
+            // dd("done");
+            return new JsonResponse('Vos informations ont été mises à jour.', 200);
         } else {
-            return new JsonResponse('MISE À JOUR RÉALISÉE AVEC SUSSE', 500);
+            return new JsonResponse('MERCI DE REMPLIR TOUS LES CHAMPS', 500);
         }
     }
 }

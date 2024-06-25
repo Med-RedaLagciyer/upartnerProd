@@ -1,10 +1,8 @@
 <div id="messages">
-	<div class="row">
+	{# <div class="row">
 		<div class="col-1">
 			<div class="form-group" style="margin-bottom: 0;">
 				<label>Objet:</label>
-
-				{# <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea> #}
 			</div>
 		</div>
 		<div class="col-11" style="padding-left: 1 !important; margin-bottom: 0;">
@@ -12,13 +10,17 @@
 				<p>{{ reclamation.objet }}</p>
 			</div>
 		</div>
-	</div>
+	</div> #}
 	<div class="row">
 		<div class="col-9">
-			<div class="form-group">
-				<textarea style="background: #d9eeff;" class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+				<div class=" mr-1 d-flex flex-column">
+					<label style="float: right;">{{ reclamation.created | date('d-m-Y') }}</label>
+					<p class="form-control chatLeft" rows="1" disabled="">{{ reclamation.observation }}</p>
+				</div>
+			{# <div class="form-group">
 				<label style="float: left;">{{ reclamation.created | date('d-m-Y') }}</label>
-			</div>
+				<textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+			</div> #}
 		</div>
 	</div>
 	{% for reponse in reclamation.reponses  %}
@@ -28,19 +30,30 @@
 				<div class="col-3"></div>
 				<div class="col-9">
 					{% if reponse.message %}
-						<div class="form-group">
+						<div class=" mr-1 d-flex flex-column">
+							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
+							<p class="form-control chatLeft" rows="1" disabled="">{{ reponse.message }}</p>
+						</div>
+						{# <div class="form-group">
 							<textarea class="form-control" rows="3" disabled="">{{ reponse.message }}</textarea>
 							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
-						</div>
+						</div> #}
 					{% endif %}
 					{% if reponse.file %}
-						<div class="form-group">
+						<div class=" mr-1 d-flex flex-column">
+							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
+							{# <p class="form-control" rows="1" disabled="">{{ reponse.message }}</p> #}
+							<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right chatLeft" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+								<i class="fas fa-download"></i> Pièce jointe
+							</a>
+						</div>
+						{# <div class="form-group">
 							<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
 								<i class="fas fa-download"></i> Piece jointe
 							</a>
 							<br>
 							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
-						</div>
+						</div> #}
 					{% endif %}
 				</div>
 			</div>
@@ -49,10 +62,14 @@
 			{% if reponse.message %}
 				<div class="row">
 					<div class="col-9">
-							<div class="form-group">
-								<textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">{{ reponse.message }}</textarea>
+						<div class=" mr-1 d-flex flex-column">
+							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
+							<p class="form-control chatLeft" rows="1" disabled="">{{ reponse.message }}</p>
+						</div>
+							{# <div class="form-group">
+								<textarea class="form-control" rows="3" disabled="">{{ reponse.message }}</textarea>
 								<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
-							</div>
+							</div> #}
 					</div>
 					<div class="col-3"></div>
 				</div>
@@ -60,13 +77,19 @@
 			{% if reponse.file %}
 				<div class="row">
 					<div class="col-9">
-							<div class="form-group">
+						<div class=" mr-1 d-flex flex-column">
+							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
+							<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right chatLeft" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+								<i class="fas fa-download"></i> Pièce jointe
+							</a>
+						</div>
+							{# <div class="form-group">
 								<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
 									<i class="fas fa-download"></i> Piece jointe
 								</a>
 								<br>
 								<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
-							</div>
+							</div> #}
 					</div>
 					<div class="col-3"></div>
 				</div>
@@ -80,6 +103,22 @@
 
 <form id="message_form" data-reclamation="{{reclamation.id}}">
 	<div class="row">
+		<div class="col-10">
+			<div class="textarea-wrapper">
+				<input name="message" class="form-control textarea" rows="1" placeholder="Ecrivez votre message ici"></input>
+				<input type="file" id="fileUpload" class="file-input" />
+				<label for="fileUpload" class="file-label"><i class="fas fa-upload"></i></label>
+			</div>
+		</div>
+		<div class="col-2" style="padding: 0;">
+			<button type="submit" class="btn btn-sm btn-primary pull-right" style="float: right">
+				Envoyer <i class="fas fa-paper-plane"></i></button>
+		</div>
+	</div>
+</form>
+
+{# <form id="message_form" data-reclamation="{{reclamation.id}}">
+	<div class="row">
 		<div class="col-9">
 			<div class="form-group">
 				<textarea name="message" class="form-control" rows="1" placeholder="Ecrivez votre message ici"></textarea>
@@ -87,7 +126,6 @@
 		</div>
 		<div
 			class="col-1" style="padding: 0;">
-			{# <input type="file" class="form-control-file" id="fileUpload" accept=".pdf, .doc, .docx, .txt, .png, .jpeg"> #}
 			<input name="file" style="display:none;" type="file" id="fileUpload" accept=".pdf, .doc, .docx, .txt, .png, .jpeg">
 			<label style="vertical-align:middle;cursor:pointer;" for="fileUpload">
 				<i class="fa fa-paperclip fa-2x" style="font-size: 28px !important;color: #465563;"></i>
@@ -101,4 +139,4 @@
 				Envoyer</button>
 		</div>
 	</div>
-</form>
+</form> #}

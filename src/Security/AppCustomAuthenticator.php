@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Entity\AccessHistorique;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCre
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Doctrine\Persistence\ManagerRegistry;
 
 class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -31,9 +33,11 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
     private UrlGeneratorInterface $urlGenerator;
     private UserRepository $userRepository;
     private UserPasswordHasherInterface $passwordEncoder;
+    private $em;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator,UserPasswordHasherInterface $passwordEncoder, UserRepository $userRepository)
+    public function __construct(UrlGeneratorInterface $urlGenerator,UserPasswordHasherInterface $passwordEncoder, UserRepository $userRepository,ManagerRegistry $doctrine)
     {
+        $this->em = $doctrine->getManager();
         $this->urlGenerator = $urlGenerator;
         $this->passwordEncoder = $passwordEncoder;
         $this->userRepository = $userRepository;
@@ -72,6 +76,17 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        // dd($request->request->get('username', ''));
+        $user = $this->userRepository->findOneBy(['username' => $request->request->get('username')]);
+        // dd($user);
+        $historique = new AccessHistorique();
+
+        $historique->setUser($user);
+        $historique->setDateAccess(new \DateTime());
+
+        $this->em->persist($historique);
+        $this->em->flush();
+
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }

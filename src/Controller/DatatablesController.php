@@ -84,7 +84,7 @@ class DatatablesController extends AbstractController {
     //     return $sqlRequest;
     // }
     
-    public static function Order($request, $columns) {
+    public static function Order($request, $columns, $type = "", $userId = "") {
         $params = $request->query->all();
         
         // Check if the "order" parameter exists and is an array
@@ -107,6 +107,13 @@ class DatatablesController extends AbstractController {
             // If "order" parameter is missing or empty, set default ordering or do nothing
             $sqlOrder = "";
         }
+
+        
+        if($type == "rec" and $sqlOrder == " ORDER BY r.id desc"){
+            // $sqlOrder = " ORDER BY CASE WHEN rep.id IS NULL THEN 0 WHEN latest_response_user_id = 10 THEN 0 ELSE 1 END ASC";
+            $sqlOrder = " ORDER BY r.created DESC";
+        }
+        // dd($sqlOrder);
     
         // Construct the LIMIT clause
         $start = $params['start'] ?? 0;

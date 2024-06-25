@@ -5,9 +5,10 @@
 		<table id="datatables_commande" style="width: 100% !important" class="table table-condensed table-bordered">
 			<thead>
 				<tr>
-					<th width="">Code Piece</th>
-					<th>Date</th>
-					<th>RefDocAsso</th>
+					<th width="">Code Commande</th>
+					<th>Date Commande</th>
+					<th>Montant facture</th>
+					<th>Montant réglement</th>
 					<th width="10%"></th>
 				</tr>
 			</thead>
@@ -16,15 +17,19 @@
 					<tr id="{{c.id}}">
 						<td id="code">{{c.code}}</td>
 						<td id="datecommande">{{c.datecommande}}</td>
-						<td id="refDocAsso">{{c.refDocAsso}}</td>
+						<td id="montantFacture">{{ c.montant_facture |number_format(2, '.', ' ') }} </td>
+						<td id="montantRegle">{% if c.montant_regle %}{{ c.montant_regle |number_format(2, '.', ' ') }}{% endif %}</td>
 						<td id="actions">
 							<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
 								<i class="fa fa-ellipsis-v" style="color: #000;"></i>
 							</a>
-							<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
-								<a data-value="local" id="commandeDet" class="btnDet dropdown-item btn-xs">
+							<div class="dropdown-menu dropdown-menu-right" style="width: 10rem !important; min-width:unset !important; font-size : 12px !important;">
+								<a data-value="local" id="recepDet" class="dropdown-item btn-xs">
 									<i class="fas fa-eye mr-2"></i>
-									Details</a>
+									Détails Réception</a>
+								<a data-value="local" id="facDet" class="dropdown-item btn-xs">
+									<i class="fas fa-eye mr-2"></i>
+									Détails Facture</a>
 							</th>
 						</td>
 					</tr>
@@ -35,7 +40,7 @@
 
 </div>
 <hr>
-<div class="row">
+{# <div class="row">
 	<div class="col-12">
 		<label>Reception:</label>
 
@@ -86,26 +91,26 @@
 					<th width="10%"></th>
 				</tr>
 			</thead>
-		</th>
-	</tr>
-</thead>
-<tbody>
-	{% for f in facture %}
-		<tr {% if f.executer == 1 %} class="etat_bg_vert" {% endif %} id="{{f.id}}">
-			<td>{{f.code}}</td>
-			<td>{{f.datefacture}}</td>
-			<td>{{f.refDocAsso}}</td>
-			<td>{{f.montant}}</td>
-			<td>
-				<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
-					<i class="fa fa-ellipsis-v" style="color: #000;"></i>
-				</a>
-				<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
-					<a data-value="local" id="factureDet" class="btnDet dropdown-item btn-xs">
-						<i class="fas fa-eye mr-2"></i>
-						Details</a>
-				</td>
-			</td>
-		</tr>
-	{% endfor %}
-</tbody></table></div></div>
+			<tbody>
+				{% for f in facture %}
+					<tr {% if f.executer == 1 %} class="etat_bg_vert" {% endif %} id="{{f.id}}">
+						<td>{{f.code}}</td>
+						<td>{{f.datefacture}}</td>
+						<td>{{f.refDocAsso}}</td>
+						<td>{{f.montant}}</td>
+						<td>
+							<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+								<i class="fa fa-ellipsis-v" style="color: #000;"></i>
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+								<a data-value="local" id="factureDet" class="btnDet dropdown-item btn-xs">
+									<i class="fas fa-eye mr-2"></i>
+									Details</a>
+							</td>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div> #}

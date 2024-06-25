@@ -1,5 +1,5 @@
 $(document).ready(function  () {
-    // console.log('hi');
+    console.log('hi');
 
     toastr.options = {
         "closeButton": true,
@@ -20,7 +20,9 @@ $(document).ready(function  () {
 
     $("body").on("submit", "#formValider", async function (e) {
         e.preventDefault();
-        
+        let icon = $("#btnvalider i");
+        // alert(icon);
+        icon.removeClass("fa-check").addClass("fa-spinner fa-spin");
         id = $(this).attr('data-id');   
         // $("#reclamer_modal").modal("show")
         const formData = new FormData($("#formValider")[0]);
@@ -32,16 +34,17 @@ $(document).ready(function  () {
                 formData
                 );
                 const response = request.data;
+                console.log(response);
                 toastr.success(response);
+                icon.addClass("fa-check").removeClass("fa-spinner fa-spin");
                 
-                // window.location.href= "{{ path('app_index') }}";
                 window.location = '/';  
 
         } catch (error) {
-            const message = error.response.data;
+            const message = error.response;
             console.log(error, error.response);
             toastr.error(message);
-            icon.addClass("fa-check-circle").removeClass("fa-spinner fa-spin ");
+            icon.addClass("fa-check").removeClass("fa-spinner fa-spin");
         }
     });
     

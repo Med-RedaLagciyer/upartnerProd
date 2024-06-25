@@ -193,7 +193,7 @@ body *{
 
 
 .text-truncate {
-    max-width: 120px; /* Adjust this value to fit your layout */
+    max-width: 250px; /* Adjust this value to fit your layout */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -206,7 +206,7 @@ body *{
 }
 
 .text-truncate-commande {
-    max-width: 150px; /* Adjust this value to fit your layout */
+    max-width: 450px; /* Adjust this value to fit your layout */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -346,6 +346,10 @@ hr {
 
 #btnReponse:focus{
     background-color:unset;
+}
+
+#datatables_gestion_factures td{
+    padding:0 !important;
 }
 
 
@@ -7034,7 +7038,11 @@ a.disabled.mailbox-attachment-close {
 
 .modal-title {
     margin-bottom: 0;
-    line-height: 1.5
+    line-height: 1.5;
+    font-size:1.6rem!important;
+    text-transform: capitalize!important;
+    color: #26354F;
+    font-weight: 600;
 }
 
 .modal-body {
@@ -34213,7 +34221,8 @@ html.maximized-card {
     padding: .125rem .25rem;
     font-size: .75rem;
     line-height: 1.5;
-    border-radius: .15rem
+    border-radius: .15rem;
+    text-transform: capitalize !important;
 }
 
 .dark-mode .btn-app,
@@ -56132,4 +56141,54 @@ a.text-muted:hover {
     border-color: #4b545c !important
 }
 
+input,textarea,td,th,p,b,label,a,span{
+    text-transform: capitalize!important;
+}
+.chatRight{
+    border-radius: 10px;
+    border-top-right-radius: 0;
+}
+.chatLeft{
+    /* background: #d9eeff; */
+    border-radius: 10px;
+    border-top-left-radius: 0;
+}
+.modal-content{
+    border-radius: 1.5rem!important;
+}
+.btn-return,.btn-xs{
+    cursor: pointer!important;
+}
+.btn-primary{
+    background: #26354f;
+    border: #26354f;
+}
+.textarea-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+  
+.textarea-wrapper .textarea {
+/* width: 300px; */
+width: 100%;
+/* height: 150px; */
+padding-right: 2rem; /* Adjust this based on the size of your icon */
+box-sizing: border-box;
+}
+
+.file-input {
+display: none; /* Hide the actual file input */
+}
+
+.file-label {
+position: absolute;
+top: 5px; /* Adjust this to position the icon vertically */
+right: 1rem; /* Adjust this to position the icon horizontally */
+cursor: pointer; /* Change cursor to pointer to indicate it’s clickable */
+}
+
+.file-label i {
+font-size: 1rem!important; /* Adjust the size of the icon */
+}
 /*# sourceMappingURL=adminlte.min.css.map */

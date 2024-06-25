@@ -1,24 +1,21 @@
 <div id="messages">
-	<div class="row">
+	{# <div class="row">
 		<div class="col-1">
 			<div class="form-group" style="margin-bottom: 0;">
 				<label>Objet:</label>
-
-				{# <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea> #}
 			</div>
 		</div>
 		<div class="col-11" style="padding-left: 1 !important; margin-bottom: 0;">
 			<div class="form-group">
 				<p>{{ reclamation.objet }}</p>
-
 			</div>
 		</div>
-	</div>
+	</div> #}
 	<div class="row">
 		<div class="col-7">
-			<div class="form-group">
-				<textarea style="background: #d9eeff;" class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+			<div class=" mr-1 d-flex flex-column">
 				<label style="float: left;">{{ reclamation.created | date('d-m-Y') }}</label>
+				<p style="" class="form-control chatLeft" rows="1" disabled="">{{ reclamation.observation }} </p>
 			</div>
 		</div>
 	</div>
@@ -30,18 +27,18 @@
 				<div class="col-3"></div>
 				<div class="col-9">
 					{% if reponse.message %}
-						<div class="form-group">
-							<textarea class="form-control" rows="3" disabled="">{{ reponse.message }}</textarea>
+						<div class=" mr-1 d-flex flex-column">
 							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
+							<p class="form-control chatRight" rows="1" disabled="">{{ reponse.message }}</p>
 						</div>
 					{% endif %}
 					{% if reponse.file %}
-						<div class="form-group">
-							<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
-								<i class="fas fa-download"></i> Piece jointe
-							</a>
-							<br>
+						<div class=" mr-1 d-flex flex-column">
 							<label style="float: right;">{{ reponse.created | date('d-m-Y') }}</label>
+							<br>
+							<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right chatleft" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+								<i class="fas fa-download"></i> Pièce jointe
+							</a>
 						</div>
 					{% endif %}
 				</div>
@@ -51,9 +48,9 @@
 			{% if reponse.message %}
 				<div class="row">
 					<div class="col-9">
-							<div class="form-group">
-								<textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">{{ reponse.message }}</textarea>
+							<div class=" mr-1 d-flex flex-column">
 								<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
+								<p class="form-control chatLeft" style="" rows="1" disabled="">{{ reponse.message }}</p>
 							</div>
 					</div>
 					<div class="col-3"></div>
@@ -62,12 +59,11 @@
 			{% if reponse.file %}
 				<div class="row">
 					<div class="col-9">
-							<div class="form-group">
-								<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
-									<i class="fas fa-download"></i> Piece jointe
-								</a>
-								<br>
+							<div class=" mr-1 d-flex flex-column">
 								<label style="float: left;">{{ reponse.created | date('d-m-Y') }}</label>
+								<a id="downloadPiece" data-file="{{reponse.file}}" class="btn btn-secondary btn-xs pull-right chatLeft" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+									<i class="fas fa-download"></i> Pièce jointe
+								</a>
 							</div>
 					</div>
 					<div class="col-3"></div>
@@ -80,27 +76,31 @@
 </div>
 
 
-<form id="message_form" data-reclamation="{{reclamation.id}}">
+<form id="message_form-"  data-reclamation="{{reclamation.id}}" enctype="multipart/form-data">
 	<div class="row">
-		<div class="col-9">
-			<div class="form-group">
-				<textarea name="message" class="form-control" rows="1" placeholder="Ecrivez votre message ici"></textarea>
+		<div class="col-10">
+			<div class="textarea-wrapper">
+				{# <textarea></textarea> #}
+				{# <textarea name="message" class="form-control" rows="1" placeholder="Ecrivez votre message ici"></textarea> #}
+				<input name="message" class="form-control textarea" rows="1" placeholder="Ecrivez votre message ici"></input>
+				<input type="file" id="fileUploade" class="file-input fileUpload" name="file" />
+				<label for="fileUploade" class="file-label"><i class="fas fa-upload"></i></label>
 			</div>
+			{# <div class=" mr-1">
+				<textarea name="message" class="form-control" rows="1" placeholder="Ecrivez votre message ici"></textarea>
+			</div> #}
 		</div>
-		<div
-			class="col-1" style="padding: 0;">
-			{# <input type="file" class="form-control-file" id="fileUpload" accept=".pdf, .doc, .docx, .txt, .png, .jpeg"> #}
+		{# <div class="col-1" style="padding: 0;">
 			<input name="file" style="display:none;" type="file" id="fileUpload" accept=".pdf, .doc, .docx, .txt, .png, .jpeg">
 			<label style="vertical-align:middle;cursor:pointer;" for="fileUpload">
 				<i class="fa fa-paperclip fa-2x" style="font-size: 28px !important;color: #465563;"></i>
 				<span style="margin-left: 10px"></span>
 			</label>
 			<i class="fa fa-times-circle remove" style="vertical-align:middle;margin-left: 5px;cursor:pointer;display:none;"></i>
-		</div>
+		</div> #}
 		<div class="col-2" style="padding: 0;">
 			<button type="submit" class="btn btn-sm btn-primary pull-right" style="float: right">
-				<i class="fas fa-paper-plane"></i>
-				Envoyer</button>
+				Envoyer <i class="fas fa-paper-plane"></i></button>
 		</div>
 	</div>
 </form>

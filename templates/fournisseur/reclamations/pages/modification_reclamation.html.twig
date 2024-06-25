@@ -1,21 +1,23 @@
-<form id="modifier-form">
+<form id="modifier-form" style=" display: flex; flex-direction: column;">
 	<div class="row">
 		<div class="col-3">
 			<div class="form-group">
 				<label>Objet:</label>
-				<textarea class="form-control" rows="3" name="objet">{{ reclamation.objet }}</textarea>
+				{# <textarea class="form-control" rows="3" name="objet">{{ reclamation.objet }}</textarea> #}
+				<input class="form-control" rows="3" name="objet" value="{{ reclamation.objet }}">
 			</div>
 		</div>
 		<div class="col-9">
 			<div class="form-group">
 				<label>Observation:
 				</label>
-				<textarea class="form-control" rows="3" name="observation">{{ reclamation.observation }}</textarea>
+				{# <textarea class="form-control" rows="3" name="observation">{{ reclamation.observation }}</textarea> #}
+				<input class="form-control" rows="3" name="observation" value="{{ reclamation.observation }}">
 			</div>
 		</div>
 	</div>
 
-	<button type="submit" class="btn btn-xs btn-success">Modifier</button>
+	<button type="submit" class="btn btn-xs btn-primary ml-auto">Modifier</button>
 </form>
 
 <hr style="margin-top:0.5rem !important; margin-bottom:0.5rem !important;">
@@ -23,15 +25,14 @@
 	<div class="row">
 		<div class="col-12">
 			<label>Liste des factures:</label>
-			<label>Liste des Factures:</label>
 
-			<table id="datatables_facture_ajoute" style="width: 100% !important" class="table table-condensed table-bordered">
+			<table id="datatables_facture_ajoute" style="width: 100% !important" class="table table-condensed table-bordered modifier_table">
 				<thead>
 					<tr>
 						<th width="">N° Facture</th>
 						<th width="20%">Montant</th>
 						<th width="30%">Date</th>
-						<th width="">Piece joint</th>
+						<th width="">Pièce jointe</th>
 						<th width="5%"></th>
 					</tr>
 				</thead>
@@ -39,7 +40,7 @@
 					{% for fac in factures %}
 						<tr>
 							<td width="" class="text-truncate" title="{{ fac.numFacture}}">{{ fac.numFacture}}</td>
-							<td width="10%">{{ fac.montant}}</td>
+							<td width="10%">{{ fac.montant |number_format(2, '.', ' ')}}</td>
 							<td width="">{{ fac.dateFacture | date('d-m-Y')}}</td>
 							<td width="">
 								{% if fac.file %}
@@ -49,7 +50,7 @@
 								{% endif %}
 							</td>
 							<td>
-								<a id="{{fac.id}}" class="btnSupprimerFactureExsist btn btn-danger btn-xs pull-right" style="width: 20px;">
+								<a id="{{fac.id}}" class="btnSupprimerFactureExsist btn btn-danger btn-xs pull-right" style="width: 20px;background:#ffd3d3 !important;border:1px solid #ffd3d3 !important">
 									<i class="fas fa-minus"></i>
 								</a>
 							</td>
@@ -84,7 +85,7 @@
 					<tr>
 						<th width="">Code Piece</th>
 						<th>Date</th>
-						<th>RefDocAsso</th>
+						<th>RéfDocAss</th>
 						<th width="10%"></th>
 					</tr>
 				</thead>
@@ -101,7 +102,7 @@
 								<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
 									<a data-value="local" id="commandeDet" class="btnDet dropdown-item btn-xs">
 										<i class="fas fa-eye mr-2"></i>
-										Details</a>
+										Détails</a>
 								</th>
 							</td>
 						</tr>

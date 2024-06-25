@@ -1,0 +1,38 @@
+
+<div class="row">
+	<div class="col-12">
+		<label>Facture:</label>
+
+		<table id="datatables_facture" style="width: 100% !important" class="table table-condensed table-bordered">
+			<thead>
+				<tr>
+					<th width="">Code</th>
+					<th>Date Facture</th>
+					<th>RéfDocAss</th>
+					<th>Montant</th>
+					<th width="10%"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for f in facture %}
+					<tr {% if f.executer == 1 %} class="etat_bg_vert" {% endif %} id="{{f.id}}">
+						<td>{{f.code}}</td>
+						<td>{{f.datefacture}}</td>
+						<td>{{f.refDocAsso}}</td>
+						<td>{{f.montant |number_format(2, '.', ' ')}}</td>
+						<td>
+							<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+								<i class="fa fa-ellipsis-v" style="color: #000;"></i>
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+								<a data-value="local" id="factureDet" class="btnDet dropdown-item btn-xs">
+									<i class="fas fa-eye mr-2"></i>
+									Détails</a>
+							</td>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>

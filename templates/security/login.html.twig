@@ -6,8 +6,8 @@
 			{% block title %}U-PARTENAIRE | Authentification
 			{% endblock %}
 		</title>
-		<link
-		rel="shortcut icon" href="{{asset('dist/img/upharma.png')}}"/>
+		{# <link rel="shortcut icon" href="{{asset('dist/img/upharma.png')}}"/> #}
+		<link rel="shortcut icon" href="{{asset('dist/img/Logo_Upartner_Icon.png')}}"/>
 		<!-- Google Font: Source Sans Pro -->
 		<link
 		rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -30,34 +30,31 @@
 		<div class="loginColumns animated fadeInDown">
 			<div class="row" style="margin-right: -15px !important;margin-left: -15px !important;">
 
-				<div class="col-md-6"><br><br><br><br><br>
-					<h2 class="font-bold">UPHARMA</h2>
+				<div class="col-md-7"><br><br><br><br><br><br><br><br><br><br>
+					<h2 class="font-bold">U-PARTENAIRE</h2>
 					<div style="color:#949494;font-size:14px !important">
 						<p style="color:#949494;font-size:14px !important">
-							UPHARMA est un progiciel de gestion intégré (PGI, ERP en anglais)  développé pour les petites et moyennes entreprises, les indépendants, auto-entrepreneurs ou les associations.
+							Gérez vos réclamations de manière simple et efficace !
 						</p>
 
 						<p style="color:#949494;font-size:14px !important">
-							À savoir la gestion des clients, fournisseurs, devis, commandes, factures, stocks, comptabilité. L’architecture d’UPHARMA  est modulaire. Il se positionne sur la facilité d'installation et la simplicité d'utilisation.
-						</p>
-
-						<p style="color:#949494;font-size:14px !important">
-							UPHARMA  fonctionne par activation de modules. Vous n'activez et ne voyez que les fonctionnalités (modules) dont vous avez besoin.
+							U-PARTENAIRE est un progiciel de gestion intégré, conçu pour proposer une solution centralisée de gestion des demandes et des réclamations partenaires permettant ainsi l’optimisation de leur traitement.
 						</p>
 					</div>
 
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-5">
 					<div class="test row">
 						<div class="col-1"></div>
 
 						<div class="col-12">
 							<centre>
-
-								<img src="/dist/img/upharma.png" alt="image" class="feed-photo" style="width: 25%; margin-left: 16%;">
+									<img src="/dist/img/Logo_Upartner.png" alt="image" class="" style="vertical-align: middle; font-family: Oswald,sans-serif;font-size: 40px;font-weight: bold;color: #CDDFF2;width: 90%;
+    margin-top: 4rem; ">
+								{# <img src="/dist/img/upharma.png" alt="image" class="feed-photo" style="width: 25%; margin-left: 6%;">
 								<span style="vertical-align: middle; font-family: Oswald,sans-serif;font-size: 40px;font-weight: bold;color: #CDDFF2;">
-									UPHARMA
-								</span>
+									U-PARTENAIRE
+								</span> #}
 
 							</center>
 
@@ -65,13 +62,13 @@
 
 
 					</div>
-					<div class="test row">
+					{# <div class="test row">
 
 						<div class="col-12">
 							<img src="/dist/img/universal.PNG" alt="image" class="feed-photo" style="width: 80%; margin-left: 10%;">
 						</div>
 
-					</div>
+					</div> #}
 					<div class="ibox-content">
 
 
@@ -85,7 +82,7 @@
 							</div>
 
 							<div class="form-group">
-								<input type="password" class="form-control" name="password" placeholder="Mots de pass" id="inputPassword" required style="padding:6px">
+								<input type="password" class="form-control" name="password" placeholder="Password" id="inputPassword" required style="padding:6px">
 							</div>
 							<br/>
 							<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">

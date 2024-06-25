@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fournisseur | Informations{% endblock %}
+
+{% block pagetitle %}Informations{% endblock %}
+{% block stylesheets %} 
+    {{parent()}}
+{% endblock %}
+{% block body %}
+	{# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" /> #}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" />
+
+<div class="callout callout-info">
+	<h5><i class="fas fa-info"></i></h5>
+	<h3>Vos informations ont été mises à jour. Veuillez attendre la confirmation de l'administration.</h3>
+ 	<a class="btn btn-success" style="text-decoration: none;color:#fff" href="{{path('app_fournisseur_validation')}}">MODIFIER</a>
+	
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{parent()}}
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="{{asset('dist/js/components/fournisseur/validation.js')}}"></>
+<script>
+    
+</script>
+
+{% endblock %}

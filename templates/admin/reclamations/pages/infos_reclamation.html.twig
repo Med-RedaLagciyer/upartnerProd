@@ -26,14 +26,14 @@
 						<th width="10%">N° facture</th>
 						<th width="">Montant</th>
 						<th width="10%">Date facture</th>
-						<th width="10%">Piece joint</th>
+						<th width="10%">Pièce joint</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for fac in factures %}
 						<tr>
 							<td width="" class="text-truncate" title="{{ fac.numFacture}}">{{ fac.numFacture}}</td>
-							<td width="10%">{{ fac.montant}}</td>
+							<td width="10%">{{ fac.montant |number_format(2, '.', ' ')}}</td>
 							<td width="">{{ fac.dateFacture | date('d-m-Y')}}</td>
 							<td width="">
 								{% if fac.file %}
@@ -61,7 +61,7 @@
 					<tr>
 						<th width="">Code Piece</th>
 						<th>Date</th>
-						<th>RefDocAsso</th>
+						<th>RéfDocAss</th>
 						<th width="10%"></th>
 					</tr>
 				</thead>
@@ -78,7 +78,7 @@
 								<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
 									<a data-value="local" id="commandeDet" class="btnDet dropdown-item btn-xs">
 										<i class="fas fa-eye mr-2"></i>
-										Details</a>
+										Détails</a>
 								</th>
 							</td>
 						</tr>

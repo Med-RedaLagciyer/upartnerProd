@@ -10,87 +10,137 @@
 	{{parent()}}
 {% endblock %}
 {% block body %}
+	<style>
+        .sticky {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 70px;
+            z-index: 1;
+        }
+    </style>
 	{# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" /> #}
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
-	<div class="card">
-		<div class="card-body">
-			<div class="row" style="margin-bottom: 0px;">
-				<div class="col-6 row">
-					<div class="col-5" style="margin-bottom:0 !important;">
-						<label style="font-size:12px !important; margin-right:10px;">Partenaire</label>
+	<div class="sticky">
+		<div class="card">
+			<div class="card-body"  style="padding: 0px;">
+				<div class="row" style="margin-bottom: 0px;">
+					<div class="col-8 row">
+						<h3 style="font-size: 35px !important; margin-right: 10px;margin-left: 20px; font-weight: bolder;color: #b1b1b1;">Partenaire : <span style="font-size: 30px !important;color: #000; padding-left: 50px;">{{donnee.partenaire.societe}}</span></h3>
+						{# <div class="col-8" style="margin-bottom:0 !important;">
+							<span style="font-size: 35px !important; margin-right: 10px; font-weight: bolder;">
+								<label style="font-size: 35px !important; margin-right: 10px; font-weight: bolder;color: #b1b1b1;">:</h3>
+								{{donnee.partenaire.societe}}
+							</span>
+						</div> #}
 					</div>
-					<div class="col-7" style="margin-bottom:0 !important;">
-						<span style="font-weight:light !important; font-size:12px !important;">
-							<label style="font-size:12px !important; margin-right:10px;">:</label>
-							{{donnee.partenaire.societe}}
-						</span>
-					</div>
-				</div>
-				<div class="col-6" style="margin: 0;padding: 0;">
-					<button class="btn btn-primary btn-sm ml-auto" id="btnautres" style="float: right; background-color: #df6a75; border: #df6a75;">Autres service</button>
-				</div>
-			</div>
-			<div class="row" style="margin-bottom: 0px;">
-				<div class="col-6 row">
-					<div class="col-5" style="margin-bottom:0 !important;">
-						<label style="font-size:12px !important; margin-right:10px;">Nombre des Commandes</label>
-					</div>
-					<div class="col-7" style="margin-bottom:0 !important;">
-						<span style="font-weight:light !important; font-size:12px !important;">
-							<label style="font-size:12px !important; margin-right:10px;">:</label>
-							{{donnee.commandes}}
-						</span>
+					<div class="col-4 d-flex flex-row-reverse" style="margin: 0;padding: 0;">
+						<div class="d-flex align-items-center">
+							<a data-toggle="dropdown" class="btn" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"  style="font-size : 12px !important;">
+								<a data-value="default" id="btnautres" class="dropdown-item btn-xs"><i class="fas fa-plus ml-1 mr-2"></i> Autres Services</a>
+								<a data-value="default" id="btnsuivi" class="dropdown-item btn-xs"><i class="fas fa-eye ml-1 mr-1"></i> Suivi des réclamations</a>
+							<a data-value="default" id="btnExtraction" class="dropdown-item btn-xs"><i class="fas fa-file-download ml-1 mr-2"></i> Extraction des Commandes</a></div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="card flex-row  align-items-normal">
+				<div class="col-4">
+					<div class="">
+						<div class="card-body d-flex align-items-baseline justify-content-center">
+							<a style="font-size:17px!important;color: #26354F;"><i class="fas fa-th-list"></i></a>
+							<b style="font-size:25px!important;margin:0 5px">{{donnee.commandes}}</b>
+							<p style="font-size:17px!important;text-transform: capitalize !important;">Commandes</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="">
+						<div class="card-body d-flex align-items-baseline justify-content-center">
+							<a style="font-size:17px!important;color: #26354F;"><i class="fas fa-file-alt"></i></a>
+							<b style="font-size:25px!important;margin:0 5px">{{donnee.reclamations}}</b>
+							<p style="font-size:17px!important;text-transform: capitalize !important;">Réclamations</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="">
+						<div class="card-body d-flex align-items-baseline justify-content-center" >
+							<a style="font-size:17px!important;color: #26354F;"><i class="fas fa-reply"></i></a>
+							<b style="font-size:25px!important;margin:0 5px">{{donnee.retour}}</b>
+							<p style="font-size:17px!important;text-transform: capitalize !important;">Retours</p>
+						</div>
+					</div>
+				</div>
+		</div>
 	</div>
+	<!-- <div class="card">
+		<div class="card-body">
+			<div class="row" style="margin-bottom: 0px;;margin-left: 20px;">
+				<div class="col-6 row" style=" height: 20px; ">
+					<div class="col-7" style="margin-bottom:0 !important;">
+						<label style="font-size: 15px !important;margin-right:10px;padding-top: 8px;">Nombre des Commandes</label>
+					</div>
+					<div class="col-5" style="margin-bottom:0 !important;">
+						<span style="font-size: 20px !important;margin-right:5px;padding-top: 3px;">
+							<label style="font-size: 20px !important;margin-right:10px;padding-top: 3px;">:</label>
+							{{donnee.commandes}}
+						</span>
+					</div>
+				</div>
+				<div class="col-6 row">
+					<div class="row">
+						<div class="col-12" style="margin-bottom: 0 !important;">
+							<label style="font-size: 12px !important; margin-right: 10px;">Nombre total de réclamation</label>
+							<span style="font-weight: light !important; font-size: 12px !important;">
+								<label style="font-size: 12px !important; margin-right: 10px;">:</label>
+								{{donnee.reclamations}}
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="margin-bottom: 0px;;margin-left: 20px;">
+				<div class="col-6 row">
+					
+				</div>
+				<div class="col-6 row">
+					<div class="row">
+						<div class="col-12" style="margin-bottom: 0 !important;">
+							<label style="font-size: 12px !important; margin-right: 10px;">Nombre total de retours</label>
+							<span style="font-weight: light !important; font-size: 12px !important;">
+								<label style="font-size: 12px !important; margin-right: 10px;">:</label>
+								{{donnee.retour}}
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> -->
 	<div class="card">
 		<div class="card-body">
 			<div class="card-header" style="padding: 10px 0 !important;border:none !important">
-				<label style="font-weight:light !important; font-size:14px !important">
-					Factures
-				</label>
-				<div
-					class="card-tools" style="margin: 0;">
-					{# <ul class="nav nav-pills ml-auto">
-																																																																																																																																																							<li class="nav-item" style=" float: right !important;">
-																																																																																																																																																								<button id="btnReclamer" class="btn btn-danger buttons-html5 btn-md" style=" float: right !important;font-size : 14px !important;" disabled>
-																																																																																																																																																									<i class="fas fa-exclamation-triangle"></i>
-																																																																																																																																																									<span>Reclamer</span>
-																																																																																																																																																								</button>
-																																																																																																																																																								<button id="btnExtraction" class="btn btn-success buttons-html5 btn-md" style=" float: right !important;font-size : 14px !important;margin-right: 5px">
-																																																																																																																																																									<i class="fas fa-exclamation-triangle"></i>
-																																																																																																																																																									<span>Extraction factures</span>
-																																																																																																																																																								</button>
-																																																																																																																																																								<select class="form-control" id="status-filter">
-																																																																																																																																																									<option value="">All</option>
-																																																																																																																																																									<option value="facturer">Facturé</option>
-																																																																																																																																																									<option value="reception">Receptioné</option>
-																																																																																																																																																									<option value="regle">Reglé</option>
-																																																																																																																																																								</select>
-																																																																																																																																																							</li>
-																																																																																																																																																						</ul> #}
-
+				<div class="row">
+					<label style="font-weight:light !important; text-transform: capitalize !important;color: #26354F;font-size:2rem!important">
+						Commandes
+					</label>
+				</div>
+				<div class="card-tools" style="margin: 0;">
 					<ul class="nav nav-pills ml-auto">
 						<li class="nav-item" style="margin-right: 6px;">
 							<select class="form-control" id="status-filter" vallue="" style="height: 100%;">
 								<option value="" selected>Tous</option>
 								<option value="facturer">Facturé</option>
-								<option value="reception">Receptioné</option>
-								<option value="regle">Reglé</option>
+								<option value="reception">Réceptioné</option>
+								<option value="regle">Réglé</option>
 							</select>
 						</li>
 						<li class="nav-item">
 							<div class="btn-group" role="group" aria-label="Button group">
 								<button id="btnReclamer" class="btn btn-danger buttons-html5 btn-md" style="background-color: #df6a75; border: #df6a75;" disabled>
 									<i class="fas fa-exclamation-triangle"></i>
-									<span>Reclamer</span>
-								</button>
-								<button id="btnExtraction" class="btn btn-success buttons-html5 btn-md" style="margin-left: 5px;background-color: #74a7b5; border: #74a7b5;">
-									<i class="fas fa-file-download"></i>
-									<span>
-										Extraction factures</span>
+									<span style="text-transform: capitalize;">Réclamer</span>
 								</button>
 							</div>
 						</li>
@@ -101,13 +151,15 @@
 				<table id="datatables_gestion_factures" class="table table-condensed table-bordered">
 					<thead>
 						<tr>
-							<th><input type="checkbox" class="check_all_factures"></th>
-							<th>Code piece</th>
-							<th>RefDocAsso</th>
-							<th>Montant total</th>
-							<th width="200px">Observation</th>
-							<th>Date</th>
-							<th>Statut</th>
+							{# <th><input type="checkbox" class="check_all_factures"></th> #}
+							<th>#</th>
+							<th style="width: 140px;text-transform: capitalize !important;">Code pièce</th>
+							<th style="width: 140px;text-transform: capitalize !important;">RéfDocAss</th>
+							<th style="width: 120px;text-transform: capitalize !important;">Montant total</th>
+							<!-- <th width="200px">Observation</th> -->
+							<th style="text-transform: capitalize !important;">Observation</th>
+							<th style="width: 120px;text-transform: capitalize !important;">Date</th>
+							<th style="width: 57px;text-transform: capitalize !important;">Statut</th>
 							<th></th>
 						</tr>
 					</thead>
@@ -138,13 +190,21 @@
 	<!-- #modal-dialog -->
 	{% include 'fournisseur/factures/modals/modalDetails.html.twig' %}
 	{% include 'fournisseur/factures/modals/modalDetailsCommande.html.twig' %}
+	{% include 'fournisseur/factures/modals/modalDetailsFacture.html.twig' %}
+	{% include 'fournisseur/factures/modals/modalDetailsReception.html.twig' %}
 	{% include 'fournisseur/factures/modals/dets.html.twig' %}
 	{% include 'fournisseur/factures/modals/modalReclamer.html.twig' %}
 	{% include 'fournisseur/factures/modals/modalAjouter.html.twig' %}
 	{% include 'fournisseur/factures/modals/autres.html.twig' %}
+	{% include 'fournisseur/factures/modals/suiviReclamations.html.twig' %}
+
+	<!-- Reclamation Modals -->
+	{% include 'fournisseur/reclamations/modals/modalDetails.html.twig' %}
+	{% include 'fournisseur/reclamations/modals/modalModifier.html.twig' %}
+	{% include 'fournisseur/reclamations/modals/modalRepondre.html.twig' %}
 
 
-	{# {# <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" ></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" ></script> -->
 																																																														    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js" type="text/javascript"></script>
 																																																														    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script> #}
 
@@ -156,6 +216,7 @@
 	<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 	<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 	<script src="{{asset('dist/js/components/fournisseur/factures.js')}}"></script>
+	<script src="{{ asset('dist/js/components/fournisseur/reclamations.js') }}"></script>
 	<script></script>
 
 {% endblock %}

@@ -57,12 +57,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?int $partenaireId = null;
 
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: AccessHistorique::class)]
+    private Collection $accessHistoriques;
+
     public function __construct()
     {
         $this->reclamations = new ArrayCollection();
         $this->reponses = new ArrayCollection();
         $this->factures = new ArrayCollection();
         $this->partenaireValides = new ArrayCollection();
+        $this->accessHistoriques = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -311,6 +315,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPartenaireId(?int $partenaireId): self
     {
         $this->partenaireId = $partenaireId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AccessHistorique>
+     */
+    public function getAccessHistoriques(): Collection
+    {
+        return $this->accessHistoriques;
+    }
+
+    public function addAccessHistorique(AccessHistorique $accessHistorique): static
+    {
+        if (!$this->accessHistoriques->contains($accessHistorique)) {
+            $this->accessHistoriques->add($accessHistorique);
+            $accessHistorique->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAccessHistorique(AccessHistorique $accessHistorique): static
+    {
+        if ($this->accessHistoriques->removeElement($accessHistorique)) {
+            // set the owning side to null (unless already changed)
+            if ($accessHistorique->getUser() === $this) {
+                $accessHistorique->setUser(null);
+            }
+        }
 
         return $this;
     }

@@ -44,30 +44,40 @@ class facturesController extends AbstractController
         //     inner join ua_t_livraisonfrscab liv on liv.ua_t_commandefrscab_id = cab.id
         //     INNER join ua_t_facturefrscab f on f.id = liv.ua_t_facturefrscab_id
         //     WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 AND f.datefacture > '2023-01-01'";
-        $query = "SELECT COUNT(*)
-        FROM `ua_t_commandefrscab` cab
-        WHERE cab.active = 1
-        AND EXISTS (
-            SELECT 1
-            FROM u_p_partenaire p
-            INNER JOIN ua_t_livraisonfrscab liv ON liv.ua_t_commandefrscab_id = cab.id
-            INNER JOIN ua_t_facturefrscab f ON f.id = liv.ua_t_facturefrscab_id
-            WHERE p.id = cab.u_p_partenaire_id
-            AND p.ice_o = '" . $this->getUser()->getUsername() . "'
-            AND f.datefacture > '2023-01-01'
-        )";
+        $query = "SELECT COUNT(*) FROM (SELECT c.*
+        
+        FROM ua_t_commandefrscab c 
+        INNER JOIN ua_t_commandefrsdet det on det.ua_t_commandefrscab_id = c.id
+        
+        WHERE EXISTS (SELECT 1 FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id) 
+        AND EXISTS (SELECT 1 FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id) 
+        AND c.u_p_partenaire_id =  " . $this->getUser()->getPartenaireId() . "  
+        AND c.active = 1
+        AND (SELECT f.datefacture FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) > '2023-01-01'
+        AND (SELECT f.active FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) = 1 GROUP BY c.id) AS countCommandes";
+        // dd($query);
+        // $query = "SELECT COUNT(*) FROM `ua_t_commandefrscab` cab INNER JOIN u_p_partenaire p on p.id = cab.u_p_partenaire_id INNER JOIN ua_t_livraisonfrscab liv ON liv.ua_t_commandefrscab_id = cab.id INNER JOIN ua_t_facturefrscab f ON f.id = liv.ua_t_facturefrscab_id LEFT JOIN u_general_operation o on o.facture_fournisseur_id = f.id LEFT JOIN tr_transaction tr on tr.operation_id = o.id WHERE cab.active = 1 AND p.ice_o = '".$this->getUser()->getUsername()."' AND f.datefacture > '2023-01-01' and (o.id is null or o.executer is null);";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $data = $result->fetchAll();
-
         // dd($data);
 
-        $reclamation = $this->em->getRepository(Reclamation::class);
+        $query = "SELECT COUNT(*) FROM `reponse` rep INNER JOIN reclamation r on r.id = rep.reclamation_id WHERE rep.userCreated_id != ".$this->getUser()->getId()." and r.userCreated_id = ".$this->getUser()->getId().";";
+        $statement = $entityManager->prepare($query);
+        $result = $statement->executeQuery();
+        $retour = $result->fetchAll();
 
-        $reclamationCount = $reclamation->count(['userCreated' => $this->getUser()]);
+        
+        $reclamation = $this->em->getRepository(Reclamation::class);
+        // $reponses = $reclamation->getReponses();
+        // dd($this->getUser());
+        
+        $reclamationCount = $reclamation->count(['userCreated' => $this->getUser(), 'active' => 1]);
         $donnee = [
             'partenaire' => $infos[0],
             'commandes' => $data[0]["COUNT(*)"],
+            'reclamations' => $reclamationCount,
+            'retour' => $retour[0]["COUNT(*)"]
         ];
         return $this->render('fournisseur/factures/index.html.twig', [
             'donnee' => $donnee,
@@ -171,14 +181,15 @@ class facturesController extends AbstractController
             $nestedData = array();
             $cd = $row['id'];
             $nestedData[] = $row['id_reclamation'] == null ? "<input type ='checkbox' class='checkfacture' id ='checkfacture' data-id='$cd'>" : "<input type ='checkbox' disabled class='checkfacture' id ='checkfacture' data-id='$cd'>";
-            $nestedData[] = $row['code'];
-            $nestedData[] = $row['refDocAsso'];
+            $nestedData[] = "<center>".$row['code']."</center>" ;
+            $nestedData[] =  "<center>".$row['refDocAsso']."</center>";
             // $nestedData[] = $row['ttc'];
-            $nestedData[] = "<div style='text-align:right !important; margin-right:20px;'> " . number_format($row['ttc'], 2, '.', ' ') . "</div>";
+            $nestedData[] = "<div style='text-align:right !important; margin-right:1rem;'> " . number_format($row['ttc'], 2, '.', ' ') . "</div>";
             // $nestedData[] = $row['observation'];
             $nestedData[] = "<div class='text-truncate-commande' title='" . $row['observation'] . "' style='text-align:left !important'> " . $row['observation'] . "</div>";
             // $nestedData[] = "<div style='text-align:right !important; margin-right:5px !important'>" . number_format($row['montant'], 2, ',', ' ') . "</div>";
-            $nestedData[] = $row['datecommande'];
+            // $nestedData[] = $row['datecommande'];
+            $nestedData[] =  "<center>".$row['datecommande']."</center>";
             // $nestedData[] = $row['dateDocAsso'];
 
 
@@ -190,13 +201,15 @@ class facturesController extends AbstractController
             // $op = $result->fetchAll();
 
             if ($row['receptioner'] == 1 && $row['facturer'] != 1 && $row['operation_count'] != 1) {
-                $nestedData[] = "receptioné";
+                $nestedData[] = "<center  style='text-transform: capitalize !important;margin-bottom:0'>receptioné</center> ";
             } elseif ($row['receptioner'] == 1 && $row['facturer'] == 1 && $row['operation_count'] != 1) {
-                $nestedData[] = "facturé";
+                $nestedData[] = "<center  style='text-transform: capitalize !important;margin-bottom:0'>facturé</center> ";
             } elseif ($row['operation_count'] == 1) {
-                $nestedData[] = "Réglé";
+                $nestedData[] = "<center  style='text-transform: capitalize !important;margin-bottom:0'>Réglé</center> ";
+                // $nestedData[] = "Réglé";
             } else {
-                $nestedData[] = "Creé";
+                $nestedData[] = "<center  style='text-transform: capitalize !important;margin-bottom:0'>Crée</center> ";
+                // $nestedData[] = "Creé";
             }
 
 
@@ -206,7 +219,7 @@ class facturesController extends AbstractController
             // $row['statut_reclamation_id'] != null ? $nestedData[] = $this->em->getRepository(Statut::class)->find($row['statut_reclamation_id'])->getDesignation() : $nestedData[] = "6";
 
 
-            $nestedData[] = $row['id_reclamation'] == null ? '<a class="" data-toggle="dropdown" href="#" aria-expanded="false" ><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>' : '<a class="" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;" style ="color: #000;"></i></a><div class="dropdown-menu dropdown-menu-right"  style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;"><a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Details</a><a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Reclamation</a>';
+           
 
             $reclamation = null;
 
@@ -252,8 +265,23 @@ class facturesController extends AbstractController
                 $etat_bg = "etat_bg_regle";
             }
 
+            $nestedData[] = $row['id_reclamation'] == null ? '<div cl="bg" class="'.$etat_bg.'">
+                <a data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a>
+                <div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+                    <a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye mr-2"></i> Détails</a>
+                    <a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-file mr-2"></i> Réclamation</a> 
+                </div>
+            </div>' : 
+            '<div cl="bg" class="'.$etat_bg.'">
+                <a data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa fa-ellipsis-v" style ="color: #000;"></i></a>
+                <div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+                    <a data-value="default" id="btnDetails" class="dropdown-item btn-xs"><i class="fas fa-eye ml-1 mr-2"></i> Détails</a>
+                    <a data-value="default" id="btnReclamation" class="dropdown-item btn-xs"><i class="fas fa-file ml-2 mr-2"></i> Réclamation</a>
+                </div>
+            </div>';
+
             $nestedData["DT_RowId"] = $cd;
-            $nestedData["DT_RowClass"] = $etat_bg;
+            // $nestedData["DT_RowClass"] = $etat_bg;
             $data[] = $nestedData;
             $i++;
         }
@@ -263,6 +291,7 @@ class facturesController extends AbstractController
             "recordsFiltered" => intval($totalRecords),
             "data" => $data
         );
+        // dd($json_data);
         return new Response(json_encode($json_data));
     }
 
@@ -397,6 +426,7 @@ class facturesController extends AbstractController
             left JOIN ua_t_facturefrscab cab on cab.id = det.ua_t_facturefrscab_id
             LEFT JOIN uarticle ar on ar.id = det.u_article_id
             LEFT JOIN p_unite u on u.id = det.p_unite_id where cab.id =" . $factureCab;
+            // dd($query);
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
             $dets = $result->fetchAll();
@@ -430,20 +460,30 @@ class facturesController extends AbstractController
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
 
-        $query = "SELECT id, code, datecommande, refDocAsso FROM `ua_t_commandefrscab` WHERE id = " . $commande_id . ";";
+        $query = "SELECT Cm.id, Cm.code, Cm.datecommande, F.montant As montant_facture, Op.montant As montant_regle FROM `Ua_t_commandefrscab` Cm
+        INNER JOIN Ua_t_livraisonfrscab Liv On Liv.Ua_t_commandefrscab_id = Cm.id
+        INNER JOIN Ua_t_facturefrscab F On F.Id = Liv.ua_t_facturefrscab_id 
+        LEFT JOIN U_general_operation Op On Op.facture_fournisseur_id = F.id
+        WHERE cm.id = " . $commande_id . ";";
+        // dd($query);
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $commande = $result->fetchAll();
+
+        // dd($commande);
 
         $query = "SELECT id, code, datelivraison, refDocAsso FROM `ua_t_livraisonfrscab` WHERE ua_t_commandefrscab_id  = " . $commande_id . ";";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $reception = $result->fetchAll();
 
+        // dd($reception);
+
         $query = "SELECT f.id, f.code, f.datefacture, f.refDocAsso, f.montant, o.executer FROM `ua_t_facturefrscab` f 
         INNER JOIN ua_t_livraisonfrscab l on l.ua_t_facturefrscab_id = f.id
         LEFT JOIN u_general_operation o on o.facture_fournisseur_id = f.id
         where l.ua_t_commandefrscab_id =" . $commande_id . ";";
+        // dd($query);
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $facture = $result->fetchAll();
@@ -451,14 +491,26 @@ class facturesController extends AbstractController
         // dd($commande, $reception, $facture);
 
 
-        $factures_infos = $this->render("fournisseur/factures/pages/detailsUgouv.html.twig", [
-            'facture' => $facture,
+        $commande_infos = $this->render("fournisseur/factures/pages/detailsUgouv.html.twig", [
+            // 'facture' => $facture,
             'commande' => $commande,
+            // 'reception' => $reception,
+        ])->getContent();
+        $facture_infos = $this->render("fournisseur/factures/pages/detailsUgouvFacture.html.twig", [
+            'facture' => $facture,
+            // 'commande' => $commande,
+            // 'reception' => $reception,
+        ])->getContent();
+        $livraison_infos = $this->render("fournisseur/factures/pages/detailsUgouvReception.html.twig", [
+            // 'facture' => $facture,
+            // 'commande' => $commande,
             'reception' => $reception,
         ])->getContent();
         // dd($dets);
         return new JsonResponse([
-            'infos' => $factures_infos
+            'infos_commande' => $commande_infos,
+            'infos_facture' => $facture_infos,
+            'infos_livraison' => $livraison_infos,
         ]);
     }
     #[Route('/dets/{id}/{type}', name: 'app_fournisseur_factures_dets')]
@@ -480,6 +532,7 @@ class facturesController extends AbstractController
             $query = "SELECT a.titre, d.tva, d.quantite, d.prixunitaire FROM `ua_t_facturefrsdet` d
             INNER JOIN uarticle a on a.id = d.u_article_id
             WHERE ua_t_facturefrscab_id =  " . $id . ";";
+            // dd($query);
         }
 
 
@@ -514,7 +567,8 @@ class facturesController extends AbstractController
                 ])->getContent();
 
                 return new JsonResponse([
-                    'infos' => $factures_infos
+                    'infos' => $factures_infos,
+                    'objetReclamationDetail' => $reclamation[0]->getObjet()
                 ]);
             } else {
                 return new JsonResponse('AUCUNE RÉCLAMATION', 500);
@@ -526,6 +580,7 @@ class facturesController extends AbstractController
             $cab = $result->fetchAll();
             $reclamation = $this->em->getRepository(Reclamation::class)->findby(['id' => $cab[0]['id_reclamation']]);
 
+            // dd($reclamation[0]->getObjet());
             if ($reclamation) {
 
                 // dd($reclamation);
@@ -536,7 +591,8 @@ class facturesController extends AbstractController
                 ])->getContent();
                 // dd($dets);
                 return new JsonResponse([
-                    'infos' => $factures_infos
+                    'infos' => $factures_infos,
+                    'objetReclamationDetail' => $reclamation[0]->getObjet()
                 ]);
             } else {
                 return new JsonResponse('AUCUNE RÉCLAMATION', 500);
@@ -678,34 +734,43 @@ class facturesController extends AbstractController
     {
         $entityManager = $doctrine->getManager('default')->getConnection();
 
-        $query = "SELECT
-        c.CODE 'CODE BC',
-        c.datecommande,
-        c.autre_information 'AUTRE INFORMATION BC',
-        c.position_actuel 'POSITION ACTUEL BC',
-        r.CODE 'ID BR',
-        r.datelivraison,
-        r.description,
-        r.position_actuel 'POSITION ACTUEL BR',
-        f.CODE 'CODE FAF',
-        f.montant 'montant FAF',
-        f.datefacture,
-        f.created 'DATE CEATION FAF',
-        f.autre_information 'AUTRE INFORMATION FAF',
-        f.source,
-        f.position_actuel 'POSITION ACTUEL FAF',
-        f.observation,
-        f.refDocAsso
-        FROM
-        `ua_t_commandefrscab` c
-        INNER JOIN u_p_partenaire p2 ON p2.id = c.u_p_partenaire_id
-        LEFT JOIN ua_t_livraisonfrscab r ON r.ua_t_commandefrscab_id = c.id
-        LEFT JOIN ua_t_facturefrscab f ON f.id = r.ua_t_facturefrscab_id
+        // $query = "SELECT
+        // c.CODE 'CODE BC',
+        // c.datecommande,
+        // c.autre_information 'AUTRE INFORMATION BC',
+        // c.position_actuel 'POSITION ACTUEL BC',
+        // r.CODE 'ID BR',
+        // r.datelivraison,
+        // r.description,
+        // r.position_actuel 'POSITION ACTUEL BR',
+        // f.CODE 'CODE FAF',
+        // f.montant 'montant FAF',
+        // f.datefacture,
+        // f.created 'DATE CEATION FAF',
+        // f.autre_information 'AUTRE INFORMATION FAF',
+        // f.source,
+        // f.position_actuel 'POSITION ACTUEL FAF',
+        // f.observation,
+        // f.refDocAsso
+        // FROM
+        // `ua_t_commandefrscab` c
+        // INNER JOIN u_p_partenaire p2 ON p2.id = c.u_p_partenaire_id
+        // LEFT JOIN ua_t_livraisonfrscab r ON r.ua_t_commandefrscab_id = c.id
+        // LEFT JOIN ua_t_facturefrscab f ON f.id = r.ua_t_facturefrscab_id
         
-        WHERE
-         c.u_p_partenaire_id = " . $this->getUser()->getPartenaireId() . " and f.active = 1 and f.datefacture > '2023-01-01';";
+        // WHERE
+        //  c.u_p_partenaire_id = " . $this->getUser()->getPartenaireId() . " and f.active = 1 and f.datefacture > '2023-01-01';";
+        
+        $query = "SELECT
+        cab.code, 
+        DATE_FORMAT(cab.datecommande,'%d/%m/%Y')  datecommande , 
+        SUM(ROUND(det.quantite * det.prixunitaire * (1+IFNULL(det.tva,0)/100) * (1-IFNULL(det.remise,0)/100), 2)) TTC  
 
 
+        FROM `ua_t_commandefrscab` cab
+        left join `u_p_partenaire` frs on frs.id = cab.u_p_partenaire_id
+        left join ua_t_commandefrsdet det on det.ua_t_commandefrscab_id = cab.id
+        where 1= 1 and cab.active = 1 and cab.u_p_partenaire_id = " . $this->getUser()->getPartenaireId() . ";";
         $statement = $entityManager->prepare($query);
         $result = $statement->executeQuery();
         $data = $result->fetchAll();
@@ -715,7 +780,8 @@ class facturesController extends AbstractController
         $sheet = $spreadsheet->getActiveSheet();
 
 
-        $headerRow = ['CODE BC', 'Date Commande', 'Autre Information BC', 'Position Actuel BC', 'ID BR', 'Date Livraison', 'Description', 'Position Actuel BR', 'CODE FAF', 'Montant FAF', 'Date Facture', 'Date Creation FAF', 'Autre Information FAF', 'Source', 'Position Actuel FAF', 'Observation', 'RefDocAsso'];
+        // $headerRow = ['CODE BC', 'Date Commande', 'Autre Information BC', 'Position Actuel BC', 'ID BR', 'Date Livraison', 'Description', 'Position Actuel BR', 'CODE FAF', 'Montant FAF', 'Date Facture', 'Date Creation FAF', 'Autre Information FAF', 'Source', 'Position Actuel FAF', 'Observation', 'RefDocAsso'];
+        $headerRow = ['CODE BC', 'Date Commande', 'TTC'];
         $sheet->fromArray([$headerRow], null, 'A1');
 
         // Add data rows

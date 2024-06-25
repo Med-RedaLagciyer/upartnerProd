@@ -3,11 +3,21 @@
 <div class="modal fade" id="show_modal">
         <div class="modal-dialog modal-md">
           <div class="modal-content">
-            <div class="modal-header">
-              <h6 class="modal-title">Reclamation</h6>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+			      <div class="modal-header  d-flex flex-column pb-0">
+            <div class="row w-100 align-items-center">
+                {# <i class="fas fa-arrow-alt-circle-left mr-2 btn-return return-commande" style="font-size: 1.3rem!important;"></i> #}
+					      <h6 class="modal-title mr-auto" >Réclamation</h6>
+            </div>
+
+				<div class="row">
+					<label>Objet : </label>
+					<p id="objetReclamationDetail"></p>
+					{# <div class="col-11" style="padding-left: 1 !important; margin-bottom: 0;">
+						<div class="form-group">
+							<p>testttt</p>
+						</div>
+					</div> #}
+				</div>
             </div>
         <div class="modal-body" id="infos_factures">
 

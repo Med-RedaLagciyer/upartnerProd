@@ -2,21 +2,39 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content" style="margin-top: 100px;">
 			<div class="modal-header">
-				<h6 class="modal-title">Autres services</h6>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			
+				<div class="row w-100 align-items-center">
+					{# <i class="fas fa-arrow-alt-circle-left mr-2 btn-return return-suivi" style="font-size: 1.3rem!important;"></i> #}
+					<h6 class="modal-title">Autres services</h6>
+				</div>
+				{# <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
-				</button>
+				</button> #}
 			</div>
 			<div class="modal-body" id="autres_body">
 				<form id="formAutres">
-
 					<div class="row">
+						<div class="col-3">
+							<div class="form-group">
+								{# <label>Objet:</label> #}
+								{# <textarea class="form-control" rows="3" name="objet">{{ reclamation.objet }}</textarea> #}
+								<input class="form-control" rows="3" name="objet" value=""  placeholder="Objet">
+							</div>
+						</div>
+						<div class="col-9">
+							<div class="form-group">
+								{# <label>Observation:</label> #}
+								{# <textarea class="form-control" rows="3" name="observation">{{ reclamation.observation }}</textarea> #}
+								<input class="form-control" rows="3" name="observation" value=""  placeholder="Observation">
+							</div>
+						</div>
+					</div>
+					{# <div class="row">
 
 						<div class="col-4">
 							<div
 								class="form-group">
-								{# <label for="observation">Objet</label> #}
-								<textarea type="text" class="form-control" placeholder="Objet" name="objet" rows="1"></textarea>
+								<input type="text" class="form-control" placeholder="Objet" name="objet" rows="1"></input>
 							</div>
 						</div>
 
@@ -27,13 +45,12 @@
 						<div class="col-12">
 							<div
 								class="form-group">
-								{# <label for="observation">Observation</label> #}
-								<textarea type="text" class="form-control" placeholder="Observation" name="observation" rows="4"></textarea>
+								<input type="text" class="form-control" placeholder="Observation" name="observation" rows="4"></input>
 							</div>
 						</div>
 
 
-					</div>
+					</div> #}
 
 				</form>
 
@@ -48,7 +65,7 @@
 							<th width="">N° Facture</th>
 							<th width="30%">Date</th>
 							<th width="20%">Montant</th>
-							<th width="">Piece joint</th>
+							<th width="">Piéce jointe</th>
 							<th width="5%"></th>
 						</tr>
 					</thead>
@@ -69,7 +86,7 @@
 				</table>
 				<br>
 				<div class="" style="float: right;">
-					<button type="submit" form="formAutres" class="btn btn-danger btn-xs pull-right" style="width: 100px;text-transform: uppercase; background-color: #df6a75; border: #df6a75;">Reclamer</button>
+					<button type="submit" form="formAutres" class="btn btn-danger btn-xs pull-right" style="width: 100px;text-transform: uppercase; background-color: #df6a75; border: #df6a75;">Réclamer</button>
 				</div>
 			</div>
 		</div>

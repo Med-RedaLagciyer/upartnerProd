@@ -22,7 +22,7 @@ $(document).ready(function  () {
     }
 
     id_freclamation = false
-    $('body').on('click','#btnDetails',async function(e) {
+    $('body').on('click','#btnDetailsReclamation',async function(e) {
         // const input = $(this).find("input");
         // alert('hi')
         e.preventDefault();
@@ -42,10 +42,11 @@ $(document).ready(function  () {
                     pageLength: 15,
                     order: [[0, "desc"]],
                     language: {
-                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        url: "/dist/js/frenchDT.json",
                     },
                 });
                 $("#reclamation_modal").modal("show")
+                $("#suivi_reclamations").modal("hide")
                 // $("#show_modal #designation").val(response.designation)
             } catch (error) {
                 console.log(error, error.response);
@@ -53,6 +54,16 @@ $(document).ready(function  () {
                 toastr.error(message);
             }
         
+    })
+    
+    $('body').on('click','.return-suivi', function(e) {
+        
+        e.preventDefault();
+        
+        $(".modal").modal("hide")
+        $("#suivi_reclamations").modal("show")
+        
+
     })
 
     $('body').on('click','#btnModifier',async function(e) {
@@ -75,10 +86,11 @@ $(document).ready(function  () {
                     pageLength: 20,
                     order: [[0, "desc"]],
                     language: {
-                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        url: "/dist/js/frenchDT.json",
                     },
                 });
                 $("#reclamation_modification_modal").modal("show")
+                $("#suivi_reclamations").modal("hide")
                 // $("#show_modal #designation").val(response.designation)
             } catch (error) {
                 console.log(error, error.response);
@@ -102,6 +114,8 @@ $(document).ready(function  () {
                 const response = request.data;
                 // console.log(response.modification)
                 $('#reponse_modal #repondre_reclamation').html(response.reclamation_reponse);
+                $('#reponse_modal #objetReclamation').text(" "+response.objetReclamation);
+                // console.log(response.objetReclamation);
                 tableReponse.ajax.reload();
                 $('#reponse_modal #tableFactures').DataTable({
                     lengthMenu: [
@@ -111,10 +125,11 @@ $(document).ready(function  () {
                     pageLength: 20,
                     order: [[0, "desc"]],
                     language: {
-                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                        url: "/dist/js/frenchDT.json",
                     },
                 });
                 $("#reponse_modal").modal("show")
+                $("#suivi_reclamations").modal("hide")
                 // $("#show_modal #designation").val(response.designation)
             } catch (error) {
                 console.log(error, error.response);
@@ -202,32 +217,41 @@ $(document).ready(function  () {
             
             $("#reclamation_modification_modal").modal("hide")
             toastr.success(response);
-            table.ajax.reload();
+            tableReclam.ajax.reload();
         } catch (error) {
             console.log(error, error.response);
             const message = error.response.data;
             toastr.error(message);
         }
     })
-
-    var table = $("#datatables_gestion_reclamations").DataTable({
-        lengthMenu: [
-            [10, 15, 20 ,25, 50, 100, 20000000000000],
-            [10, 15, 20, 25, 50, 100, "All"],
-        ],
-        pageLength: 20,
-        order: [[0, "desc"]],
-        ajax: "/fournisseur/reclamations/list",
-        processing: true,
-        serverSide: true,
-        deferRender: true,
-        // orderable: false, targets: [0] ,
-        columnDefs: [
-            { orderable: false, targets: 0 } // First column (index 0) is not orderable
-          ],
-        language: {
-            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
-        },
+    var tableReclam = null;
+    
+    $("body").on("click", "#btnsuivi", async function (e) {
+        
+        $("#suivi_reclamations").modal("show")
+        if (tableReclam != null) {
+            tableReclam.ajax.reload()
+        }else{
+            tableReclam = $("#datatables_gestion_reclamations").DataTable({
+                lengthMenu: [
+                    [10, 15, 20 ,25, 50, 100, 20000000000000],
+                    [10, 15, 20, 25, 50, 100, "All"],
+                ],
+                order: [[0, "desc"]],
+                ajax: "/fournisseur/reclamations/list",
+                processing: true,
+                serverSide: true,
+                // orderable: false, targets: [0] ,
+                columnDefs: [
+                    { orderable: false, targets:5 } // First column (index 0) is not orderable
+                  ],
+                language: {
+                    url: "/dist/js/frenchDT.json",
+                },
+            });
+        }
+        
+        
     });
 
     var tableReponse = $("#datatables_gestion_reclamations_reponses").DataTable({
@@ -246,7 +270,7 @@ $(document).ready(function  () {
             { orderable: false, targets: 0 } // First column (index 0) is not orderable
           ],
         language: {
-            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+            url: "/dist/js/frenchDT.json",
         },
     });
 
@@ -302,7 +326,7 @@ $(document).ready(function  () {
                 const response = request.data;
                 console.log(response);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
-                table.ajax.reload();
+                tableReclam.ajax.reload();
                 toastr.success(response);
             } catch (error) {
                 console.log(error, error.response);
@@ -331,7 +355,7 @@ $(document).ready(function  () {
                 const response = request.data;
                 // console.log(response);
                 // icon.addClass('fa-trash').removeClass("fa-spinner fa-spin ");
-                table.ajax.reload();
+                tableReclam.ajax.reload();
                 toastr.success(response);
             } catch (error) {
                 console.log(error, error.response);
@@ -341,16 +365,22 @@ $(document).ready(function  () {
             }
         }
     })
+    // $('#fileUploade').on('input',function(e){
+    //     alert('Changed!')
+    // });
 
-    $("body").on("submit", "#message_form", async function (e) {
+    $("body").on("submit", "#message_form-", async function (e) {
         e.preventDefault();
         // console.log(factureAjt);
         // console.log(factureSupp);
         // return;
         
         // $("#reclamer_modal").modal("show")
-        var file = $("#fileUpload")[0].files[0];
-        const formData = new FormData($("#message_form")[0]);
+        // var file = $("#fileUploade")[0].files[0];
+        // console.log(file)
+        var file = $("#fileUploade").prop('files')[0];
+        // console.log(file)
+        const formData = new FormData($("#message_form-")[0]);
         formData.append('file', file);
         // let formData = new FormData([0]);
         formData.append("reclamation", $(this).attr('data-reclamation'));
@@ -363,37 +393,57 @@ $(document).ready(function  () {
             const response = request.data;
             var msg="";
             if(response.message){
-                msg +=`<div class="row">   
-                                <div class="col-7">
-                                    <div class="form-group">
-                                        <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
-                                        <label style="float: left;" >${response.date}</label>
-                                    </div>
-                                </div>
-                                <div class="col-5">
+                // msg +=`<div class="row">   
+                //                 <div class="col-7">
+                //                     <div class="form-group">
+                //                         <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
+                //                         <label style="float: left;" >${response.date}</label>
+                //                     </div>
+                //                 </div>
+                //                 <div class="col-5">
                                 
-                                </div>
-                            </div>`;
+                //                 </div>
+                //             </div>`;
+                msg +=`<div class="row">
+                            <div class="col-9">
+                                    <div class=" mr-1 d-flex flex-column">
+                                        <label style="float: left;">${response.date}</label>
+                                        <p class="form-control chatLeft" style="" rows="1" disabled="">${response.message}</p>
+                                    </div>
+                            </div>
+                            <div class="col-3"></div>
+                        </div>`;
             }
             if(response.file){
-                msg +=`<div class="row">   
-                    <div class="col-7">
-                        <div class="form-group">
-                            <a id="downloadPiece" data-file="${response.file}" class="btn btn-primary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
-                                <i class="fas fa-download"></i> Piece jointe
-                            </a>
-                            <br>
-                            <label style="float: left;" >${response.date}</label>
-                        </div>
-                    </div>
-                    <div class="col-5">
+                // msg +=`<div class="row">   
+                //     <div class="col-7">
+                //         <div class="form-group">
+                //             <a id="downloadPiece" data-file="${response.file}" class="btn btn-primary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+                //                 <i class="fas fa-download"></i> Piece jointe
+                //             </a>
+                //             <br>
+                //             <label style="float: left;" >${response.date}</label>
+                //         </div>
+                //     </div>
+                //     <div class="col-5">
                     
-                    </div>
-                </div>`;
+                //     </div>
+                // </div>`;
+                msg +=`<div class="row">
+                            <div class="col-9">
+                                    <div class=" mr-1 d-flex flex-column">
+                                        <label style="float: left;">${response.date}</label>
+                                        <a id="downloadPiece" href="/uploads/message/${response.file}" data-file="${response.file}" class="btn btn-secondary btn-xs pull-right chatLeft" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+                                            <i class="fas fa-download"></i> Piece jointe
+                                        </a>
+                                    </div>
+                            </div>
+                            <div class="col-3"></div>
+                        </div>`;
             }
             console.log(msg);
             $("body #messages").append(msg);
-            $("#message_form")[0].reset();
+            $("#message_form-")[0].reset();
 
         } catch (error) {
             const message = error.response.data;
@@ -402,24 +452,24 @@ $(document).ready(function  () {
         }
     });
 
-    $("body").on("click", "#btnAjouterFacture", async function (e) {
+    $("body").on("click", ".modifier_table #btnAjouterFacture", async function (e) {
         e.preventDefault();
-
-        if($('#numFacture').val() == "" || $('#date').val() == "" || $('#montant').val() == "" ){
+        // alert('tewt')
+        if($('.modifier_table #numFacture').val() == "" || $('.modifier_table #date').val() == "" || $('.modifier_table #montant').val() == "" ){
             // Toast.fire({
             //     icon: 'error',
             //     title: "DONNÉES FACTURE OBLIGATOIRES"
             // })
-            toastr.error("DONNÉES FACTURE OBLIGATOIRES");
+            toastr.error("DONNÉES FACTURÉES OBLIGATOIRES");
             return;
         }
 
-        var numFacture = $('#numFacture').val();
-        var date = $('#date').val();
-        var montant = $('#montant').val();
+        var numFacture = $('.modifier_table #numFacture').val();
+        var date = $('.modifier_table #date').val();
+        var montant = $('.modifier_table #montant').val();
         // var observation = $('#observation').val();
         var id = Math.random();
-        var file = $("#fileUpload")[0].files[0];
+        var file = $(".modifier_table #fileUpload")[0].files[0];
         console.log(file);
         // return;
         
@@ -431,23 +481,28 @@ $(document).ready(function  () {
             "montant" : montant,
             "file" : file,
         });
+        let filename = "Fichier Introuvable";
+        if (file != null) {
+            filename = file.name;
+        }
 
         var newRow = `<tr>  
                         <td>${numFacture}</td>
                         <td>${date}</td>
                         <td>${montant}</td>
                         <td>
-                        ${file.name}
+                        ${filename}
                         </td>
-                        <td><a id="${id}" class="btnSupprimerFacture btn btn-danger btn-xs pull-right" style="width: 20px;"><i class="fas fa-minus"></i></a></td>
+                        <td><a id="${id}" class="btnSupprimerFacture btn btn-danger btn-xs pull-right"  style="width: 20px;background:#ffd3d3 !important;border:1px solid #ffd3d3 !important">
+                        <i class="fas fa-minus"></i></a></td>
                     </tr>` ;
 
-        $('#datatables_facture_ajoute tbody').prepend(newRow);
+        $('.modifier_table tbody').prepend(newRow);
 
-        $("#numFacture").val('')
-        $("#date").val('')
-        $("#montant").val('')
-        $("#fileUpload").val('')
+        $(".modifier_table #numFacture").val('')
+        $(".modifier_table #date").val('')
+        $(".modifier_table #montant").val('')
+        $(".modifier_table #fileUpload").val('')
     });
 
     $("body").on("click", ".btnSupprimerFactureExsist", async function (e) {
@@ -506,24 +561,24 @@ $(document).ready(function  () {
         }, 100);
     });
 
-    $('body').on('click', '#downloadPiece', function() {
-        // alert("hi");
-        var fileName = $(this).data('file');
+    // $('body').on('click', '#downloadPiece', function() {
+    //     var fileName = $(this).data('file');
         
-        var fileUrl = '/uploads/message/' + fileName; 
-        // window.location.href = fileUrl;
-        var downloadLink = $('<a></a>');
-        downloadLink.attr('href', fileUrl);
-        downloadLink.attr('download', 'PieceJoint.pdf'); 
-        downloadLink.css('display', 'none');
+    //     var fileUrl = '/uploads/message/' + fileName; 
+    //     alert(fileUrl);
+    //     // window.location.href = fileUrl;
+    //     var downloadLink = $('<a></a>');
+    //     downloadLink.attr('href', fileUrl);
+    //     downloadLink.attr('download', 'PieceJoint.pdf'); 
+    //     downloadLink.css('display', 'none');
         
-        $('body').append(downloadLink);
+    //     $('body').append(downloadLink);
         
-        downloadLink[0].click();
+    //     downloadLink[0].click();
         
-        setTimeout(function() {
-            downloadLink.remove();
-        }, 100);
-    });
+    //     setTimeout(function() {
+    //         downloadLink.remove();
+    //     }, 100);
+    // });
     
 })

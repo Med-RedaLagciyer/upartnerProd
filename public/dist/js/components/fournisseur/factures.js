@@ -1,5 +1,6 @@
 $(document).ready(function  () {
     // console.log('hi');
+    
 
     toastr.options = {
         "closeButton": true,
@@ -33,6 +34,7 @@ $(document).ready(function  () {
                 const request = await axios.get('/fournisseur/factures/reclamation/'+id_facture_cab+'/'+type);
                 const response = request.data;
                 $('#show_modal #infos_factures').html(response.infos);
+                $('#show_modal #objetReclamationDetail').text(" "+response.objetReclamationDetail);
                 $("#show_modal").modal("show")
                 // $("#show_modal #designation").val(response.designation)
             } catch (error) {
@@ -41,6 +43,16 @@ $(document).ready(function  () {
                 toastr.error(message);
             }
         
+    })
+    $('body').on('click','#recepDet',async function(e) {
+        e.preventDefault();
+        $(".modal").modal("hide")
+        $("#detailsRecep").modal("show")
+    })
+    $('body').on('click','#facDet',async function(e) {
+        e.preventDefault();
+        $(".modal").modal("hide")
+        $("#detailsFac").modal("show")
     })
     $('body').on('click','#btnDetails',async function(e) {
         // const input = $(this).find("input");
@@ -56,8 +68,10 @@ $(document).ready(function  () {
                 try {
                     const request = await axios.get('/fournisseur/factures/detailsCommande/'+id_facture_cab+'/'+type);
                     const response = request.data;
-                    $('#detailsCommand #infos_Commande').html(response.infos);
-                    $("#datatables_commande").DataTable({
+                    $('#detailsCommand #infos_Commande').html(response.infos_commande);
+                    $('#detailsFac #infos_Facture').html(response.infos_facture);
+                    $('#detailsRecep #infos_Reception').html(response.infos_livraison);
+                    $("body #datatables_commande").DataTable({
                         lengthMenu: [
                             [5, 10, 15, 20 ,25, 50, 100, 20000000000000],
                             [5, 10, 15, 20, 25, 50, 100, "All"],
@@ -69,10 +83,10 @@ $(document).ready(function  () {
                             { orderable: false, targets: 0 } // First column (index 0) is not orderable
                           ],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                            url: "/dist/js/frenchDT.json",
                         },
                     });
-                    $("#datatables_reception").DataTable({
+                    $("body #datatables_reception").DataTable({
                         lengthMenu: [
                             [5, 10, 15, 20 ,25, 50, 100, 20000000000000],
                             [5, 10, 15, 20, 25, 50, 100, "All"],
@@ -84,10 +98,10 @@ $(document).ready(function  () {
                             { orderable: false, targets: 0 } // First column (index 0) is not orderable
                           ],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                            url: "/dist/js/frenchDT.json",
                         },
                     });
-                    $("#datatables_facture").DataTable({
+                    $("body #datatables_facture").DataTable({
                         lengthMenu: [
                             [5, 10, 15, 20 ,25, 50, 100, 20000000000000],
                             [5, 10, 15, 20, 25, 50, 100, "All"],
@@ -99,7 +113,7 @@ $(document).ready(function  () {
                             { orderable: false, targets: 0 } // First column (index 0) is not orderable
                           ],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                            url: "/dist/js/frenchDT.json",
                         },
                     });
                     $("#detailsCommand").modal("show")
@@ -126,7 +140,7 @@ $(document).ready(function  () {
                             { orderable: false, targets: 0 } // First column (index 0) is not orderable
                           ],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                            url: "/dist/js/frenchDT.json",
                         },
                     });
                     $("#show_modal").modal("show")
@@ -142,6 +156,27 @@ $(document).ready(function  () {
             
         
     })
+
+    // var table = $("#datatables_gestion_reclamations").DataTable({
+    //     lengthMenu: [
+    //         [10, 15, 20 ,25, 50, 100, 20000000000000],
+    //         [10, 15, 20, 25, 50, 100, "All"],
+    //     ],
+    //     pageLength: 20,
+    //     order: [[0, "desc"]],
+    //     ajax: "/fournisseur/reclamations/list",
+    //     processing: true,
+    //     serverSide: true,
+    //     deferRender: true,
+    //     // orderable: false, targets: [0] ,
+    //     columnDefs: [
+    //         { orderable: false, targets: 0 } // First column (index 0) is not orderable
+    //       ],
+    //     language: {
+    //         url: "/dist/js/frenchDT.json",
+    //     },
+    // });
+
 
     $("body").on("click", "#btnautres", async function (e) {
         // alert('hi');
@@ -181,7 +216,7 @@ $(document).ready(function  () {
                             { orderable: false, targets: 0 } // First column (index 0) is not orderable
                           ],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+                            url: "/dist/js/frenchDT.json",
                         },
                     });
                     
@@ -206,7 +241,7 @@ $(document).ready(function  () {
         pageLength: 20,
         order: [[0, "desc"]],
         language: {
-            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+            url: "/dist/js/frenchDT.json",
         },
     });
 
@@ -218,7 +253,7 @@ $(document).ready(function  () {
         pageLength: 20,
         order: [[0, "desc"]],
         language: {
-            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+            url: "/dist/js/frenchDT.json",
         },
     });
 
@@ -228,7 +263,7 @@ $(document).ready(function  () {
             [10, 15, 20, 25, 50, 100, "All"],
         ],
         pageLength: 20,
-        order: [[0, "desc"]],
+        order: [[1, "desc"]],
         ajax: {
             url: "/fournisseur/factures/list",
             type: "GET",
@@ -243,9 +278,17 @@ $(document).ready(function  () {
             { orderable: false, targets: [0,6,7] } // First column (index 0) is not orderable
         ],
         language: {
-            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+            // url: "/dist/js/frenchDT.json",
+            // url: "/dist/js/frenchDT.json",
         },
     });
+    // $('[ref="bg"]').each(function() {
+    //     alert("hi");
+    //     // Get the class of the current element
+    //     var currentClass = $(this).attr('cl');
+    //     // Add the class to the parent element
+    //     $(this).parent().addClass(currentClass);
+    // });
 
     $('#status-filter').on('change', function () {
         table.ajax.reload(); // Reload table data when filter changes
@@ -267,28 +310,47 @@ $(document).ready(function  () {
             { orderable: false, targets: 0 } // First column (index 0) is not orderable
           ],
         language: {
-            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
+            // url: "/dist/js/frenchDT.json",
+            url: "/frenchDT.json",
         },
     });
 
-    commandes = [];
-    $("body").on("click", "#checkfacture", function () {
-        const input = $(this)
-        // console.log(input.attr("data-id"))
-        // input.prop("checked", true);
-        if(input.is(":checked")){
-            
-            commandes.push(input.attr("data-id"));
-        }else{
-            const index = commandes.indexOf(input.attr("data-id"));
-            commandes.splice(index,1);
-        }
+    let commandes = [];
 
-        var anyChecked = $(".checkfacture:checked").length > 0;
-        $("#btnReclamer").prop("disabled", !anyChecked);
+    $("body").on("click", ".checkfacture", function () {
+        const input = $(this);
+        const id = input.attr("data-id");
+        $(".checkfacture").not(input).prop("checked", false);
+
+        if (input.is(":checked")) {
+            commandes = [id];
+        } else {
+            const index = commandes.indexOf(id);
+            if (index > -1) {
+                commandes.splice(index, 1);
+            }
+        }
         
-        console.log(commandes);
+        const anyChecked = $(".checkfacture:checked").length > 0;
+        $("#btnReclamer").prop("disabled", !anyChecked);
     });
+    // $("body").on("click", "#checkfacture", function () {
+    //     const input = $(this)
+    //     // console.log(input.attr("data-id"))
+    //     // input.prop("checked", true);
+    //     if(input.is(":checked")){
+            
+    //         commandes.push(input.attr("data-id"));
+    //     }else{
+    //         const index = commandes.indexOf(input.attr("data-id"));
+    //         commandes.splice(index,1);
+    //     }
+
+    //     var anyChecked = $(".checkfacture:checked").length > 0;
+    //     $("#btnReclamer").prop("disabled", !anyChecked);
+        
+    //     // console.log(commandes);
+    // });
     // $("body").off("click", ".checkfacture");
 
     $("body").on("click", ".check_all_factures", function () {
@@ -357,6 +419,14 @@ $(document).ready(function  () {
         }
     });
 
+    
+    $('body').on('click','.return-commande', function(e) {
+        
+        e.preventDefault();
+        
+        $(".modal").modal("hide")
+        $("#detailsCommand").modal("show")
+    })
 
     $("body").on("submit", "#message_form", async function (e) {
         e.preventDefault();
@@ -379,33 +449,53 @@ $(document).ready(function  () {
 
             var msg="";
             if(response.message){
-                msg +=`<div class="row">   
-                                <div class="col-7">
-                                    <div class="form-group">
-                                        <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
-                                        <label style="float: left;" >${response.date}</label>
-                                    </div>
-                                </div>
-                                <div class="col-5">
+                // msg +=`<div class="row">   
+                //                 <div class="col-7">
+                //                     <div class="form-group">
+                //                         <textarea class="form-control" style="background: #d9eeff;" rows="3" disabled="">${response.message}</textarea>
+                //                         <label style="float: left;" >${response.date}</label>
+                //                     </div>
+                //                 </div>
+                //                 <div class="col-5">
                                 
-                                </div>
-                            </div>`;
+                //                 </div>
+                //             </div>`;
+                msg +=`<div class="row">
+                            <div class="col-9">
+                                    <div class=" mr-1 d-flex flex-column">
+                                        <label style="float: left;">${response.date}</label>
+                                        <p class="form-control chatLeft" style="" rows="1" disabled="">${response.message}</p>
+                                    </div>
+                            </div>
+                            <div class="col-3"></div>
+                        </div>`;
             }
             if(response.file){
-                msg +=`<div class="row">   
-                    <div class="col-7">
-                        <div class="form-group">
-                            <a id="downloadPiece" data-file="${response.file}" class="btn btn-primary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
-                                <i class="fas fa-download"></i> Piece jointe
-                            </a>
-                            <br>
-                            <label style="float: left;" >${response.date}</label>
-                        </div>
-                    </div>
-                    <div class="col-5">
+                msg +=`<div class="row">
+                            <div class="col-9">
+                                    <div class=" mr-1 d-flex flex-column">
+                                        <label style="float: left;">${response.date}</label>
+                                        <a id="downloadPiece" data-file="${response.file}" class="btn btn-secondary btn-xs pull-right chatLeft" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+                                            <i class="fas fa-download"></i> Piece jointe
+                                        </a>
+                                    </div>
+                            </div>
+                            <div class="col-3"></div>
+                        </div>`;
+                // msg +=`<div class="row">   
+                //     <div class="col-7">
+                //         <div class="form-group">
+                //             <a id="downloadPiece" data-file="${response.file}" class="btn btn-primary btn-xs pull-right" style="background-color: #d9eeff; color: #515151;border: 1px solid #ced4da;">
+                //                 <i class="fas fa-download"></i> Piece jointe
+                //             </a>
+                //             <br>
+                //             <label style="float: left;" >${response.date}</label>
+                //         </div>
+                //     </div>
+                //     <div class="col-5">
                     
-                    </div>
-                </div>`;
+                //     </div>
+                // </div>`;
             }
 
             $("body #messages").append(msg);
@@ -429,7 +519,7 @@ $(document).ready(function  () {
             //     icon: 'error',
             //     title: "DONNÉES FACTURE OBLIGATOIRES"
             // })
-            toastr.error("DONNÉES FACTURE OBLIGATOIRES");
+            toastr.error("DONNÉES FACTURÉES OBLIGATOIRES");
             return;
         }
 
@@ -447,13 +537,18 @@ $(document).ready(function  () {
             "montant" : montant,
             "file" : file,
         });
+        let filename = "Fichier Introuvable";
+        if (file != null) {
+            filename = file.name;
+        }
 
         var newRow = `<tr>  
                         <td>${numFacture}</td>
                         <td>${date}</td>
                         <td>${montant}</td>
-                        <td>${montant}</td>
-                        <td><a id="${id}" class="btnSupprimerFacture btn btn-danger btn-xs pull-right" style="width: 20px;"><i class="fas fa-minus"></i></a></td>
+                        <td>${filename}</td>
+                        <td><a id="${id}" class="btnSupprimerFacture btn btn-danger btn-xs pull-right"  style="width: 20px;background:#ffd3d3 !important;border:1px solid #ffd3d3 !important">
+                        <i class="fas fa-minus"></i></a></td>
                     </tr>` ;
 
         $('body #datatables_facture_ajoute tbody').prepend(newRow);

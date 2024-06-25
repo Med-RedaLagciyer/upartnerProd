@@ -13,6 +13,9 @@ pagetitle %}
 
 	<script src="https://kit.fontawesome.com/f8496f65dc.js" crossorigin="anonymous"></script>
 	<style>
+		.car *{
+			font-family: "Oswald",sans-serif !important;
+		}
 		.card img {
 			margin-top: 20px;
 			display: block;
@@ -48,6 +51,82 @@ pagetitle %}
 			letter-spacing: 8px;
 			font-weight: 700;
 		}
+
+		@media screen and (min-width: 768px) {
+			/* Apply styles for screens wider than 768px */
+			.dash {
+				left: -13px !important;
+				position: fixed;
+				display: inline-block;
+				transform: rotate(-90deg);
+				-webkit-transform-origin-y: bottom;
+				font-size: 55px !important;
+				color: #c5c5c5;
+				-moz-transform-origin: bottom;
+				top: 142px;
+				left: -10px;
+				text-transform: uppercase;
+				letter-spacing: 1px !important;
+				font-weight: 700;
+			}
+		}
+
+		@media screen and (min-width: 992px) {
+			/* Apply styles for screens wider than 992px */
+			.dash {
+				left: 161px !important;
+				position: fixed;
+				display: inline-block;
+				transform: rotate(-90deg);
+				-webkit-transform-origin-y: bottom;
+				font-size: 64px !important;
+				color: #c5c5c5;
+				-moz-transform-origin: bottom;
+				top: 157px;
+				left: -10px;
+				text-transform: uppercase;
+				letter-spacing: 1px !important;
+				font-weight: 700;
+			}
+		}
+
+		@media screen and (min-width: 1200px) {
+			/* Apply styles for screens wider than 1200px */
+			.dash {
+				    left: 133px !important;
+					position: fixed;
+					display: inline-block;
+					transform: rotate(-90deg);
+					-webkit-transform-origin-y: bottom;
+					font-size: 80px !important;
+					color: #c5c5c5;
+					-moz-transform-origin: bottom;
+					top: 186px;
+					left: -10px;
+					text-transform: uppercase;
+					letter-spacing: 1px !important;
+					font-weight: 700;
+			}
+		}
+
+		@media screen and (min-width: 1396px) {
+			/* Apply styles for screens wider than 1200px */
+			.dash {
+				        left: 125px !important;
+    position: fixed;
+    display: inline-block;
+    transform: rotate(-90deg);
+    -webkit-transform-origin-y: bottom;
+    font-size: 93px !important;
+    color: #c5c5c5;
+    -moz-transform-origin: bottom;
+    top: 186px;
+    left: -10px;
+    text-transform: uppercase;
+    letter-spacing: 1px !important;
+    font-weight: 700;
+			}
+		}
 	</style>
 
 	<div class="dash">
@@ -55,15 +134,15 @@ pagetitle %}
 	</div>
 	<div class="row" style="margin:3% auto 0; width:70%">
 		<div class="col-5  mb-5 ml-5">
-			<a href="{{path('app_fournisseur_factures')}}" style="">
-				<div class="info-box" style="height:100px">
-					<span class="info-box-icon bg-info" style="background-color: #90bad3 !important;width:100px">
+			{# <a href="{{path('app_fournisseur_factures')}}" style="">
+				<div class="info-box" style="height:200px; display: block !important;">
+					<span class="info-box-icon bg-info" style="color: #90bad3 !important;background: none !important;height: 75px;margin-left:142px">
 						<div class="icon">
 							<i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
 						</div>
 					</span>
-					<div class="info-box-content">
-						<span class="info-box-text" style="color: black;">Commandes</span>
+					<div class="info-box-content" style="font-size: 20px !important;text-align: center;">
+						<span class="info-box-text" style="color: black;">Commandes en cours</span>
 						<span class="info-box-number" style="color: black;">{{donnee.factureCount}}</span>
 						<div class="progress">
 							<div class="progress-bar" id="facturesProgressBar" style="width: 0%; background-color: #90bad3;"></div>
@@ -71,26 +150,39 @@ pagetitle %}
 					</div>
 
 				</div>
+			</a> #}
+			<a href="{{path('app_fournisseur_factures')}}" style="display: block; text-align: center;">
+				<div class="info-box" style="height:200px; display: block !important;">
+					<span class="info-box-icon bg-info" style="color: #90bad3 !important;background: none !important;height: 75px; display: inline-block;">
+						<div class="icon">
+							<i class="fas fa-file-invoice" style="font-size: 50px !important;"></i>
+						</div>
+					</span>
+					<div class="info-box-content" style="font-size: 20px !important;text-align: center;">
+						<span class="info-box-text" style="color: black;">Commandes en cours</span>
+						<span class="info-box-number" style="color: black;">{{donnee.factureCount}}</span>
+						<div class="progress">
+							<div class="progress-bar" id="reclamationProgressBar" style="width: 0%; background-color: #90bad3;"></div>
+						</div>
+					</div>
+				</div>
 			</a>
 		</div>
 		<div class="col-5  mb-5 ml-5">
-			<a href="{{path('app_fournisseur_autres')}}" style="">
-				<div class="info-box" style="height:100px">
-					<span class="info-box-icon bg-info" style="background-color: #ff9999 !important;width:100px">
-						<div
-							class="icon">
-							{# <i class="fa fa-message" ></i> #}
+			<a href="{{path('app_fournisseur_factures')}}" style="display: block; text-align: center;">
+				<div class="info-box" style="height:200px; display: block !important;">
+					<span class="info-box-icon bg-info" style="color: #ff9999 !important;background: none !important;height: 75px; display: inline-block;">
+						<div class="icon">
 							<i class="fas fa-sticky-note" style="font-size: 50px !important;"></i>
 						</div>
 					</span>
-					<div class="info-box-content">
-						<span class="info-box-text" style="color: black;">Reclamations</span>
+					<div class="info-box-content" style="font-size: 20px !important;text-align: center;">
+						<span class="info-box-text" style="color: black;">Réclamations</span>
 						<span class="info-box-number" style="color: black;">{{donnee.reclamationCount}}</span>
 						<div class="progress">
 							<div class="progress-bar" id="reclamationProgressBar" style="width: 0%; background-color: #ff9999;"></div>
 						</div>
 					</div>
-
 				</div>
 			</a>
 		</div>
@@ -102,20 +194,20 @@ pagetitle %}
 	{{parent()}}
 	<script>
 		$(document).ready(function () { // Fetch the reclamation count from your data (replace this with your actual data)
-var reclamationCount = {{ donnee.reclamationCount }};
-var facturesCount = {{ donnee.factureCount }};
-// Define the maximum value for the progress bar (replace this with your maximum value if applicable)
-var maxReclamations = 100;
-var maxFactures = 1000;
+			var reclamationCount = {{ donnee.reclamationCount }};
+			var facturesCount = {{ donnee.factureCount }};
+			// Define the maximum value for the progress bar (replace this with your maximum value if applicable)
+			var maxReclamations = 100;
+			var maxFactures = 1000;
 
-// Calculate the percentage of completion
-var percentageRec = (reclamationCount / maxReclamations) * 100;
-var percentageFac = (facturesCount / maxFactures) * 100;
+			// Calculate the percentage of completion
+			var percentageRec = (reclamationCount / maxReclamations) * 100;
+			var percentageFac = (facturesCount / maxFactures) * 100;
 
-// Set the width of the progress bar
-$('#reclamationProgressBar').css('width', percentageRec + '%');
-$('#facturesProgressBar').css('width', percentageFac + '%');
-});
+			// Set the width of the progress bar
+			$('#reclamationProgressBar').css('width', percentageRec + '%');
+			$('#facturesProgressBar').css('width', percentageFac + '%');
+		});
 	</script>
 
 {% endblock %}

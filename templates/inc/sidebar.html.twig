@@ -2,10 +2,14 @@
 	class="main-sidebar sidebar-dark-primary elevation-4 text-sm">
 	<!-- Brand Logo -->
 	<a href="{{path('app_index')}}" class="brand-link">
-		<img src="{{asset('dist/img/upharma.png')}}" alt="Fcz" class="brand-image " style="margin-left: 0;opacity: .8">
+	<center>
+		<img src="/dist/img/Logo_Upartner.png" alt="image" class="feed-photo" style="vertical-align: middle; font-family: Oswald,sans-serif;font-size: 40px;font-weight: bold;color: #CDDFF2; height: 45px; ">
+	</center>
+		
+		{# <img src="{{asset('dist/img/upharma.png')}}" alt="Fcz" class="brand-image " style="margin-left: 0;opacity: .8">
 		<span style="vertical-align: middle; font-family: 'Oswald',sans-serif;font-size: 40px;font-weight: bold;color: #CDDFF2;">
 			U-PARTENAIRE
-		</span>
+		</span> #}
 	</a>
 
 	<!-- Sidebar -->
@@ -53,18 +57,19 @@
 				{% elseif  app.user.valide == 2 %}
 					{# for fournisseurs #}
 					<li class="nav-item menu-is-opening menu-open">
-						<a href="#" class="nav-link">
+						{# <a href="#" class="nav-link">
 							<i class="nav-icon far fa-envelope"></i>
 							<p>
 								Reclamations
 								<i class="right fas fa-angle-left"></i>
 							</p>
-						</a>
+						</a> #}
 						<ul class="nav nav-treeview">
 							<li class="nav-item">
 								<a href="{{path('app_fournisseur_factures')}}" class="nav-link {% if 'app_fournisseur_factures' in app.request.get('_route') %}active{% endif %}">
-									<i class="fas fa-chevron-right nav-icon"></i>
-									<p>Nouvelle réclamation</p>
+									{# <i class="fas fa-chevron-right nav-icon"></i> #}
+									<i class="fas fa-file-alt nav-icon ml-0"></i>
+									<p style="text-transform: capitalize !important;">Réclamation</p>
 								</a>
 							</li>
 							{# <li class="nav-item">
@@ -73,12 +78,13 @@
 																							<p>autres factures</p>
 																						</a>
 																					</li> #}
-							<li class="nav-item">
+																					
+							{# <li class="nav-item">
 								<a href="{{path('app_fournisseur_reclamations')}}" class="nav-link {% if 'app_fournisseur_reclamations' in app.request.get('_route') %}active{% endif %}">
 									<i class="fas fa-chevron-right nav-icon"></i>
 									<p>Suivi réclamations</p>
 								</a>
-							</li>
+							</li> #}
 						</ul>
 					</li>
 				{% else %}

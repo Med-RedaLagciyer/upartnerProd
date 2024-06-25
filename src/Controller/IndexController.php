@@ -22,19 +22,35 @@ class IndexController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if ($security->getUser()->getValide() != 2 and $security->isGranted('ROLE_FRS')) {
+        if ($security->isGranted('ROLE_FRS') and $security->getUser()->getValide() == 1 ) {
+            // Redirect to the await page
+            return $this->redirectToRoute('app_fournisseur_await');
+        }
+
+        if ($security->isGranted('ROLE_FRS') and $security->getUser()->getValide() == 0 ) {
             return $this->redirectToRoute('app_fournisseur_validation');
-        } elseif ($security->isGranted('ROLE_FRS')) {
+        }
+
+        if ($security->isGranted('ROLE_FRS') and $security->getUser()->getValide() == 2) {
             $donnee = [];
 
             // $reclamation = $doctrine->getRepository(Reclamation::class);
 
             $entityManager = $doctrine->getManager('default')->getConnection();
 
-            $query = "SELECT COUNT(*) FROM `ua_t_commandefrscab` cab inner join u_p_partenaire p on p.id = cab.u_p_partenaire_id
-            inner join ua_t_livraisonfrscab liv on liv.ua_t_commandefrscab_id = cab.id
-            INNER join ua_t_facturefrscab f on f.id = liv.ua_t_facturefrscab_id
-            WHERE p.ice_o like '" . $this->getUser()->getUsername() . "' and cab.active = 1 AND f.datefacture > '2023-01-01'";
+            // $query = "SELECT COUNT(*) FROM `ua_t_commandefrscab` cab INNER JOIN u_p_partenaire p on p.id = cab.u_p_partenaire_id INNER JOIN ua_t_livraisonfrscab liv ON liv.ua_t_commandefrscab_id = cab.id INNER JOIN ua_t_facturefrscab f ON f.id = liv.ua_t_facturefrscab_id LEFT JOIN u_general_operation o on o.facture_fournisseur_id = f.id LEFT JOIN tr_transaction tr on tr.operation_id = o.id WHERE cab.active = 1 AND p.ice_o = '".$this->getUser()->getUsername()."' AND f.datefacture > '2023-01-01' and (o.id is null or o.executer is null);";
+            $query = "SELECT COUNT(*) FROM (SELECT c.*
+        
+            FROM ua_t_commandefrscab c 
+            INNER JOIN ua_t_commandefrsdet det on det.ua_t_commandefrscab_id = c.id
+            
+            WHERE EXISTS (SELECT 1 FROM ua_t_livraisonfrscab l WHERE l.ua_t_commandefrscab_id = c.id) 
+            AND EXISTS (SELECT 1 FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id) 
+            AND c.u_p_partenaire_id =  " . $this->getUser()->getPartenaireId() . "  
+            AND c.active = 1
+            AND (SELECT f.datefacture FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) > '2023-01-01'
+            AND (SELECT f.active FROM ua_t_livraisonfrscab l JOIN ua_t_facturefrscab f ON l.ua_t_facturefrscab_id = f.id WHERE l.ua_t_commandefrscab_id = c.id LIMIT 1) = 1 GROUP BY c.id) AS countCommandes";
+            
             // dd($query);
             $statement = $entityManager->prepare($query);
             $result = $statement->executeQuery();
@@ -53,7 +69,8 @@ class IndexController extends AbstractController
             return $this->render('index/indexfrs.html.twig', [
                 'donnee' => $donnee,
             ]);
-        } else {
+        } 
+        if ($security->isGranted('ROLE_ADMIN')) {
             $donnee = [];
 
             $user = $doctrine->getRepository(User::class);

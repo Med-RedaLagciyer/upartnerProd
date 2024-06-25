@@ -2,14 +2,16 @@
 	<div class="col-3">
 		<div class="form-group">
 			<label>Objet:</label>
-			<textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea>
+			{# <textarea class="form-control" rows="3" disabled="">{{ reclamation.objet }}</textarea> #}
+			<p class="form-control" rows="3" disabled="">{{ reclamation.objet }}</p>
 		</div>
 	</div>
 	<div class="col-9">
 		<div class="form-group">
 			<label>Observation:
 			</label>
-			<textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea>
+			{# <textarea class="form-control" rows="3" disabled="">{{ reclamation.observation }}</textarea> #}
+			<p class="form-control" rows="3" disabled="">{{ reclamation.observation }}</p>
 		</div>
 	</div>
 </div>
@@ -26,14 +28,14 @@
 						<th width="10%">N° facture</th>
 						<th width="">Montant</th>
 						<th width="10%">Date facture</th>
-						<th width="10%">Piece joint</th>
+						<th width="10%">Pièce jointe</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for fac in factures %}
 						<tr>
 							<td width="" class="text-truncate" title="{{ fac.numFacture}}">{{ fac.numFacture}}</td>
-							<td width="10%">{{ fac.montant}}</td>
+							<td width="10%">{{ fac.montant |number_format(2, '.', ' ')}}</td>
 							<td width="">{{ fac.dateFacture | date('d-m-Y')}}</td>
 							<td width="">
 								{% if fac.file %}
@@ -59,9 +61,9 @@
 			<table id="datatables_commande" style="width: 100% !important" class="table table-condensed table-bordered">
 				<thead>
 					<tr>
-						<th width="">Code Piece</th>
+						<th width="">Code Pièce</th>
 						<th>Date</th>
-						<th>RefDocAsso</th>
+						<th>RéfDocAss</th>
 						<th width="10%"></th>
 					</tr>
 				</thead>
@@ -78,7 +80,7 @@
 								<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
 									<a data-value="local" id="commandeDet" class="btnDet dropdown-item btn-xs">
 										<i class="fas fa-eye mr-2"></i>
-										Details</a>
+										Détails</a>
 								</th>
 							</td>
 						</tr>

@@ -34,13 +34,24 @@ $(document).ready(function  () {
         ],
         pageLength: 20,
         order: [[0, "desc"]],
-        ajax: "/admin/users/list",
+        // ajax: "/admin/users/list",
+        ajax: {
+            url: "/admin/users/list",
+            type: "GET",
+            data: function (d) {
+                d.status = $('#status-filter').val(); // Add status filter value to request data
+            }
+        },
         processing: true,
         serverSide: true,
         deferRender: true,
         language: {
             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json",
         },
+    });
+
+    $('#status-filter').on('change', function () {
+        table.ajax.reload(); // Reload table data when filter changes
     });
 
     $('body').on('click','#btnAjouter', async function (e) {
@@ -98,6 +109,21 @@ $(document).ready(function  () {
         }
     })
 
+    
+    $('body').on('click','#btnAccess', async function (e) {
+        e.preventDefault();
+        $("#modalAccess").modal("show")
+    })
+
+    $("#access").on("submit", async (e) => {
+        e.preventDefault();
+
+        var dateDebut = $('#modalAccess #dateDebut').val();
+        var dateFin = $('#modalAccess #dateFin').val();
+        // console.log(selectedValues);
+        window.open('/admin/users/extractionAccess/' + dateDebut+ '/' + dateFin);
+    })
+
     $('body').on('click','#btnDevalider', async function (e) {
         e.preventDefault();
         const id = $(this).closest('tr').attr('id');
@@ -107,7 +133,7 @@ $(document).ready(function  () {
             const request = await axios.get('/admin/users/devalider/'+id);
             const response = request.data;
             table.ajax.reload();
-            toastr.success(response);
+            toastr.success(response.message);
             
         } catch (error) {
             console.log(error, error.response);

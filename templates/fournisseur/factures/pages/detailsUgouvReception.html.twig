@@ -1,0 +1,37 @@
+
+<div class="row">
+	<div class="col-12">
+		<label>Réception:</label>
+
+		<table id="datatables_reception" style="width: 100% !important" class="table table-condensed table-bordered">
+			<thead>
+				<tr>
+					<th width="">Code réception</th>
+					<th>Date</th>
+					<th>RéfDocAss</th>
+					<th width="10%"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for r in reception %}
+					<tr id="{{r.id}}">
+						<td>{{r.code}}</td>
+						<td>{{r.datelivraison}}</td>
+						<td>{{r.refDocAsso}}</td>
+						<td>
+							<a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+								<i class="fa fa-ellipsis-v" style="color: #000;"></i>
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" style="width: 8rem !important; min-width:unset !important; font-size : 12px !important;">
+								<a data-value="local" id="receptionDet" class="btnDet dropdown-item btn-xs">
+									<i class="fas fa-eye mr-2"></i>
+									Détails</a>
+							</th>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+</div>
