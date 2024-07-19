@@ -21,9 +21,16 @@
 		<nav class="mt-2">
 			<ul
 				class="nav nav-pills nav-sidebar flex-column nav-flat nav-compact" data-widget="treeview" role="menu" data-accordion="false">
-
-				{# for administration #}
-				{% if is_granted('ROLE_ADMIN') %}
+				{% if 'app_admin_syncronize' in app.request.get('_route') %}
+					<li class="nav-item">
+						<a href="{{path('app_admin_syncronize')}}" class="nav-link {% if 'app_admin_syncronize' in app.request.get('_route') %}active{% endif %}">
+							<i class="nav-icon fas fa-wrench"></i>
+							<p>
+								Synchronisation
+							</p>
+						</a>
+					</li>
+				{% elseif  is_granted('ROLE_ADMIN') %}
 					<li class="nav-item menu-is-opening menu-open">
 						<a href="#" class="nav-link">
 							<i class="nav-icon fas fa-users-cog"></i>
