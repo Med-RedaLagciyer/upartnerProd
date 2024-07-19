@@ -30,6 +30,7 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/fournisseur, roles: ROLE_FRS }
+        - { path: ^/syncronize, roles: PUBLIC_ACCESS }
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 

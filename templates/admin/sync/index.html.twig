@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Synchronisation
+{% endblock %}
+
+{% block body %}
+	<div class="page-header d-print-none" style="margin-bottom: 20px;">
+		<div class="container-xl" style="min-width: 100%;margin:auto 0px;">
+			<div class="row g-2 align-items-center">
+				<div
+					class="col-md-6">
+					<!-- Page pre-title -->
+					<div class="page-pretitle">
+						Paramétrage
+					</div>
+					<h2 class="page-title">
+						Synchronisation
+					</h2>
+				</div>
+				<!-- Page title actions -->
+				<div class="col-md-6 ms-auto d-print-none">
+					<div class="btn-list" style="float: right;">
+						<button id="syncAll" class="btn btn-primary" href="">
+							<i class="fa-solid fa-rotate"></i>&nbsp;Synchroniser</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-12">
+		<div class="row row-cards" id="syncContainer"></div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+	{{parent()}}
+	<script src="{{asset('dist/js/components/admin/sync.js')}}"></script>
+{% endblock %}
